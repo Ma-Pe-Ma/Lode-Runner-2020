@@ -21,7 +21,7 @@ In the root folder there is a simple txt configuration file in which you can cha
 - enemies "wear" different suits when they carry gold
 - level timer at top of the screen
 
- The levels are ripped from the original Apple II version. The NES port has only 50 levels and this remake includes the missing 100 levels too. Note: The levels ported to the NES are not 100% identical to the original ones, as some rows or columns are missing in the ported levels. If you have the proper NES levelset I will happily include it.
+The levels are ripped from the original Apple II version. The NES port has only 50 levels and this remake includes the missing 100 levels too. Note: The levels ported to the NES are not 100% identical to the original ones, as some rows or columns are missing in the ported levels. If you have the proper NES levelset I will happily include it.
 
 A conspicious difference about the collision detection: in the original when there are 3 guards circling around a ladder, they do not stop, while in this version they do, but this does not effect the gameplay much, I think...)
 
@@ -76,10 +76,9 @@ The game uses XInput API for controller handling.
 	alt + enter  	-   		    change window mode (full or windowed)
 	esc  			-	    	    close application
 
-## Download Links
+## Downloading built versions
 
-Basic version
-Video recording version
+Check out the repository's Builds folder!
 
 Just simply unpack the 7z archive and launch the Lode Runner.exe.
 

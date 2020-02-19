@@ -105,9 +105,9 @@ int main(int argc, char**argv) {
 		exit(0);
 	}
 
-	glfwSetErrorCallback(errorCallback);
-
 	glfwInit();
+
+	glfwSetErrorCallback(errorCallback);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -115,8 +115,9 @@ int main(int argc, char**argv) {
 	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LODE RUNNER 2019 - Margitai Peter", NULL, NULL);	
-	glfwSetWindowPos(window, 10, 10);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LODE RUNNER 2020 - Margitai Peter", NULL, NULL);	
+	glfwSetWindowPosCallback(window, window_pos_callback);
+	glfwSetWindowPos(window, windowPosX, windowPosY);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -308,7 +309,7 @@ int main(int argc, char**argv) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Writeing gametime
+		//Writing gametime
 		if (menu == L04 || menu == C04 || menu == L06 || menu == C06) {
 			std::string timeValue = std::to_string(gameTime);
 			timeValue = timeValue.substr(0,timeValue.length()-5);

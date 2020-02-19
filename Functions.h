@@ -97,7 +97,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
 }
 
+void window_pos_callback(GLFWwindow* window, int xpos, int ypos) {
 
+	if (!fullScreen) {
+
+		windowPosX = xpos;
+		windowPosY = ypos;
+	}
+}
 
 //Taking Screenshot
 void screenCapture() {
@@ -351,7 +358,7 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	speed = seb * deltaTime;
+	speed = speedFactor * deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5)
 		leftButton.detect(1);
@@ -588,20 +595,25 @@ int RtAudioVorbis(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 void FullscreenSwitch() {
 	
 	if (!fullScreen) {
+		
+		fullScreen = !fullScreen;
+
+		former_SCR_HEIGHT = SCR_HEIGHT;
+		former_SCR_WIDTH = SCR_WIDTH;
 
 		const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		
+
 		glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	
+		
 	}
 	else {	
 
-		glfwSetWindowMonitor(window, NULL, 0, 0, SCR_WIDTH, SCR_HEIGHT, 0);
-		glfwSetWindowPos(window, 100, 100);
-	}
+		glfwSetWindowMonitor(window, NULL, 0, 0, former_SCR_WIDTH, former_SCR_HEIGHT, 0);
+		glfwSetWindowPos(window, windowPosX, windowPosY);
 
-	fullScreen = !fullScreen;
+		fullScreen = !fullScreen;
+	}
 
 	glfwMakeContextCurrent(window);
 }

@@ -173,12 +173,8 @@ void Enemy::Initialize(int i, Vector2D PosIn) {
 
 	TextureRef = 12;
 
-	charSpeed = enemySpeed * speed;
-
-	if (i == 0) {
-		charSpeed = playerSpeed * speed;
+	if (i == 0)
 		TextureRef = 48;
-	}
 
 	carriedGold = nullptr;
 
@@ -186,6 +182,12 @@ void Enemy::Initialize(int i, Vector2D PosIn) {
 }
 
 void Enemy::Move() {
+
+	charSpeed = enemySpeed * speed;
+
+	if(index == 0)
+		charSpeed = playerSpeed *speed;
+
 	if (index == 0 && state == freeRun) {
 
 		if (leftDigButton.impulse())
@@ -803,8 +805,6 @@ void Enemy::FreeRun() {
 		if (index == 0)
 			Audio::SFX[17].PlayPause();
 
-		//rud_indul = true;
-		//fkezd = Pos.y;
 		Pos.x = curX;
 		dPos.x = 0;
 		dPos.y = 0;
@@ -998,12 +998,7 @@ void Enemy::Falling() {
 	dPos.x = 0;
 	dPos.y = -charSpeed;
 
-	//már nem a kezdõ rúdnál van
-	//if (Pos.y + dPos.y < fkezd - 1)
-		//rud_indul = false;
-
-	//beleesés a gödörbe zuhanásból
-
+	//falling into pit from falling
 	int curX = int(Pos.x + 0.5);
 	int nextY = int(Pos.y + dPos.y);
 
@@ -1367,6 +1362,12 @@ void Enemy::Pitting() {
 
 void Enemy::Animation() {
 
+	charSpeed = enemySpeed * speed;
+
+	if (index == 0)
+		charSpeed = playerSpeed * speed;
+
+
 	//determining the direction of the character for animation (and pitting too)
 	if (state != falling) {
 		if (prevPos.x - Pos.x > 0)
@@ -1413,6 +1414,9 @@ void Enemy::Animation() {
 		}		
 	}
 
+	//factor to slow or fasten animationSpeed
+	int animationFactor = 20;
+
 	//dying
 	if (state == dying) {
 		if (index == 0)
@@ -1438,9 +1442,9 @@ void Enemy::Animation() {
 
 			//std::cout << "\n falling: " << index;
 
-			int factor = 32 * charSpeed / speed;
+			int factor = animationFactor * charSpeed / speed;
 
-			int timeFactor = int(factor*gameTime) % 4;
+			int timeFactor = int(factor * gameTime) % 4;
 			int enemyRef = 16;
 
 			if (index == 0)
@@ -1452,8 +1456,8 @@ void Enemy::Animation() {
 	//going animation
 	if(Pos.x - prevPos.x != 0 && (state == freeRun || pitState == climbing) && (middle == empty || middle == ladder || middle == trapDoor)) {
 		
-		int factor = 32 * charSpeed / speed;
-		int timeFactor = int(factor*gameTime) % 4;
+		int factor = animationFactor * charSpeed / speed;
+		int timeFactor = int(factor * gameTime) % 4;
 
 		int enemyRef = 12;
 		if (index == 0)
@@ -1475,7 +1479,7 @@ void Enemy::Animation() {
 	//on ladder, or coming out from pit
 	if ((Pos.y - prevPos.y != 0 && (state == freeRun && (middle == ladder || downBlock == ladder))) || (Pos.y - prevPos.y > 0 && Pos.x - prevPos.x == 0 && (pitState == climbing || pitState == moving)  )) {
 
-		int factor = 32 * charSpeed / speed;
+		int factor = animationFactor * charSpeed / speed;
 
 		int timeFactor = int(factor * gameTime) % 4;
 		int enemyRef = 0;
@@ -1494,7 +1498,7 @@ void Enemy::Animation() {
 	//on pole
 	if (state == freeRun && middle == pole && (Pos.x - prevPos.x != 0 || Pos.y - prevPos.y != 0) && curY == Pos.y) {
 		
-		int factor = 32 * charSpeed / speed;
+		int factor = animationFactor * charSpeed / speed;
 		int timeFactor = int(factor * gameTime) % 4;
 
 		int enemyRef = 4;
@@ -1528,13 +1532,15 @@ int Enemy::PathFinding() {
 	//enemies are in .act and not in base!
 	//if a hole is created then the value of brick in act is emptied, but in the base it is unchanged!
 
+	charSpeed = enemySpeed * speed;
+
 	int x = int(Pos.x + 0.5);
 	int y = int(Pos.y + 0.5);
 
 	int runnerX = int(enemies[0].Pos.x + 0.5);
 	int runnerY = int(enemies[0].Pos.y + 0.5);
 
-	//while f
+	//while
 	if (y == runnerY && enemies[0].state != falling) {
 		while (x != runnerX) {
 			layoutBlock checkable = layout[x][y];
@@ -1557,16 +1563,16 @@ int Enemy::PathFinding() {
 				break;						 // exit loop with closest x if no path to runner
 		}
 
-		// scan for a path ignoring walls is a success
+		//scan for a path ignoring walls is a success
 		if (x == runnerX) {
 			if (Pos.x < runnerX) {
 				
-				dPos.x = speed * enemySpeed;
+				dPos.x = charSpeed;
 				dPos.y = 0;
 			}
 			else if (Pos.x > runnerX) {
 				
-				dPos.x = -speed * enemySpeed;
+				dPos.x = -charSpeed;
 				dPos.y = 0;
 			}
 			else {

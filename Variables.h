@@ -17,6 +17,12 @@ char pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
 unsigned int SCR_WIDTH = 1500;
 unsigned int SCR_HEIGHT = 900;
 
+unsigned int former_SCR_WIDTH = 1500;
+unsigned int former_SCR_HEIGHT = 900;
+
+unsigned int windowPosX = 30;
+unsigned int windowPosY = 30;
+
 unsigned int viewPortWidth = SCR_WIDTH;
 unsigned int viewPortHeight = SCR_HEIGHT;
 
@@ -70,7 +76,7 @@ float startingTimer;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 float speed;
-float seb = 5;
+float speedFactor = 5;
 
 float diggingTime = 7.15f;
 float holeIdle = 2.2f;

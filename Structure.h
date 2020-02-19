@@ -453,11 +453,12 @@ void gameScreen(float currentFrame) {
 	}
 
 	//enemy pathfinding
-	if (enemies[0].state != dying)
-		for (int i = 1; i < Enemy::enemyNr; i++) {
-			if (enemies[i].state != dying)
-				enemies[i].PathFinding();
-		}
+	if (!startingScreen)
+		if (enemies[0].state != dying)
+			for (int i = 1; i < Enemy::enemyNr; i++) {
+				if (enemies[i].state != dying)
+					enemies[i].PathFinding();
+			}
 	
 	//check if runner dies by enemy
 	if(enemies[0].state != dying && enemies[0].state != falling)
@@ -504,12 +505,12 @@ void gameScreen(float currentFrame) {
 	if (!startingScreen)
 		for (int i = 0; i < Enemy::enemyNr; i++)
 			if (enemies[0].state != dying) {
-				
+
 				enemies[i].Move();
-				
+
 				enemies[i].Pos.x += enemies[i].dPos.x;
 				enemies[i].Pos.y += enemies[i].dPos.y;
-				
+
 				enemies[i].dPos.x = 0;
 				enemies[i].dPos.y = 0;
 
@@ -539,7 +540,7 @@ void gameScreen(float currentFrame) {
 							enemies[i].carriedGold->Pos = { (float)prevX, (float)prevY };
 							enemies[i].goldVariable = -1;
 							enemies[i].carriedGold = nullptr;
-						}	
+						}
 				}
 			}
 
