@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 
 #include <iostream>
 #include <fstream>
@@ -8,13 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <SHADER/shader_m.h>
 
-#define	 STB_IMAGE_IMPLEMENTATION
-#define  STB_IMAGE_WRITE_IMPLEMENTATION
-#include <STB/stb_image.h>
-#include <STB/stb_image_write.h>
-
-#include <vorbis/vorbisfile.h>
-#include <vorbis/codec.h>
 #include <RtAudio/RtAudio.h>
 
 #define RELEASE_VERSION
@@ -27,17 +21,12 @@
 //default pix_fmt
 #define STREAM_PIX_FMT AV_PIX_FMT_YUV420P
 
-
 #ifdef VIDEO_RECORDING
 #include "MultiMediaRecording.h"
 #endif
 
-#include "AudioPlayback.h"
-#include "Button.h"
 #include "Variables.h"
-#include "Player.h"
 #include "Functions.h"
-#include "Level.h"
 #include "Structure.h"
 
 #include <cstdio>
@@ -45,7 +34,7 @@
 #include <thread>
 
 int main(int argc, char**argv) {
-
+	
 	HWND hWnd = GetConsoleWindow();
 	ShowWindow(hWnd, SW_HIDE);
 
@@ -66,7 +55,6 @@ int main(int argc, char**argv) {
 
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
-
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
 
 			levelFileName = "level/lodeRunner.champLevel.txt";
@@ -143,8 +131,7 @@ int main(int argc, char**argv) {
 
 	GLFWimage icon;
 	int iconNrComp;
-	icon.pixels = stbi_load("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
-
+	icon.pixels = getRawCharArrayWithSTBI("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
 	glfwSetWindowIcon(window, 1, &icon);
 
 	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
@@ -286,7 +273,7 @@ int main(int argc, char**argv) {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
 
 	std::chrono::system_clock::time_point prevFrameStart = std::chrono::system_clock::now();
-
+	
 	while (!glfwWindowShouldClose(window)) {
 
 		std::chrono::duration<double, std::milli> work_time = std::chrono::system_clock::now() - prevFrameStart;
@@ -323,7 +310,7 @@ int main(int argc, char**argv) {
 
 		processInput(window);
 
-		if (lAlt.continous() && enter.Simple())
+		if (lAlt.continous() && enter.simple())
 			FullscreenSwitch();
 
 		switch (menu) {
@@ -396,7 +383,7 @@ int main(int argc, char**argv) {
 		}
 
 		//take a screenshot
-		if (pButton.Simple())
+		if (pButton.simple())
 			screenCapture();
 
 #ifdef VIDEO_RECORDING

@@ -1,9 +1,10 @@
+#include "Structure.h"
 
 void mainMenu(float currentFrame) {
 	//main menu music cyclically playing!
-	if (Audio::SFX[5].GetPlayStatus() == stopped)		
+	if (Audio::SFX[5].GetPlayStatus() == stopped)
 		Audio::SFX[5].PlayPause();
-			
+
 	//Drawing main menu
 	if (championShip)
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -20,7 +21,6 @@ void mainMenu(float currentFrame) {
 
 	//drawing cursor
 	if (!championShip) {
-
 		glBindVertexArray(cursorVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
 		float cursorY = (1.0f - 2 * menuCursor) / 14;
@@ -34,11 +34,11 @@ void mainMenu(float currentFrame) {
 	}
 
 	//changing gamemode
-	if (space.Simple() || down.Simple())
+	if (space.simple() || down.simple())
 		if (++menuCursor == 3)
 			menuCursor = 0;
 
-	if (up.Simple())
+	if (up.simple())
 		if (--menuCursor == -1)
 			menuCursor = 2;
 
@@ -46,62 +46,62 @@ void mainMenu(float currentFrame) {
 		menuCursor = 0;
 
 	//choosing selected gamemode
-	if (enter.Simple()) {
-		
+	if (enter.simple()) {
+
 		Audio::SFX[5].StopAndRewind();
 
 		switch (menuCursor) {
-		
+
 			//single player
-			case 0:
-				Audio::SFX[8].PlayPause();
-				introTimer = currentFrame;
-				menu = L02;
-				break;
+		case 0:
+			Audio::SFX[8].PlayPause();
+			introTimer = currentFrame;
+			menu = L02;
+			break;
 
 			//multiplayer
-			case 1:
-				Audio::SFX[8].PlayPause();
-				menu = L02;
-				introTimer = currentFrame;
-				break;
+		case 1:
+			Audio::SFX[8].PlayPause();
+			menu = L02;
+			introTimer = currentFrame;
+			break;
 
 			//level generator
-			case 2:
+		case 2:
 
-				menu = L08;
+			menu = L08;
 
-				geX = 1;
-				geY = 16;
+			geX = 1;
+			geY = 16;
 
-				for (int i = 0; i < 30; i++)
-					for (int j = 0; j < 17; j++) {
-						if (j == 0)
-							gen[i][j] = 2;
-						else if (i == 0 || i == 29)
-							gen[i][j] = 2;
-						else
-							gen[i][j] = 0;
-					}
-				break;
-			}
+			for (int i = 0; i < 30; i++)
+				for (int j = 0; j < 17; j++) {
+					if (j == 0)
+						gen[i][j] = 2;
+					else if (i == 0 || i == 29)
+						gen[i][j] = 2;
+					else
+						gen[i][j] = 0;
+				}
+			break;
+		}
 	}
 }
 
 void introScreen(float currentFrame) {
-	
+
 	if (Audio::SFX[8].GetPlayStatus() == playing) {
-	
-		if (space.Simple()) {
+
+		if (space.simple()) {
 			menu = L03;
 			Audio::SFX[8].StopAndRewind();
 		}
 
-		if (enter.Simple())
+		if (enter.simple())
 			Audio::SFX[8].StopAndRewind();
 
 		std::string number = "00" + std::to_string(level[playerNr]);
-		
+
 		if (level[playerNr] > 9)
 			number = '0' + std::to_string(level[playerNr]);
 
@@ -153,26 +153,26 @@ void introScreen(float currentFrame) {
 
 		for (int i = 0; i < Enemy::enemyNr; i++) {
 
-			layoutBlock blockUnder = layout[int(enemies[i].Pos.x)][int(enemies[i].Pos.y + 0.5) - 1];
+			LayoutBlock blockUnder = layout[int(Enemy::enemies[i].Pos.x)][int(Enemy::enemies[i].Pos.y + 0.5) - 1];
 
-			if ((blockUnder == empty || blockUnder == trapDoor || blockUnder == pole) && !Enemy::EnemyCheckerGlobal(enemies[i].Pos.x, enemies[i].Pos.y - 1)) {
+			if ((blockUnder == empty || blockUnder == trapDoor || blockUnder == pole) && !Enemy::EnemyCheckerGlobal(Enemy::enemies[i].Pos.x, Enemy::enemies[i].Pos.y - 1)) {
 
-				enemies[i].state = falling;
-				if(i==0)
-					enemies[i].TextureRef = 52;
-				else
-					enemies[i].TextureRef = 16;
-			}
-				
-			else {
-				enemies[i].state = freeRun;
-				
+				Enemy::enemies[i].state = falling;
 				if (i == 0)
-					enemies[i].TextureRef = 48;
+					Enemy::enemies[i].TextureRef = 52;
 				else
-					enemies[i].TextureRef = 12;
+					Enemy::enemies[i].TextureRef = 16;
 			}
-				
+
+			else {
+				Enemy::enemies[i].state = freeRun;
+
+				if (i == 0)
+					Enemy::enemies[i].TextureRef = 48;
+				else
+					Enemy::enemies[i].TextureRef = 12;
+			}
+
 		}
 
 		playerShader->setBool("direction", true);
@@ -183,30 +183,26 @@ void introScreen(float currentFrame) {
 }
 
 void selectScreen(float currentFrame) {
-	
-	if (leftButton.Simple()) {
 
+	if (leftButton.simple()) {
 		level[playerNr]--;
 		Audio::SFX[16].StopAndRewind();
 		Audio::SFX[16].PlayPause();
 	}
 
-	if (rightButton.Simple()) {
-
+	if (rightButton.simple()) {
 		level[playerNr]++;
 		Audio::SFX[16].StopAndRewind();
 		Audio::SFX[16].PlayPause();
 	}
 
-	if (up.Simple()) {
-
+	if (up.simple()) {
 		level[playerNr] += 10;
 		Audio::SFX[16].StopAndRewind();
 		Audio::SFX[16].PlayPause();
 	}
 
-	if (down.Simple()) {
-
+	if (down.simple()) {
 		level[playerNr] -= 10;
 		Audio::SFX[16].StopAndRewind();
 		Audio::SFX[16].PlayPause();
@@ -227,12 +223,12 @@ void selectScreen(float currentFrame) {
 
 		if (level[playerNr] > 150)
 			level[playerNr] = level[playerNr] % 10;
-		
+
 		if (level[playerNr] < 1)
 			level[playerNr] = 150 + level[playerNr];
 	}
 
-	if (enter.Simple()) {
+	if (enter.simple()) {
 		menu = L02;
 		introTimer = currentFrame;
 		Audio::SFX[8].StopAndRewind();
@@ -255,9 +251,8 @@ void selectScreen(float currentFrame) {
 }
 
 void gameScreen(float currentFrame) {
-
 	//play gamplay music cyclically
-	if (Audio::SFX[7].GetPlayStatus() != playing && enemies[0].state != dying)
+	if (Audio::SFX[7].GetPlayStatus() != playing && Enemy::enemies[0].state != dying)
 		Audio::SFX[7].PlayPause();
 
 	bool takePauseScreenshot = false;
@@ -265,12 +260,12 @@ void gameScreen(float currentFrame) {
 	gameTime = prevSessionSum + (currentFrame - curSessionStartTime);
 
 	//pause
-	if (enter.Simple() && enemies[0].state != dying) {
+	if (enter.simple() && Enemy::enemies[0].state != dying) {
 
 		takePauseScreenshot = true;
 
 		menu = L06;
-		
+
 		Audio::SFX[7].PlayPause();
 
 		if (Audio::SFX[4].GetPlayStatus() == playing)
@@ -289,7 +284,7 @@ void gameScreen(float currentFrame) {
 
 	//if every gold is collected draw the ladders which are needed to finish the level
 	if (Gold::remainingGoldCount == 0) {
-		
+
 		Audio::SFX[4].PlayPause();
 		highestLadder = 0;
 
@@ -300,7 +295,7 @@ void gameScreen(float currentFrame) {
 
 		Gold::remainingGoldCount = -1;
 	}
-	
+
 	//drawing level, digging and rebuilding brick, death by rebuilt brick
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 18; j++) {
@@ -311,15 +306,15 @@ void gameScreen(float currentFrame) {
 			else if (holeTimer[i][j] > 0);
 			//animating flashing ladder
 			else if (layout[i][j] == ladder) {
-				int timeFactor= int(gameTime) % 4;
+				int timeFactor = int(gameTime) % 4;
 				if (timeFactor == 3)
 					timeFactor = 1;
-					DrawLevel(i, j, 12 + timeFactor, 0);
+				DrawLevel(i, j, 12 + timeFactor, 0);
 			}
 			//draw every other item simply
 			else if (layout[i][j] == brick)
 				DrawLevel(i, j, 0, 0);
-			else if(layout[i][j] == trapDoor)
+			else if (layout[i][j] == trapDoor)
 				DrawLevel(i, j, 0, holeTimer[i][j]);
 			else if (layout[i][j] == concrete)
 				DrawLevel(i, j, 6, 0);
@@ -338,22 +333,22 @@ void gameScreen(float currentFrame) {
 				int debris = 19 + randomDebris * 6;
 
 				if (!(layout[i][j + 1] == brick || layout[i][j + 1] == concrete || Enemy::EnemyCheckerGlobal(i, j + 1)))
-					DrawLevel(i, j + 1, debris + timeFactor, 0);				
-				
+					DrawLevel(i, j + 1, debris + timeFactor, 0);
+
 				if (timeFactor == 4)
 					layout[i][j] = empty;
 
 				//digging is prevented if enemy is close to the brick
 				for (int l = 1; l < Enemy::enemyNr; l++) {
-					if (abs(enemies[l].Pos.x - i) <= 0.75 && enemies[l].Pos.y >= j + 1 && enemies[l].Pos.y < j + 1.5) {
-						
+					if (abs(Enemy::enemies[l].Pos.x - i) <= 0.75 && Enemy::enemies[l].Pos.y >= j + 1 && Enemy::enemies[l].Pos.y < j + 1.5) {
+
 						Audio::SFX[2].PlayPause();
 						Audio::SFX[1].StopAndRewind();
-						
+
 						holeTimer[i][j] = 0;
 						layout[i][j] = brick;
 						digTime = gameTime - 2;
-						enemies[0].state = freeRun;
+						Enemy::enemies[0].state = freeRun;
 						left_pit = false;
 						right_pit = false;
 					}
@@ -363,7 +358,7 @@ void gameScreen(float currentFrame) {
 			//rebuilding brick
 			if (holeTimer[i][j] + diggingTime - buildTime < gameTime && gameTime < holeTimer[i][j] + diggingTime && holeTimer[i][j] > 0) {
 				int timeFactor = int(5 * (gameTime - diggingTime + buildTime - holeTimer[i][j]) / buildTime) % 5;
-				DrawLevel(i, j, 11 - timeFactor,0);
+				DrawLevel(i, j, 11 - timeFactor, 0);
 			}
 
 			//brick is rebuilt
@@ -375,10 +370,10 @@ void gameScreen(float currentFrame) {
 				DrawLevel(i, j, 0, 0);
 
 				//brick rebuilt player dies
-				if (abs(enemies[0].Pos.x - i) < 0.5 && int(enemies[0].Pos.y + 0.5) == j && enemies[0].state != dying) {
+				if (abs(Enemy::enemies[0].Pos.x - i) < 0.5 && int(Enemy::enemies[0].Pos.y + 0.5) == j && Enemy::enemies[0].state != dying) {
 
-					enemies[0].state = dying;
-					enemies[0].dieTimer = currentFrame;
+					Enemy::enemies[0].state = dying;
+					Enemy::enemies[0].dieTimer = currentFrame;
 					Audio::SFX[17].StopAndRewind();
 					Audio::SFX[7].StopAndRewind();
 					Audio::SFX[3].PlayPause();
@@ -386,7 +381,7 @@ void gameScreen(float currentFrame) {
 
 				/*//useless condition as enemies can't drop gold at hole which they entered from side!
 				if (int checkGold = Enemy::GoldChecker(i, j) != -1) {
-					
+
 					gold[checkGold].Pos.x = -2;
 					gold[checkGold].Pos.y = -2;
 					Gold::remainingGoldCount--;
@@ -394,79 +389,79 @@ void gameScreen(float currentFrame) {
 
 				//brick rebuilt but enemy got into the brick from the side
 				for (int m = 1; m < Enemy::enemyNr; m++)
-					if (abs(enemies[m].Pos.x - i) < 0.5 && abs(enemies[m].Pos.y - j) < 0.5 && enemies[m].state != pitting) {
+					if (abs(Enemy::enemies[m].Pos.x - i) < 0.5 && abs(Enemy::enemies[m].Pos.y - j) < 0.5 && Enemy::enemies[m].state != pitting) {
 
 						score_enemy += 300;
 
-						if (enemies[m].goldVariable >= 0) {
+						if (Enemy::enemies[m].goldVariable >= 0) {
 
-							enemies[m].carriedGold->Pos = { -2, -2 };
-							enemies[m].goldVariable = -1;
-							enemies[m].carriedGold = nullptr;
+							Enemy::enemies[m].carriedGold->Pos = { -2, -2 };
+							Enemy::enemies[m].goldVariable = -1;
+							Enemy::enemies[m].carriedGold = nullptr;
 
 							Gold::remainingGoldCount--;
 						}
 
-						enemies[m].pitState = out;
-						enemies[m].state = dying;
+						Enemy::enemies[m].pitState = out;
+						Enemy::enemies[m].state = dying;
 
-						enemies[m].Pos.x = -1;
-						enemies[m].Pos.y = -1;
+						Enemy::enemies[m].Pos.x = -1;
+						Enemy::enemies[m].Pos.y = -1;
 
-						enemies[m].dPos.x = 0;
-						enemies[m].dPos.y = 0;
+						Enemy::enemies[m].dPos.x = 0;
+						Enemy::enemies[m].dPos.y = 0;
 
-						enemies[m].holePos.x = -1;
-						enemies[m].holePos.y = -1;					
+						Enemy::enemies[m].holePos.x = -1;
+						Enemy::enemies[m].holePos.y = -1;
 					}
 			}
 		}
 
 	//Gold detection
 	for (int i = 0; i < Enemy::enemyNr; i++) {
-		int checkGold = Enemy::GoldChecker(enemies[i].Pos.x, enemies[i].Pos.y);
+		int checkGold = Enemy::GoldChecker(Enemy::enemies[i].Pos.x, Enemy::enemies[i].Pos.y);
 		if (checkGold >= 0) {
 
 			if (i == 0) {
 				if (Audio::SFX[0].GetPlayStatus() == playing)
 					Audio::SFX[0].StopAndRewind();
-					
+
 				Audio::SFX[0].PlayPause();
 
 				score_gold += 200;
-				gold[checkGold].Pos.x = -2;
-				gold[checkGold].Pos.y = -2;
+				Gold::gold[checkGold].Pos.x = -2;
+				Gold::gold[checkGold].Pos.y = -2;
 				Gold::remainingGoldCount--;
 			}
 			else {
-				if (enemies[i].carriedGold == nullptr) {
+				if (Enemy::enemies[i].carriedGold == nullptr) {
 
-					enemies[i].carriedGold = &gold[checkGold];
+					Enemy::enemies[i].carriedGold = &Gold::gold[checkGold];
 
-					gold[checkGold].Pos.x = -1;
-					gold[checkGold].Pos.y = -2;
+					Gold::gold[checkGold].Pos.x = -1;
+					Gold::gold[checkGold].Pos.y = -2;
 
-					enemies[i].goldVariable = rand() % 26 + 14;
+					Enemy::enemies[i].goldVariable = rand() % 26 + 14;
 				}
-			}	
+			}
 		}
 	}
 
 	//enemy pathfinding
 	if (!startingScreen)
-		if (enemies[0].state != dying)
+		if (Enemy::enemies[0].state != dying)
 			for (int i = 1; i < Enemy::enemyNr; i++) {
-				if (enemies[i].state != dying)
-					enemies[i].PathFinding();
+				if (Enemy::enemies[i].state != dying)
+					Enemy::enemies[i].PathFinding();
 			}
-	
+
 	//check if runner dies by enemy
-	if(enemies[0].state != dying && enemies[0].state != falling)
+	if (Enemy::enemies[0].state != dying && Enemy::enemies[0].state != falling)
 		for (int i = 1; i < Enemy::enemyNr; i++) {
-			if (abs(enemies[i].Pos.x - enemies[0].Pos.x) < 0.5 && abs(enemies[i].Pos.y - enemies[0].Pos.y) < 0.5) {
-				
-				enemies[0].state = dying;
-				enemies[0].dieTimer = currentFrame;
+			if (abs(Enemy::enemies[i].Pos.x - Enemy::enemies[0].Pos.x) < 0.5 && abs(Enemy::enemies[i].Pos.y - Enemy::enemies[0].Pos.y) < 0.5) {
+
+				Enemy::enemies[0].state = dying;
+				Enemy::enemies[0].dieTimer = currentFrame;
 
 				Audio::SFX[3].PlayPause();
 				Audio::SFX[7].StopAndRewind();
@@ -476,86 +471,86 @@ void gameScreen(float currentFrame) {
 
 	//Gold drawing
 	for (int i = 0; i < Gold::goldNr; i++)
-		if (gold[i].Pos.x > 0) {
-			
+		if (Gold::gold[i].Pos.x > 0) {
+
 			int timeFactor = int(gameTime) % 4;
 
 			if (timeFactor == 3)
 				timeFactor = 1;
 
-			DrawLevel(gold[i].Pos.x, gold[i].Pos.y, 36 + timeFactor, 0);
+			DrawLevel(Gold::gold[i].Pos.x, Gold::gold[i].Pos.y, 36 + timeFactor, 0);
 		}
 
 	//player input
 	if (rightButton.continous() && leftButton.continous())
-		enemies[0].dPos.x = 0;
+		Enemy::enemies[0].dPos.x = 0;
 	else if (rightButton.continous())
-		enemies[0].dPos.x = playerSpeed * speed;
+		Enemy::enemies[0].dPos.x = playerSpeed * speed;
 	else if (leftButton.continous())
-		enemies[0].dPos.x = -playerSpeed * speed;
+		Enemy::enemies[0].dPos.x = -playerSpeed * speed;
 
 	if (up.continous() && down.continous())
-		enemies[0].dPos.y = 0;
+		Enemy::enemies[0].dPos.y = 0;
 	else if (up.continous())
-		enemies[0].dPos.y = playerSpeed * speed;
+		Enemy::enemies[0].dPos.y = playerSpeed * speed;
 	else if (down.continous())
-		enemies[0].dPos.y = -playerSpeed * speed;
-	
+		Enemy::enemies[0].dPos.y = -playerSpeed * speed;
+
 	//moving runner and enemies by the input
 	if (!startingScreen)
 		for (int i = 0; i < Enemy::enemyNr; i++)
-			if (enemies[0].state != dying) {
+			if (Enemy::enemies[0].state != dying) {
 
-				enemies[i].Move();
+				Enemy::enemies[i].Move();
 
-				enemies[i].Pos.x += enemies[i].dPos.x;
-				enemies[i].Pos.y += enemies[i].dPos.y;
+				Enemy::enemies[i].Pos.x += Enemy::enemies[i].dPos.x;
+				Enemy::enemies[i].Pos.y += Enemy::enemies[i].dPos.y;
 
-				enemies[i].dPos.x = 0;
-				enemies[i].dPos.y = 0;
+				Enemy::enemies[i].dPos.x = 0;
+				Enemy::enemies[i].dPos.y = 0;
 
 				//dropping gold
 				if (i != 0) {
 
 					//Determining when to drop gold
-					int curX = int(enemies[i].Pos.x + 0.5);
-					int curY = int(enemies[i].Pos.y + 0.5);
+					int curX = int(Enemy::enemies[i].Pos.x + 0.5);
+					int curY = int(Enemy::enemies[i].Pos.y + 0.5);
 
-					int prevX = int(enemies[i].prevPos.x + 0.5);
-					int prevY = int(enemies[i].prevPos.y + 0.5);
+					int prevX = int(Enemy::enemies[i].prevPos.x + 0.5);
+					int prevY = int(Enemy::enemies[i].prevPos.y + 0.5);
 
-					if (enemies[i].goldVariable > 0)
+					if (Enemy::enemies[i].goldVariable > 0)
 						if (curX != prevX || curY != prevY)
-							enemies[i].goldVariable--;
+							Enemy::enemies[i].goldVariable--;
 
 					int checkGold = Enemy::GoldChecker(prevX, prevY);
 
-					layoutBlock prevBlock = layout[prevX][prevY];
-					layoutBlock prevBlockUnder = layout[prevX][prevY - 1];
+					LayoutBlock prevBlock = layout[prevX][prevY];
+					LayoutBlock prevBlockUnder = layout[prevX][prevY - 1];
 					float prevHole = holeTimer[prevX][prevY];
 
-					if (enemies[i].goldVariable == 0)
-						if (prevBlock == empty && prevHole == 0 && checkGold < 0 && (prevBlockUnder == brick || prevBlockUnder == concrete || prevBlockUnder == ladder) && enemies[i].state == freeRun && (prevX != curX || prevY != curY)) {
+					if (Enemy::enemies[i].goldVariable == 0)
+						if (prevBlock == empty && prevHole == 0 && checkGold < 0 && (prevBlockUnder == brick || prevBlockUnder == concrete || prevBlockUnder == ladder) && Enemy::enemies[i].state == freeRun && (prevX != curX || prevY != curY)) {
 
-							enemies[i].carriedGold->Pos = { (float)prevX, (float)prevY };
-							enemies[i].goldVariable = -1;
-							enemies[i].carriedGold = nullptr;
+							Enemy::enemies[i].carriedGold->Pos = { (float)prevX, (float)prevY };
+							Enemy::enemies[i].goldVariable = -1;
+							Enemy::enemies[i].carriedGold = nullptr;
 						}
 				}
 			}
 
 	//player dying
-	if (enemies[0].state == dying) {
+	if (Enemy::enemies[0].state == dying) {
 		if (Audio::SFX[3].GetPlayStatus() == playing) {
-			
+
 			Audio::SFX[17].StopAndRewind();
 			double deathLength = Audio::SFX[3].LengthInSec();
 
-			int timeFactor = int(9 * (currentFrame - enemies[0].dieTimer) / (deathLength + 0.01)) % 9;
+			int timeFactor = int(9 * (currentFrame - Enemy::enemies[0].dieTimer) / (deathLength + 0.01)) % 9;
 			if (timeFactor == 8)
 				timeFactor = 31;
 
-			enemies[0].TextureRef = 28 + timeFactor;
+			Enemy::enemies[0].TextureRef = 28 + timeFactor;
 		}
 		else {
 			Enemy::enemyNr = 1;
@@ -585,23 +580,23 @@ void gameScreen(float currentFrame) {
 
 	//animation of characters
 	for (int i = 0; i < Enemy::enemyNr; i++) {
-		if (enemies[0].state == dying && i != 0)
-			enemies[i].state = freeRun;
+		if (Enemy::enemies[0].state == dying && i != 0)
+			Enemy::enemies[i].state = freeRun;
 
-		if(!startingScreen)
-			enemies[i].Animation();
+		if (!startingScreen)
+			Enemy::enemies[i].Animation();
 
-		DrawEnemy(enemies[i].Pos.x, enemies[i].Pos.y, enemies[i].TextureRef, enemies[i].direction, enemies[i].carriedGold);
+		DrawEnemy(Enemy::enemies[i].Pos.x, Enemy::enemies[i].Pos.y, Enemy::enemies[i].TextureRef, Enemy::enemies[i].direction, Enemy::enemies[i].carriedGold);
 
-		enemies[i].dPrevPos.x = enemies[i].Pos.x - enemies[i].prevPos.x;
-		enemies[i].dPrevPos.y = enemies[i].Pos.y - enemies[i].prevPos.y;
+		Enemy::enemies[i].dPrevPos.x = Enemy::enemies[i].Pos.x - Enemy::enemies[i].prevPos.x;
+		Enemy::enemies[i].dPrevPos.y = Enemy::enemies[i].Pos.y - Enemy::enemies[i].prevPos.y;
 
-		enemies[i].prevPos.x = enemies[i].Pos.x;
-		enemies[i].prevPos.y = enemies[i].Pos.y;
+		Enemy::enemies[i].prevPos.x = Enemy::enemies[i].Pos.x;
+		Enemy::enemies[i].prevPos.y = Enemy::enemies[i].Pos.y;
 	}
 
 	//end of level, the top of level reached
-	if ((int(enemies[0].Pos.y + 0.5) >= highestLadder + 1 && Gold::remainingGoldCount == -1 && menuCursor < 2) || (menuCursor == 2 && int(enemies[0].Pos.y + 0.5) >= 17)) {
+	if ((int(Enemy::enemies[0].Pos.y + 0.5) >= highestLadder + 1 && Gold::remainingGoldCount == -1 && menuCursor < 2) || (menuCursor == 2 && int(Enemy::enemies[0].Pos.y + 0.5) >= 17)) {
 		menu = L05;
 		outroTimer = currentFrame;
 
@@ -612,13 +607,13 @@ void gameScreen(float currentFrame) {
 		if (playerLife[playerNr] < 9)
 			playerLife[playerNr]++;
 
-		enemies[0].Pos.y = 0;
+		Enemy::enemies[0].Pos.y = 0;
 	}
 
 	if (takePauseScreenshot) {
 		glActiveTexture(GL_TEXTURE4);
 
-		unsigned char *screenBuffer = new unsigned char[viewPortWidth * viewPortHeight * 3];
+		unsigned char* screenBuffer = new unsigned char[viewPortWidth * viewPortHeight * 3];
 
 		glReadPixels(viewPortX, viewPortY, viewPortWidth, viewPortHeight, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
 
@@ -636,22 +631,22 @@ void gameScreen(float currentFrame) {
 	}
 
 	if (startingScreen) {
-	
+
 		gameTime = 0;
 		curSessionStartTime = currentFrame;
 		prevSessionSum = 0;
 
 		if (currentFrame > startingTimer + 2) {
 
-			if (enemies[0].state == falling)
+			if (Enemy::enemies[0].state == falling)
 				Audio::SFX[17].PlayPause();
-			
+
 			startingScreen = false;
 		}
 	}
 
 	//levelselect with space
-	if (space.Simple() && enemies[0].state != dying) {
+	if (space.simple() && Enemy::enemies[0].state != dying) {
 
 		menu = L03;
 
@@ -668,13 +663,13 @@ void gameScreen(float currentFrame) {
 
 void pauseScreen(float currentFrame) {
 	if (Audio::SFX[14].GetPlayStatus() != playing) {
-		if (enter.Simple()) {
-			
+		if (enter.simple()) {
+
 			Audio::SFX[14].PlayPause();
 			menu = C06;
 		}
 
-		if (space.Simple()) {
+		if (space.simple()) {
 			if (menuCursor < 2)
 				menu = L03;
 			else
@@ -691,11 +686,11 @@ void pauseScreen(float currentFrame) {
 
 void pauseScreenOut(float currentFrame) {
 	if (Audio::SFX[14].GetPlayStatus() != playing) {
-		
+
 		//continue playing digging sound
 		if (Audio::SFX[1].GetPlayStatus() == paused)
 			Audio::SFX[1].PlayPause();
-		
+
 		//if unpaused continue playing the melody for collecting every gold
 		if (Audio::SFX[4].GetPlayStatus() == paused)
 			Audio::SFX[4].PlayPause();
@@ -703,12 +698,12 @@ void pauseScreenOut(float currentFrame) {
 		//if unpaused continue playing the SFX for the falling of player
 		if (Audio::SFX[17].GetPlayStatus() == paused)
 			Audio::SFX[17].PlayPause();
-		
+
 		menu = L04;
 
 		curSessionStartTime = currentFrame;
 	}
-	
+
 	glBindVertexArray(mainVAO);
 	mainShader->use();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -717,7 +712,7 @@ void pauseScreenOut(float currentFrame) {
 void outroScreen(float currentFrame) {
 	if (Audio::SFX[13].GetPlayStatus() == playing) {
 
-		if (enter.Simple())
+		if (enter.simple())
 			Audio::SFX[13].StopAndRewind();
 
 		std::string gold_points = std::to_string(score_gold) + " POINTS";
@@ -730,7 +725,7 @@ void outroScreen(float currentFrame) {
 
 		//draw enemy for score indicator
 		DrawEnemy(11, 9.5, 12, left, nullptr);
-		
+
 		//draw Gold for score indicator
 		int ido = int(2 * currentFrame) % 4;
 		if (ido == 3)
@@ -740,24 +735,24 @@ void outroScreen(float currentFrame) {
 
 		for (int i = 7; i < 13; i++)
 			for (int k = 0; k < 3; k++) {
-				
+
 				//drawing ladder
 				if (i == 9)
-					DrawLevel(i, k, 12 + ido,0);
+					DrawLevel(i, k, 12 + ido, 0);
 				//drawing bricks
 				if (k == 2)
-					DrawLevel(i, k, 0,0);
+					DrawLevel(i, k, 0, 0);
 			}
 
 		//runner climbs ladder
-		if (int(enemies[0].Pos.y + speed) != 3) {
-			
+		if (int(Enemy::enemies[0].Pos.y + speed) != 3) {
+
 			int timeFactor = ((currentFrame - outroTimer) * 4);
-			
-			enemies[0].Pos.y += speed * 0.1;
-			enemies[0].TextureRef = 36 + timeFactor % 4;
-			
-			DrawEnemy(9, enemies[0].Pos.y, enemies[0].TextureRef, left, nullptr);
+
+			Enemy::enemies[0].Pos.y += speed * 0.1;
+			Enemy::enemies[0].TextureRef = 36 + timeFactor % 4;
+
+			DrawEnemy(9, Enemy::enemies[0].Pos.y, Enemy::enemies[0].TextureRef, left, nullptr);
 		}
 		//nail bitting after reaching top of ladder
 		else {
@@ -766,7 +761,7 @@ void outroScreen(float currentFrame) {
 		}
 	}
 	else {
-		
+
 		Audio::SFX[7].StopAndRewind();
 
 		if (menuCursor < 2) {
@@ -796,7 +791,7 @@ void outroScreen(float currentFrame) {
 }
 
 void gameOverScreen(float currentFrame) {
-	
+
 	if (Audio::SFX[6].GetPlayStatus() == playing) {
 		std::string gameOverText = "GAME OVER";
 		std::string playerName = "PLAYER " + std::to_string(playerNr + 1);
@@ -841,7 +836,7 @@ void gameOverScreen(float currentFrame) {
 }
 
 void generatorScreen(float currentFrame) {
-	if (rightButton.Simple())
+	if (rightButton.simple())
 		if (++geX > 28)
 			geX = 28;
 		else {
@@ -849,7 +844,7 @@ void generatorScreen(float currentFrame) {
 			Audio::SFX[9].PlayPause();
 		}
 
-	if (leftButton.Simple())
+	if (leftButton.simple())
 		if (--geX < 1)
 			geX = 1;
 		else {
@@ -857,16 +852,16 @@ void generatorScreen(float currentFrame) {
 			Audio::SFX[9].PlayPause();
 		}
 
-	if (up.Simple())
+	if (up.simple())
 		if (++geY > 16)
 			geY = 16;
 		else {
 			Audio::SFX[9].StopAndRewind();
 			Audio::SFX[9].PlayPause();
 		}
-			
 
-	if (down.Simple())
+
+	if (down.simple())
 		if (--geY < 1)
 			geY = 1;
 		else {
@@ -875,28 +870,28 @@ void generatorScreen(float currentFrame) {
 		}
 
 	//chaning element upwards
-	if (rightDigButton.Simple()) {
+	if (rightDigButton.simple()) {
 
 		if (++gen[geX][geY] > 9)
 			gen[geX][geY] = 0;
 
 		Audio::SFX[10].StopAndRewind();
 		Audio::SFX[10].PlayPause();
-	}			
+	}
 
 	//chaning element downwards
-	if (leftDigButton.Simple()) {
+	if (leftDigButton.simple()) {
 		if (--gen[geX][geY] < 0)
 			gen[geX][geY] = 9;
 
 		Audio::SFX[10].StopAndRewind();
 		Audio::SFX[10].PlayPause();
-	}			
+	}
 
 	//yellow cursor block
 	if (int(3 * currentFrame) % 2)
-		DrawLevel(geX, geY, 54,0);
-	
+		DrawLevel(geX, geY, 54, 0);
+
 	//drawing generator elements
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 17; j++) {
@@ -921,10 +916,10 @@ void generatorScreen(float currentFrame) {
 				ref = 48;
 
 			if (ref >= 0)
-				DrawLevel(i, j, ref,0);
+				DrawLevel(i, j, ref, 0);
 		}
 
-	if (enter.Simple()) {
+	if (enter.simple()) {
 
 		gameTime = 0;
 		curSessionStartTime = currentFrame;
@@ -932,8 +927,8 @@ void generatorScreen(float currentFrame) {
 
 		Enemy::enemyNr = 1;
 		Gold::goldNr = 0;
-		enemies[0].Pos.x = -1;
-		enemies[0].Pos.y = -1;
+		Enemy::enemies[0].Pos.x = -1;
+		Enemy::enemies[0].Pos.y = -1;
 
 		for (int i = 0; i < 30; i++)
 			for (int j = 0; j < 17; j++) {
@@ -957,19 +952,19 @@ void generatorScreen(float currentFrame) {
 
 					Vector2D Pos = { i, j };
 
-					gold[Gold::goldNr].Initialize(Gold::goldNr, Pos);
+					Gold::gold[Gold::goldNr].Initialize(Gold::goldNr, Pos);
 					Gold::goldNr++;
 				}
 				if (gen[i][j] == 8) {
 
 					layout[i][j] = empty;
 					if (Enemy::enemyNr < 11) {
-						
+
 						Vector2D Pos;
 						Pos.x = i;
 						Pos.y = j;
 
-						enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, Pos);
+						Enemy::enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, Pos);
 
 						Enemy::enemyNr++;
 					}
@@ -982,13 +977,13 @@ void generatorScreen(float currentFrame) {
 					Pos.x = i;
 					Pos.y = j;
 
-					enemies[0].Initialize(0, Pos);
+					Enemy::enemies[0].Initialize(0, Pos);
 				}
 			}
 
 		//if no player was given, put in one!
-		if (enemies[0].Pos.x == -1) {
-			
+		if (Enemy::enemies[0].Pos.x == -1) {
+
 			int spawnX = 1;
 			int spawnY = 1;
 
@@ -996,7 +991,7 @@ void generatorScreen(float currentFrame) {
 
 			while (!foundPlaceForRunner) {
 				if (layout[spawnX][spawnY] != empty || gen[spawnX][spawnY] == 7 || gen[spawnX][spawnY] == 8) {
-					
+
 					std::cout << "\n layout: " << layout[spawnX][spawnY] << ", gold: " << Enemy::GoldChecker(spawnX, spawnY);
 
 					spawnX++;
@@ -1011,7 +1006,7 @@ void generatorScreen(float currentFrame) {
 					Pos.x = spawnX;
 					Pos.y = spawnY;
 
-					enemies[0].Initialize(0, Pos);
+					Enemy::enemies[0].Initialize(0, Pos);
 					foundPlaceForRunner = true;
 				}
 			}
@@ -1019,36 +1014,35 @@ void generatorScreen(float currentFrame) {
 
 		for (int i = 0; i < Enemy::enemyNr; i++) {
 
-			int curX = int(enemies[i].Pos.x + 0.5);
-			int curY = int(enemies[i].Pos.y + 0.5);
+			int curX = int(Enemy::enemies[i].Pos.x + 0.5);
+			int curY = int(Enemy::enemies[i].Pos.y + 0.5);
 
 
-			if ((layout[curX][curY - 1] == empty || layout[curX][curY - 1] == trapDoor || layout[curX][curY - 1] == pole) && !Enemy::EnemyCheckerGlobal(enemies[i].Pos.x, enemies[i].Pos.y - 1)) {
+			if ((layout[curX][curY - 1] == empty || layout[curX][curY - 1] == trapDoor || layout[curX][curY - 1] == pole) && !Enemy::EnemyCheckerGlobal(Enemy::enemies[i].Pos.x, Enemy::enemies[i].Pos.y - 1)) {
 
-				enemies[i].state = falling;
+				Enemy::enemies[i].state = falling;
 				if (i == 0) {
 					Audio::SFX[17].PlayPause();
-					enemies[i].TextureRef = 52;
+					Enemy::enemies[i].TextureRef = 52;
 				}
-					
+
 				else
-					enemies[i].TextureRef = 16;
+					Enemy::enemies[i].TextureRef = 16;
 			}
 
 			else {
-				enemies[i].state = freeRun;
+				Enemy::enemies[i].state = freeRun;
 
 				if (i == 0)
-					enemies[i].TextureRef = 48;
+					Enemy::enemies[i].TextureRef = 48;
 				else
-					enemies[i].TextureRef = 12;
+					Enemy::enemies[i].TextureRef = 12;
 			}
 		}
 
 		for (int i = 0; i < 50; i++)
-			enemies[i].gold = gold;
+			Enemy::enemies[i].gold = Gold::gold;
 
-		Enemy::enemies = enemies;
 		Gold::remainingGoldCount = Gold::goldNr;
 		menu = L04;
 	}

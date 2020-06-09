@@ -1,4 +1,4 @@
-#pragma once
+#include "Variables.h"
 
 Shader *selectShader, *mainShader, *levelShader, *playerShader;
 
@@ -29,7 +29,7 @@ unsigned int viewPortHeight = SCR_HEIGHT;
 unsigned int viewPortX = 0;
 unsigned int viewPortY = 0;
 
-char soundNames[SOUND_FILE_NR][25] = {	"SFX/gold.ogg", "SFX/dig.ogg","SFX/dig_prev.ogg",
+const char soundNames[SOUND_FILE_NR][25] = { "SFX/gold.ogg", "SFX/dig.ogg","SFX/dig_prev.ogg",
 										"SFX/death.ogg", "SFX/everygold.ogg","SFX/mainmenu.ogg",
 										"SFX/gameover.ogg", "SFX/gameplay.ogg","SFX/intro.ogg",
 										"SFX/step1.ogg","SFX/step2.ogg","SFX/ladder1.ogg",
@@ -37,98 +37,85 @@ char soundNames[SOUND_FILE_NR][25] = {	"SFX/gold.ogg", "SFX/dig.ogg","SFX/dig_pr
 										"SFX/pole1.ogg","SFX/pole2.ogg", "SFX/fall.ogg"
 };
 
-enum layoutBlock {
-	empty,
-	brick,
-	concrete,
-	ladder,
-	pole,
-	trapDoor,
-	finishLadder,
-};
-
-enum RecordingState {
-	uninitialized,
-	recording,
-	closing,
-}recordingState;
+RecordingState recordingState;
 
 //variable for changing moving sound, going-0, laddering-1, poling-2
-int going[3] = {};
+ int going[3] = {};
 
-bool championShip = false;
-bool usCover = false;
+ bool championShip = false;
+ bool usCover = false;
 
-int FPS = 35;
-unsigned int recordinghHeight = 0;
+ int FPS = 35;
+ unsigned int recordinghHeight = 0;
 
 #ifdef VIDEO_RECORDING
-MultiMedia* GameVideo;
-VideoParameters* videoIn;
-VideoParameters* videoOut;
-AudioParameters* audioIn;
-AudioParameters* audioOut;
+ MultiMedia* GameVideo;
+ VideoParameters* videoIn;
+ VideoParameters* videoOut;
+ AudioParameters* audioIn;
+ AudioParameters* audioOut;
 #endif
 
-bool startingScreen;
-float startingTimer;
+ bool startingScreen;
+ float startingTimer;
 
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
-float speed;
-float speedFactor = 5;
+ float deltaTime = 0.0f;	// time between current frame and last frame
+ float lastFrame = 0.0f;
+ float speed;
+ float speedFactor = 5;
 
-float diggingTime = 7.15f;
-float holeIdle = 2.2f;
+ float diggingTime = 7.15f;
+ float holeIdle = 2.2f;
 
-float playerSpeed = 0.9f;
-float enemySpeed = 0.415f;
+ float playerSpeed = 0.9f;
+ float enemySpeed = 0.415f;
 
-float destroyTime = 0.5f;
-float buildTime = 0.5f;
-float holeHorizontalTime = 0.25;
-int randomDebris;
+ float destroyTime = 0.5f;
+ float buildTime = 0.5f;
+ float holeHorizontalTime = 0.25;
+ int randomDebris;
 
 //current curosr in the generating screen
-int geX, geY;
+ int geX, geY;
 
 //the highest Ladder of the level, where the player has to reach to exit, it is determined at every level loading
-int highestLadder;
+ int highestLadder;
 
 //cursor of the menu
-int menuCursor = 0;
+ int menuCursor = 0;
 
 //number of earlier taken screenshots and videos
-unsigned int scr = 0;
-unsigned int vid = 0;
+ unsigned int scr = 0;
+ unsigned int vid = 0;
 
-layoutBlock layout[30][18];
-int gen[30][18] = {};
+ LayoutBlock layout[30][18];
+ int gen[30][18] = {};
 
 //array which holds the timer of holes
-float holeTimer[30][18];
+ float holeTimer[30][18];
 
-float introTimer;
-float gameTime;
-float curSessionStartTime = 0;
-float outroTimer;
-float game_overTimer;
-float prevSessionSum = 0;
-float recordStartTime = 0;
+ float introTimer;
+ float gameTime;
+ float curSessionStartTime = 0;
+ float outroTimer;
+ float game_overTimer;
+ float prevSessionSum = 0;
+ float recordStartTime = 0;
 
-int correction = 0;
+ int correction = 0;
 
-int score_gold = 0;
-int score_enemy = 0;
-int level[2] = { 1,1 };
-int playerLife[2] = { 5,5 };	
-int playerNr = 0;
-int score[2] = {0,0};
-int highScore=0;
-bool game_over[2] = {};
+ int score_gold = 0;
+ int score_enemy = 0;
+ int level[2] = { 1,1 };
+ int playerLife[2] = { 5,5 };
+ int playerNr = 0;
+ int score[2] = { 0,0 };
+ int highScore = 0;
+ bool game_over[2] = {};
 bool level_inc[2][2];
 
-bool right_pit = false, left_pit = false;
+bool right_pit;
+bool left_pit;
 float idleTime;
 float fallTime;
 float digTime;
@@ -145,7 +132,7 @@ float blokk[16] =
 };
 
 float main_menu[16] =
-{	-1,	-1,		0.0, 0.0,
+{ -1,	-1,		0.0, 0.0,
 	 1, -1,		1.0, 0.0,
 	 1,	 1,		1.0, 1.0,
 	-1,	 1,		0.0, 1.0,
@@ -156,34 +143,4 @@ unsigned int indices[6] = {
 		 2,3,0
 };
 
-enum menuEnum {
-	//main menu
-	L01,
-	C01,
-
-	//intro
-	L02,
-	C02,
-
-	//select
-	L03,
-	C03,
-
-	//gameplay
-	L04,
-	C04,
-
-	//
-	L05,
-	C05,
-
-	L06,
-	C06,
-
-	L07,
-	C07,
-
-	L08,
-	C08
-	
-} menu = L01;
+Menu menu = L01;

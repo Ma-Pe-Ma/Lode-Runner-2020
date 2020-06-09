@@ -64,17 +64,17 @@ The game uses XInput API for controller handling.
 
 	Keyboard    	Controller	    Effect
 
-	arrows  	    left stick	    moving/change game mode at main menu
-	q 			    LB/LT		    dig to the left
-	w 			    RB/RT		    dig to the right
-	enter 		    start		    pause, skip intro/outro
-	space 		    back		    change level during gameplay
+	arrows		left stick	    moving/change game mode at main menu
+	q		LB/LT		    dig to the left
+	w		RB/RT		    dig to the right
+	enter		start		    pause, skip intro/outro
+	space		back		    change level during gameplay
 	
-	p 			    -   		    take screenshot
-	r 			    -			    start/end recording gameplay video
+	p		-		    take screenshot
+	r		-		    start/end recording gameplay video
 	
 	alt + enter  	-   		    change window mode (full or windowed)
-	esc  			-	    	    close application
+	esc  		-	    	    close application
 
 ## Downloading built versions
 
@@ -104,4 +104,4 @@ This was my first complex project since I started programming. My earlier effort
 
 However, in the near future I'm not planning to address this issues as I have other projects and I got bored by this a little. So it's possible that the next big update will only come in a few years from the initial commit.
 
-## Have fun with playing it!
+** Have fun playing with it!**

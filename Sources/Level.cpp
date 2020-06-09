@@ -1,3 +1,4 @@
+#include "Level.h"
 
 void LevelLoading(unsigned int levelNumber) {
 	std::fstream level;
@@ -10,7 +11,7 @@ void LevelLoading(unsigned int levelNumber) {
 		levelNumber = 1;
 	if (levelNumber > 150)
 		levelNumber = 150;
-	
+
 	std::string levelName = "Level 00" + std::to_string(levelNumber);
 
 	if (levelNumber > 9)
@@ -20,7 +21,7 @@ void LevelLoading(unsigned int levelNumber) {
 		levelName = "Level " + std::to_string(levelNumber);
 
 	Enemy::enemyNr = 1;
-	
+
 	bool foundLevel = false;
 	//reading level into the layout matrix
 	int rowCounter = 0;
@@ -54,28 +55,27 @@ void LevelLoading(unsigned int levelNumber) {
 						layout[i][17 - rowCounter] = empty;
 						holeTimer[i][17 - rowCounter] = -3.0f;
 					}
-						
 
 					else if (row[i] == '&') {							//runner
 
 						layout[i][17 - rowCounter] = empty;
-						
+
 						Vector2D Pos;
 						Pos.x = i;
 						Pos.y = 17 - rowCounter;
-						
-						enemies[0].Initialize(0, Pos);
+
+						Enemy::enemies[0].Initialize(0, Pos);
 					}
 
 					else if (row[i] == '0') {							//guards
 
 						layout[i][17 - rowCounter] = empty;
-						
+
 						Vector2D Pos;
 						Pos.x = i;
 						Pos.y = 17 - rowCounter;
 
-						enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, Pos);
+						Enemy::enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, Pos);
 						Enemy::enemyNr++;
 					}
 
@@ -85,10 +85,10 @@ void LevelLoading(unsigned int levelNumber) {
 
 						Vector2D Pos = { i, 17 - rowCounter };
 
-						gold[Gold::goldNr].Initialize(Gold::goldNr, Pos);
+						Gold::gold[Gold::goldNr].Initialize(Gold::goldNr, Pos);
 						Gold::goldNr++;
 					}
-					else 
+					else
 						layout[i][17 - rowCounter] = empty;
 				}
 
@@ -110,9 +110,8 @@ void LevelLoading(unsigned int levelNumber) {
 	}
 
 	for (int i = 0; i < 50; i++)
-		enemies[i].gold = gold;
+		Enemy::enemies[i].gold = Gold::gold;
 
-	Enemy::enemies = enemies;
 	Gold::remainingGoldCount = Gold::goldNr;
 	level.close();
 }
@@ -121,7 +120,7 @@ void HighestLadder() {
 
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 17; j++) {
-			
+
 			if (holeTimer[i][j] == -3.0f)
 				layout[i][j] = ladder;
 
@@ -131,13 +130,13 @@ void HighestLadder() {
 }
 
 void HighestLadderGen() {
-	
+
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 17; j++) {
-			
+
 			if (gen[i][j] == 3)
 				highestLadder = j;
-			
+
 			if (gen[i][j] == 6) {
 
 				layout[i][j] = ladder;

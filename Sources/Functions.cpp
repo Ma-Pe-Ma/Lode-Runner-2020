@@ -1,4 +1,9 @@
-#include <bitset>
+#include "Functions.h"
+
+#define	 STB_IMAGE_IMPLEMENTATION
+#define  STB_IMAGE_WRITE_IMPLEMENTATION
+#include <STB/stb_image.h>
+#include <STB/stb_image_write.h>
 
 void FindScreenShotCount() {
 	while (true) {
@@ -88,10 +93,10 @@ void UpdateViewPortValues(int width, int height) {
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	
+
 	UpdateViewPortValues(width, height);
-	
-	if(recordingState == recording)
+
+	if (recordingState == recording)
 		recordingState = closing;
 
 	glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
@@ -108,7 +113,7 @@ void window_pos_callback(GLFWwindow* window, int xpos, int ypos) {
 
 //Taking Screenshot
 void screenCapture() {
-	unsigned char *buffer = new unsigned char[SCR_WIDTH * SCR_HEIGHT * 3];
+	unsigned char* buffer = new unsigned char[SCR_WIDTH * SCR_HEIGHT * 3];
 	glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
 	//find next non-existing screenshot identifier
@@ -117,7 +122,7 @@ void screenCapture() {
 	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";				//ide megadni hogy hogyan nevezze el a screenshotokat...
 	scr++;
 
-	const char *name = sname.c_str();
+	const char* name = sname.c_str();
 
 	stbi_flip_vertically_on_write(true);
 
@@ -125,17 +130,17 @@ void screenCapture() {
 		std::cout << "\nERROR: Could not write screenshot file: " << name;
 	}
 	else std::cout << "\nScreenshot taken as: " << name;
-	
+
 	delete[] buffer;
 }
 
-unsigned int loadTexture(char const * path) {
+unsigned int loadTexture(char const* path) {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
 	if (data) {
 		GLenum format;
 		if (nrComponents == 1)
@@ -151,7 +156,7 @@ unsigned int loadTexture(char const * path) {
 
 		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -163,6 +168,10 @@ unsigned int loadTexture(char const * path) {
 	}
 
 	return textureID;
+}
+
+unsigned char* getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type) {
+	return stbi_load(path, width, height, nrComponents, type);
 }
 
 //from left to right, from down to up
@@ -190,11 +199,11 @@ void levelTextureMapping(int index) {
 	blokk[10] = ((index / 6 + 1) * 1.0) / 11;
 	blokk[11] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
 
-	blokk[12] = ((index / 6 + 1)*1.0) / 11;
-	blokk[13] = 1.0 - ((index % 6)*1.0) / 6;
+	blokk[12] = ((index / 6 + 1) * 1.0) / 11;
+	blokk[13] = 1.0 - ((index % 6) * 1.0) / 6;
 
-	blokk[14] = ((index / 6)*1.0) / 11;
-	blokk[15] = 1.0 - ((index % 6)*1.0) / 6;
+	blokk[14] = ((index / 6) * 1.0) / 11;
+	blokk[15] = 1.0 - ((index % 6) * 1.0) / 6;
 }
 
 void abcTextureMapping(char karakter) {
@@ -213,7 +222,7 @@ void abcTextureMapping(char karakter) {
 
 		blokk[14] = float(0) / 16;
 		blokk[15] = (4.0f) / 4;
-	
+
 		return;
 	}
 
@@ -236,7 +245,7 @@ void abcTextureMapping(char karakter) {
 
 	for (int j = 0; j < 10; j++)
 		if (j == (int(karakter) - 48)) {
-			blokk[8] = (1.0*j + 0.01) / 16;
+			blokk[8] = (1.0 * j + 0.01) / 16;
 			blokk[9] = (1.0) / 2;
 
 			blokk[10] = (j + 1.0) / 16;
@@ -245,7 +254,7 @@ void abcTextureMapping(char karakter) {
 			blokk[12] = (j + 1.0) / 16;
 			blokk[13] = (3.0) / 4;
 
-			blokk[14] = (1.0*j + 0.01) / 16;
+			blokk[14] = (1.0 * j + 0.01) / 16;
 			blokk[15] = (3.0) / 4;
 		}
 
@@ -294,7 +303,7 @@ void TextWriting(std::string text, float i, float j) {
 		if (text.at(k) != ' ') {
 
 			abcTextureMapping(text.at(k));
-			
+
 			selectShader->use();
 			selectShader->setVec2("gPos", glm::vec2(i, j));
 			selectShader->setInt("textureA", 3);
@@ -309,7 +318,7 @@ void TextWriting(std::string text, float i, float j) {
 }
 
 void DrawLevel(float x, float y, int ref, float holeTimer) {
-		
+
 	if (holeTimer == -2)
 		ref = 24;
 
@@ -350,8 +359,8 @@ void DrawEnemy(float x, float y, int ref, Direction direction, Gold* gold) {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void processInput(GLFWwindow *window) {
-	
+void processInput(GLFWwindow* window) {
+
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
@@ -410,7 +419,7 @@ void processInput(GLFWwindow *window) {
 		enemies[2].dPos.y = -enemySpeed * speed;
 
 	*/
-	
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0)
 		rightDigButton.detect(1);
 	else
@@ -442,15 +451,15 @@ void processInput(GLFWwindow *window) {
 		lAlt.detect(0);
 }
 
-static void errorCallback(int error, const char *description) {
-	std::cout << "\n error: " << error<<", description: "<<description;
+void errorCallback(int error, const char* description) {
+	std::cout << "\n error: " << error << ", description: " << description;
 	std::cout << std::hex << "\n hex: 0x" << error;
 
 	std::cout << std::dec;
 }
 
 void loadConfig() {
-	
+
 	//FPS = STREAM_FRAME_RATE;
 
 	std::ifstream config("config.txt", std::fstream::in);
@@ -463,7 +472,7 @@ void loadConfig() {
 				continue;
 
 			for (int i = 0; i < setup.length(); i++) {
-				
+
 				if (setup.compare(0, 5, "width") == 0)
 					SCR_WIDTH = std::stoi(setup.substr(6, 4));
 
@@ -554,9 +563,9 @@ void loadConfig() {
 	config.close();
 }
 
-int RtAudioVorbis(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
-	short *out = (short *)outputBuffer;
-	Audio *data = (Audio *)userData;
+int RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
+	short* out = (short*)outputBuffer;
+	Audio* data = (Audio*)userData;
 
 	if (status)
 		std::cout << "Stream underflow detected!" << std::endl;
@@ -580,34 +589,34 @@ int RtAudioVorbis(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 		for (int j = 0; j < CHANNEL_COUNT; j++) {
 			short ki = 0;
 			for (int k = 0; k < s; k++)
-				ki += (((short(pcmout[k][2 * CHANNEL_COUNT*i + 2 * j] << 8)) + pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1])) / s;
+				ki += (((short(pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8)) + pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1])) / s;
 
 #ifdef VIDEO_RECORDING
 			if (recordingState == recording && GameVideo->Initialized())
 				GameVideo->audio->EncodeFrame(ki);
 #endif
-			*out++ = ki;
+			* out++ = ki;
 		}
 
 	return 0;
 }
 
 void FullscreenSwitch() {
-	
+
 	if (!fullScreen) {
-		
+
 		fullScreen = !fullScreen;
 
 		former_SCR_HEIGHT = SCR_HEIGHT;
 		former_SCR_WIDTH = SCR_WIDTH;
 
-		const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 		glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		
+
 	}
-	else {	
+	else {
 
 		glfwSetWindowMonitor(window, NULL, 0, 0, former_SCR_WIDTH, former_SCR_HEIGHT, 0);
 		glfwSetWindowPos(window, windowPosX, windowPosY);
@@ -621,11 +630,11 @@ void FullscreenSwitch() {
 #ifdef VIDEO_RECORDING
 
 void InitializeGameVideo() {
-	
+
 	//not the best method as 
 	audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 	audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
-	
+
 	videoIn = new VideoParameters(viewPortWidth, viewPortHeight, AV_CODEC_ID_NONE, 400000, AV_PIX_FMT_RGB24, STREAM_FRAME_RATE);
 
 	unsigned int usedRecordingHeight = viewPortHeight;
