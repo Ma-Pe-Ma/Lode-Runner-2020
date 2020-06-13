@@ -7,6 +7,14 @@
 #include "Enums/AudioStatus.h"
 #include "Variables.h"
 
+#include <RtAudio/RtAudio.h>
+#include "MultiMediaRecording/MultiMedia.h"
+
+#define SOUND_FILE_NR 18
+#define FRAMES_PER_BUFFER 64
+#define CHANNEL_COUNT 2
+#define SAMPLE_RATE 44100
+
 class Audio {
 
 private:
@@ -30,6 +38,11 @@ public:
 	Audio(int, const char*);
 	Audio(const char*);
 	Audio() {}
-};
 
-#endif // !AUDIOSTATUS_H
+	static int RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData);
+	static MultiMedia* multiMedia;
+
+	static char pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
+	static const char soundNames[SOUND_FILE_NR][25];
+};
+#endif // !AUDIO_H

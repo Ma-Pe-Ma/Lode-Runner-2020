@@ -1,9 +1,9 @@
 ## given resolutions: 0=1500×900, 1=750×450, 2=3000×1800, 3=1750×1050, if custom resolution is given then this entry is neglected
-#resolution 3
+resolution 3
 
 #custom resolution
-width 1500
-height 900
+#width 1500
+#height 900
 
 # levelset: 0 = original levels, 1 = Championship LR levels
 levelSet 0

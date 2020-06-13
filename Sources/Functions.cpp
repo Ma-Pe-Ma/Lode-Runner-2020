@@ -1,182 +1,7 @@
 #include "Functions.h"
 
-#define	 STB_IMAGE_IMPLEMENTATION
-#define  STB_IMAGE_WRITE_IMPLEMENTATION
-#include <STB/stb_image.h>
-#include <STB/stb_image_write.h>
-
-void FindScreenShotCount() {
-	while (true) {
-		std::string stringName = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
-
-		std::ifstream fileStream;
-		fileStream.open(stringName);
-
-		if (fileStream.fail()) {
-			std::cout << "\n scr: " << scr;
-			fileStream.close();
-			break;
-		}
-		else {
-			scr++;
-			fileStream.close();
-		}
-	}
-}
-
-void FindVideoCount() {
-	while (true) {
-		std::string stringName = "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
-
-		std::ifstream fileStream;
-		fileStream.open(stringName);
-
-		if (fileStream.fail()) {
-			std::cout << "\n vid: " << vid;
-			fileStream.close();
-			break;
-		}
-		else {
-			vid++;
-			fileStream.close();
-		}
-	}
-}
-
-void UpdateViewPortValues(int width, int height) {
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
-
-	viewPortWidth = SCR_WIDTH;
-	viewPortHeight = SCR_HEIGHT;
-
-	if (viewPortHeight % 2 == 1)
-		viewPortHeight--;
-
-	if (viewPortWidth % 2 == 1)
-		viewPortWidth--;
-
-	viewPortX = (width - 15.0f / 9 * height) / 2;
-	viewPortY = (height - 9.0f / 15 * width) / 2;
-
-	float screenRatio = ((float)width) / height;
-
-	if (screenRatio >= 15.0f / 9) {
-
-		viewPortY = 0;
-		viewPortHeight = height;
-
-		if (viewPortHeight % 2 == 1)
-			viewPortHeight--;
-
-		viewPortWidth = 15.0f / 9 * height;
-
-		if (viewPortWidth % 2 == 1)
-			viewPortWidth--;
-
-		viewPortX = (width - viewPortWidth) / 2;
-	}
-	else {
-		viewPortX = 0;
-		viewPortWidth = width;
-
-		if (viewPortWidth % 2 == 1)
-			viewPortWidth--;
-
-		viewPortHeight = 9.0f / 15 * viewPortWidth;
-
-		if (viewPortHeight % 2 == 1)
-			viewPortHeight--;
-
-		viewPortY = (height - viewPortHeight) / 2;
-	}
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-
-	UpdateViewPortValues(width, height);
-
-	if (recordingState == recording)
-		recordingState = closing;
-
-	glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
-}
-
-void window_pos_callback(GLFWwindow* window, int xpos, int ypos) {
-
-	if (!fullScreen) {
-
-		windowPosX = xpos;
-		windowPosY = ypos;
-	}
-}
-
-//Taking Screenshot
-void screenCapture() {
-	unsigned char* buffer = new unsigned char[SCR_WIDTH * SCR_HEIGHT * 3];
-	glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-
-	//find next non-existing screenshot identifier
-	FindScreenShotCount();
-
-	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";				//ide megadni hogy hogyan nevezze el a screenshotokat...
-	scr++;
-
-	const char* name = sname.c_str();
-
-	stbi_flip_vertically_on_write(true);
-
-	if (!stbi_write_png(name, SCR_WIDTH, SCR_HEIGHT, 3, buffer, 0)) {
-		std::cout << "\nERROR: Could not write screenshot file: " << name;
-	}
-	else std::cout << "\nScreenshot taken as: " << name;
-
-	delete[] buffer;
-}
-
-unsigned int loadTexture(char const* path) {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data) {
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
-}
-
-unsigned char* getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type) {
-	return stbi_load(path, width, height, nrComponents, type);
-}
-
 //from left to right, from down to up
 void playerTextureMapping(int index) {
-
 	blokk[8] = ((index % 12) * 1.0) / 12;
 	blokk[9] = ((index / 12) * 1.0) / 5;
 
@@ -192,7 +17,6 @@ void playerTextureMapping(int index) {
 
 //from up to down, from left to right
 void levelTextureMapping(int index) {
-
 	blokk[8] = ((index / 6) * 1.0) / 11;
 	blokk[9] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
 
@@ -303,10 +127,9 @@ void TextWriting(std::string text, float i, float j) {
 		if (text.at(k) != ' ') {
 
 			abcTextureMapping(text.at(k));
-
-			selectShader->use();
-			selectShader->setVec2("gPos", glm::vec2(i, j));
-			selectShader->setInt("textureA", 3);
+			GLHelper::selectShader->use();
+			GLHelper::selectShader->setVec2("gPos", glm::vec2(i, j));
+			GLHelper::selectShader->setInt("textureA", 3);
 
 			glBindVertexArray(selectVAO);
 			glBindBuffer(GL_ARRAY_BUFFER, selectVBO);
@@ -324,12 +147,12 @@ void DrawLevel(float x, float y, int ref, float holeTimer) {
 
 	levelTextureMapping(ref);
 
-	levelShader->use();
+	GLHelper::levelShader->use();
 	glBindVertexArray(levelVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, levelVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(blokk), blokk, GL_STATIC_DRAW);
 	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 8, (void*) &blokk[8]);
-	levelShader->setVec2("gPos", x, y);
+	GLHelper::levelShader->setVec2("gPos", x, y);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
@@ -347,14 +170,14 @@ void DrawEnemy(float x, float y, int ref, Direction direction, Gold* gold) {
 
 	playerTextureMapping(ref);
 
-	playerShader->use();
+	GLHelper::playerShader->use();
 	glBindVertexArray(playerVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(blokk), blokk, GL_STATIC_DRAW);
-	playerShader->setVec2("gPos", glm::vec2(x, y));
-	playerShader->setBool("direction", dirToShader);
-	playerShader->setBool("carryGold", carryGold);
-	playerShader->setFloat("ref", blokk[8]);
+	GLHelper::playerShader->setVec2("gPos", glm::vec2(x, y));
+	GLHelper::playerShader->setBool("direction", dirToShader);
+	GLHelper::playerShader->setBool("carryGold", carryGold);
+	GLHelper::playerShader->setFloat("ref", blokk[8]);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -451,19 +274,10 @@ void processInput(GLFWwindow* window) {
 		lAlt.detect(0);
 }
 
-void errorCallback(int error, const char* description) {
-	std::cout << "\n error: " << error << ", description: " << description;
-	std::cout << std::hex << "\n hex: 0x" << error;
-
-	std::cout << std::dec;
-}
-
 void loadConfig() {
-
 	//FPS = STREAM_FRAME_RATE;
 
 	std::ifstream config("config.txt", std::fstream::in);
-
 	std::string setup;
 
 	if (config.is_open()) {
@@ -471,261 +285,94 @@ void loadConfig() {
 			if (setup[0] == '#')
 				continue;
 
-			for (int i = 0; i < setup.length(); i++) {
+			if (setup.compare(0, 5, "width") == 0)
+				GLHelper::SCR_WIDTH = std::stoi(setup.substr(6, 4));
 
-				if (setup.compare(0, 5, "width") == 0)
-					SCR_WIDTH = std::stoi(setup.substr(6, 4));
+			if (setup.compare(0, 6, "height") == 0)
+				GLHelper::SCR_HEIGHT = std::stoi(setup.substr(7, 4));
 
-				if (setup.compare(0, 6, "height") == 0)
-					SCR_HEIGHT = std::stoi(setup.substr(7, 4));
-
-				if (setup.compare(0, 10, "resolution") == 0) {
-					if (std::stoi(setup.substr(11, 1)) == 0) {
-						SCR_WIDTH = 1500;
-						SCR_HEIGHT = 900;
-					}
-
-					if (std::stoi(setup.substr(11, 1)) == 1) {
-						SCR_WIDTH = 750;
-						SCR_HEIGHT = 450;
-					}
-
-					if (std::stoi(setup.substr(11, 1)) == 2) {
-						SCR_WIDTH = 3000;
-						SCR_HEIGHT = 1800;
-					}
-
-					if (std::stoi(setup.substr(11, 1)) == 3) {
-						SCR_WIDTH = 1750;
-						SCR_HEIGHT = 1050;
-					}
+			if (setup.compare(0, 10, "resolution") == 0) {
+				if (std::stoi(setup.substr(11, 1)) == 0) {
+					GLHelper::SCR_WIDTH = 1500;
+					GLHelper::SCR_HEIGHT = 900;
 				}
 
-				if (setup.compare(0, 11, "playerSpeed") == 0)
-					playerSpeed = std::stof(setup.substr(12));
-
-				if (setup.compare(0, 10, "enemySpeed") == 0)
-					enemySpeed = std::stof(setup.substr(11));
-
-				if (setup.compare(0, 3, "FPS") == 0)
-					FPS = std::stoi(setup.substr(4));
-
-				if (setup.compare(0, 8, "levelSet") == 0) {
-					if (std::stoi(setup.substr(9)) == 0)
-						levelFileName = "level/lodeRunner.baseLevel.txt";
-
-					if (std::stoi(setup.substr(9)) == 1) {
-						levelFileName = "level/lodeRunner.champLevel.txt";
-						championShip = true;
-
-						if (level[0] > 51) {
-							level[0] = 51;
-							level[1] = 51;
-						}
-					}
+				if (std::stoi(setup.substr(11, 1)) == 1) {
+					GLHelper::SCR_WIDTH = 750;
+					GLHelper::SCR_HEIGHT = 450;
 				}
 
-				if (setup.compare(0, 8, "US COVER") == 0)
-					usCover = std::stoi(setup.substr(9));
-
-				if (setup.compare(0, 7, "levelNr") == 0) {
-					int levelNr = std::stoi(setup.substr(8));
-
-					if (levelNr < 1) levelNr = 1;
-					if (levelNr > 150) levelNr = 150;
-
-					level[0] = levelNr;
-					level[1] = levelNr;
-
-					if (championShip)
-						if (level[0] > 51) {
-							level[0] = 51;
-							level[1] = 51;
-						}
+				if (std::stoi(setup.substr(11, 1)) == 2) {
+					GLHelper::SCR_WIDTH = 3000;
+					GLHelper::SCR_HEIGHT = 1800;
 				}
 
-				if (setup.compare(0, 16, "Recording height") == 0)
-					recordinghHeight = std::stoul(setup.substr(17));
+				if (std::stoi(setup.substr(11, 1)) == 3) {
+					GLHelper::SCR_WIDTH = 1750;
+					GLHelper::SCR_HEIGHT = 1050;
+				}
 			}
-			UpdateViewPortValues(SCR_WIDTH, SCR_HEIGHT);
+
+			if (setup.compare(0, 11, "playerSpeed") == 0)
+				playerSpeed = std::stof(setup.substr(12));
+
+			if (setup.compare(0, 10, "enemySpeed") == 0)
+				enemySpeed = std::stof(setup.substr(11));
+
+			if (setup.compare(0, 3, "FPS") == 0)
+				FPS = std::stoi(setup.substr(4));
+
+			if (setup.compare(0, 8, "levelSet") == 0) {
+				if (std::stoi(setup.substr(9)) == 0)
+					levelFileName = "level/lodeRunner.baseLevel.txt";
+
+				if (std::stoi(setup.substr(9)) == 1) {
+					levelFileName = "level/lodeRunner.champLevel.txt";
+					championShip = true;
+
+					if (level[0] > 51) {
+						level[0] = 51;
+						level[1] = 51;
+					}
+				}
+			}
+
+			if (setup.compare(0, 8, "US COVER") == 0)
+				usCover = std::stoi(setup.substr(9));
+
+			if (setup.compare(0, 7, "levelNr") == 0) {
+				int levelNr = std::stoi(setup.substr(8));
+
+				if (levelNr < 1) levelNr = 1;
+				if (levelNr > 150) levelNr = 150;
+
+				level[0] = levelNr;
+				level[1] = levelNr;
+
+				if (championShip)
+					if (level[0] > 51) {
+						level[0] = 51;
+						level[1] = 51;
+					}
+			}
+
+			if (setup.compare(0, 16, "Recording height") == 0)
+				recordingHeight = std::stoul(setup.substr(17));
 		}
 
-		leftDigButton.setImpulseTime(0.3);
-		rightDigButton.setImpulseTime(0.3);
+		GLHelper::updateViewPortValues(GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT);
 	}
 	else
 		std::cout << "\n Config File Not Found!";
 
+	leftDigButton.setImpulseTime(0.3);
+	rightDigButton.setImpulseTime(0.3);
 
-	FindScreenShotCount();
-	FindVideoCount();
+	GLHelper::FindScreenShotCount();
+	GLHelper::FindVideoCount();
+
+	std::cout << "window x : " << GLHelper::SCR_WIDTH;
+	std::cout << "window y : " << GLHelper::SCR_HEIGHT;
 
 	config.close();
 }
-
-int RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
-	short* out = (short*)outputBuffer;
-	Audio* data = (Audio*)userData;
-
-	if (status)
-		std::cout << "Stream underflow detected!" << std::endl;
-
-	int s = 0;
-	for (int i = 0; i < SOUND_FILE_NR; i++)
-		if ((data + i)->GetPlayStatus() == playing) {
-
-			long ret = (data + i)->ReadNextBuffer(pcmout[s]);
-
-			if (ret == 0)
-				(data + i)->StopAndRewind();
-
-			s++;
-		}
-
-	//if (av_compare_ts(video.next_pts, video.AudioCodecContext->time_base,STREAM_DURATION, (AVRational) { 1, 1 }) >= 0);
-	//else;
-
-	for (int i = 0; i < nBufferFrames; i++)
-		for (int j = 0; j < CHANNEL_COUNT; j++) {
-			short ki = 0;
-			for (int k = 0; k < s; k++)
-				ki += (((short(pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8)) + pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1])) / s;
-
-#ifdef VIDEO_RECORDING
-			if (recordingState == recording && GameVideo->Initialized())
-				GameVideo->audio->EncodeFrame(ki);
-#endif
-			* out++ = ki;
-		}
-
-	return 0;
-}
-
-void FullscreenSwitch() {
-
-	if (!fullScreen) {
-
-		fullScreen = !fullScreen;
-
-		former_SCR_HEIGHT = SCR_HEIGHT;
-		former_SCR_WIDTH = SCR_WIDTH;
-
-		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-		glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-	}
-	else {
-
-		glfwSetWindowMonitor(window, NULL, 0, 0, former_SCR_WIDTH, former_SCR_HEIGHT, 0);
-		glfwSetWindowPos(window, windowPosX, windowPosY);
-
-		fullScreen = !fullScreen;
-	}
-
-	glfwMakeContextCurrent(window);
-}
-
-#ifdef VIDEO_RECORDING
-
-void InitializeGameVideo() {
-
-	//not the best method as 
-	audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
-	audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
-
-	videoIn = new VideoParameters(viewPortWidth, viewPortHeight, AV_CODEC_ID_NONE, 400000, AV_PIX_FMT_RGB24, STREAM_FRAME_RATE);
-
-	unsigned int usedRecordingHeight = viewPortHeight;
-
-	if (viewPortHeight > recordinghHeight)
-		usedRecordingHeight = recordinghHeight;
-
-	if (recordinghHeight) {
-
-		if (usedRecordingHeight % 2 == 1)
-			usedRecordingHeight--;
-
-		int usedRecordingWidth = (int)((1.0f * viewPortWidth / viewPortHeight) * usedRecordingHeight);
-
-		if (usedRecordingWidth % 2 == 1)
-			usedRecordingWidth--;
-
-		videoOut = new VideoParameters(usedRecordingWidth, usedRecordingHeight, AV_CODEC_ID_H264, 400000, AV_PIX_FMT_YUV420P, STREAM_FRAME_RATE);
-	}
-
-	else
-		videoOut = new VideoParameters(viewPortWidth, viewPortHeight, AV_CODEC_ID_H264, 400000, AV_PIX_FMT_YUV420P, STREAM_FRAME_RATE);
-
-
-	GameVideo = new MultiMedia(videoOut, videoIn, audioOut, audioIn);
-
-	std::string fileName = "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
-
-	FindVideoCount();
-
-	GameVideo->Initialize(fileName);
-	GameVideo->video->SetRecordStartTime(glfwGetTime());
-}
-
-void WriteVideoFrame() {
-	//std::cout << "\n\n frameNr: " << recordFrameNr++ << ", time: " << diff << ", average fps: " << diff/recordFrameNr<<", "<<recordFrameNr/diff;// << ", fps theo: " << (glfwGetTime() - recordTime) * 50 * 20;
-	if (GameVideo->Initialized()) {
-
-		//glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, GameVideo->video->buffer);
-		glReadPixels(viewPortX, viewPortY, viewPortWidth, viewPortHeight, GL_RGB, GL_UNSIGNED_BYTE, GameVideo->video->buffer);
-		GameVideo->video->EncodeFrame(glfwGetTime());
-
-		while (GameVideo->audio->have || GameVideo->video->have) {
-
-			if (GameVideo->video->have && (!GameVideo->audio->have)) {
-				av_interleaved_write_frame(GameVideo->formatContext, GameVideo->video->packet);
-				GameVideo->video->have = false;
-			}
-			else if (GameVideo->audio->have && GameVideo->video->have && av_compare_ts(GameVideo->video->nextPts, GameVideo->video->codecContext->time_base, GameVideo->audio->nextPts, GameVideo->audio->codecContext->time_base) <= 0) {
-				av_interleaved_write_frame(GameVideo->formatContext, GameVideo->video->packet);
-				GameVideo->video->have = false;
-			}
-			else {
-				av_interleaved_write_frame(GameVideo->formatContext, GameVideo->audio->packet);
-				GameVideo->audio->have = false;
-			}
-		}
-	}
-}
-
-void CloseGameVideo() {
-
-	GameVideo->CloseVideo();
-
-	delete audioIn;
-	delete audioOut;
-	delete videoIn;
-	delete videoOut;
-	delete GameVideo;
-}
-
-void RecordHandling() {
-	if (recordingState == uninitialized) {
-
-		if (REC.Simple()) {
-
-			InitializeGameVideo();
-			recordingState = recording;
-		}
-	}
-	else if (recordingState == recording) {
-
-		if (REC.Simple())
-			recordingState = closing;
-
-		WriteVideoFrame();
-	}
-	else if (recordingState == closing) {
-
-		CloseGameVideo();
-		recordingState = uninitialized;
-	}
-}
-#endif

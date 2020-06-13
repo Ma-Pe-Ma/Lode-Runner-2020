@@ -1,6 +1,7 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
+#include "GLHelper.h"
 #include "Enums/Menu.h"
 #include "Gold.h"
 #include "Enemy.h"

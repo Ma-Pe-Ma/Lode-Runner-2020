@@ -13,9 +13,9 @@ void mainMenu(float currentFrame) {
 
 	//drawing background
 	glClear(GL_COLOR_BUFFER_BIT);
-	mainShader->use();
-	mainShader->setInt("mode", 0);
-	mainShader->setInt("textureA", 2);
+	GLHelper::mainShader->use();
+	GLHelper::mainShader->setInt("mode", 0);
+	GLHelper::mainShader->setInt("textureA", 2);
 	glBindVertexArray(mainVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -27,8 +27,8 @@ void mainMenu(float currentFrame) {
 		float cursorLocation[] = { -3.0f / 14, cursorY - 1.0f / 14, -6.0f / 35, cursorY - 1.0f / 14, -6.0f / 35, cursorY, -3.0f / 14, cursorY };
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 8, cursorLocation);
 
-		mainShader->setInt("mode", 1);
-		mainShader->setInt("textureA", 1);
+		GLHelper::mainShader->setInt("mode", 1);
+		GLHelper::mainShader->setInt("textureA", 1);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
@@ -175,7 +175,7 @@ void introScreen(float currentFrame) {
 
 		}
 
-		playerShader->setBool("direction", true);
+		GLHelper::playerShader->setBool("direction", true);
 		curSessionStartTime = currentFrame;
 		prevSessionSum = 0;
 		startingTimer = currentFrame;
@@ -613,12 +613,12 @@ void gameScreen(float currentFrame) {
 	if (takePauseScreenshot) {
 		glActiveTexture(GL_TEXTURE4);
 
-		unsigned char* screenBuffer = new unsigned char[viewPortWidth * viewPortHeight * 3];
+		unsigned char* screenBuffer = new unsigned char[GLHelper::viewPortWidth * GLHelper::viewPortHeight * 3];
 
-		glReadPixels(viewPortX, viewPortY, viewPortWidth, viewPortHeight, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
+		glReadPixels(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
 
 		glBindTexture(GL_TEXTURE_2D, pauseScreenT);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewPortWidth, viewPortHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GLHelper::viewPortWidth, GLHelper::viewPortHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, screenBuffer);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
 		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -678,9 +678,9 @@ void pauseScreen(float currentFrame) {
 	}
 
 	glBindVertexArray(mainVAO);
-	mainShader->use();
-	mainShader->setInt("textureA", 4);
-	mainShader->setInt("mode", 1);
+	GLHelper::mainShader->use();
+	GLHelper::mainShader->setInt("textureA", 4);
+	GLHelper::mainShader->setInt("mode", 1);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -705,7 +705,7 @@ void pauseScreenOut(float currentFrame) {
 	}
 
 	glBindVertexArray(mainVAO);
-	mainShader->use();
+	GLHelper::mainShader->use();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 

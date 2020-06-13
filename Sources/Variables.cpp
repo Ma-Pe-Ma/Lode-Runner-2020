@@ -1,7 +1,5 @@
 #include "Variables.h"
 
-Shader *selectShader, *mainShader, *levelShader, *playerShader;
-
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
 
 unsigned int pauseScreenT;
@@ -13,32 +11,6 @@ unsigned int cursorVAO, cursorVBO, cursorEBO;
 
 std::string levelFileName = "level/lodeRunner.baseLevel.txt";
 
-char pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
-unsigned int SCR_WIDTH = 1500;
-unsigned int SCR_HEIGHT = 900;
-
-unsigned int former_SCR_WIDTH = 1500;
-unsigned int former_SCR_HEIGHT = 900;
-
-unsigned int windowPosX = 30;
-unsigned int windowPosY = 30;
-
-unsigned int viewPortWidth = SCR_WIDTH;
-unsigned int viewPortHeight = SCR_HEIGHT;
-
-unsigned int viewPortX = 0;
-unsigned int viewPortY = 0;
-
-const char soundNames[SOUND_FILE_NR][25] = { "SFX/gold.ogg", "SFX/dig.ogg","SFX/dig_prev.ogg",
-										"SFX/death.ogg", "SFX/everygold.ogg","SFX/mainmenu.ogg",
-										"SFX/gameover.ogg", "SFX/gameplay.ogg","SFX/intro.ogg",
-										"SFX/step1.ogg","SFX/step2.ogg","SFX/ladder1.ogg",
-										"SFX/ladder2.ogg", "SFX/outro.ogg","SFX/pause.ogg",
-										"SFX/pole1.ogg","SFX/pole2.ogg", "SFX/fall.ogg"
-};
-
-RecordingState recordingState;
-
 //variable for changing moving sound, going-0, laddering-1, poling-2
  int going[3] = {};
 
@@ -46,15 +18,7 @@ RecordingState recordingState;
  bool usCover = false;
 
  int FPS = 35;
- unsigned int recordinghHeight = 0;
-
-#ifdef VIDEO_RECORDING
- MultiMedia* GameVideo;
- VideoParameters* videoIn;
- VideoParameters* videoOut;
- AudioParameters* audioIn;
- AudioParameters* audioOut;
-#endif
+ unsigned int recordingHeight = 0;
 
  bool startingScreen;
  float startingTimer;
@@ -84,10 +48,6 @@ RecordingState recordingState;
 //cursor of the menu
  int menuCursor = 0;
 
-//number of earlier taken screenshots and videos
- unsigned int scr = 0;
- unsigned int vid = 0;
-
  LayoutBlock layout[30][18];
  int gen[30][18] = {};
 
@@ -112,7 +72,7 @@ RecordingState recordingState;
  int score[2] = { 0,0 };
  int highScore = 0;
  bool game_over[2] = {};
-bool level_inc[2][2];
+ bool level_inc[2][2];
 
 bool right_pit;
 bool left_pit;
@@ -120,25 +80,21 @@ float idleTime;
 float fallTime;
 float digTime;
 
-bool fullScreen = false;
-GLFWwindow* window;
-
-float blokk[16] =
-{
+float blokk[16] = {
 	-0.5,	-0.5,
 	 0.5,	-0.5,
 	 0.5, 	 0.5,
 	-0.5,	 0.5,
 };
 
-float main_menu[16] =
-{ -1,	-1,		0.0, 0.0,
+float main_menu[16] = {
+    -1,	-1,		0.0, 0.0,
 	 1, -1,		1.0, 0.0,
 	 1,	 1,		1.0, 1.0,
 	-1,	 1,		0.0, 1.0,
 };
 
-unsigned int indices[6] = {
+const unsigned int indices[6] = {
 		 0,1,2,
 		 2,3,0
 };

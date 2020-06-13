@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 
+#include <iostream>
+
 #include "Enums/Direction.h"
 #include "Enums/EnemyState.h"
 #include "Enums/PitState.h"

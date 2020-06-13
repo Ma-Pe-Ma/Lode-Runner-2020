@@ -11,20 +11,15 @@
 
 #include <RtAudio/RtAudio.h>
 
-#define RELEASE_VERSION
-//#define VIDEO_RECORDING
-
-#define STREAM_DURATION 10.0
-//for correct recording: audio-nb_samples/samplefreqency > 1/streamframerate (video FPS)
-#define STREAM_FRAME_RATE 60
-
-//default pix_fmt
-#define STREAM_PIX_FMT AV_PIX_FMT_YUV420P
+//#define RELEASE_VERSION
+#define VIDEO_RECORDING
 
 #ifdef VIDEO_RECORDING
-#include "MultiMediaRecording.h"
+#include "MultiMediaRecording/MultiMediaHelper.h"
+#include "MultiMediaRecording/MultiMedia.h"
 #endif
 
+#include "GLHelper.h"
 #include "Variables.h"
 #include "Functions.h"
 #include "Structure.h"
@@ -34,7 +29,6 @@
 #include <thread>
 
 int main(int argc, char**argv) {
-	
 	HWND hWnd = GetConsoleWindow();
 	ShowWindow(hWnd, SW_HIDE);
 
@@ -69,8 +63,7 @@ int main(int argc, char**argv) {
 		}
 	}	
 
-	Audio::OpenAudioFiles(soundNames);	
-		
+	Audio::OpenAudioFiles(Audio::soundNames);
 	RtAudio dac = RtAudio(RtAudio::WINDOWS_WASAPI);
 
 	if (dac.getDeviceCount() < 1) {
@@ -85,7 +78,7 @@ int main(int argc, char**argv) {
 	
 	unsigned int bufferFrames = FRAMES_PER_BUFFER;
 	try {
-		dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames, &RtAudioVorbis, (void *)Audio::SFX);
+		dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames, &Audio::RtAudioVorbis, (void *)Audio::SFX);
 		dac.startStream();
 	}
 	catch (RtAudioError& e) {
@@ -93,21 +86,25 @@ int main(int argc, char**argv) {
 		exit(0);
 	}
 
+	
+
 	glfwInit();
 
-	glfwSetErrorCallback(errorCallback);
-
+	glfwSetErrorCallback(GLHelper::errorCallback);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LODE RUNNER 2020 - Margitai Peter", NULL, NULL);	
-	glfwSetWindowPosCallback(window, window_pos_callback);
-	glfwSetWindowPos(window, windowPosX, windowPosY);
+	std::cout << "window x : " << GLHelper::SCR_WIDTH;
+	std::cout << "window y : " << GLHelper::SCR_HEIGHT;
 
-	if (window == NULL) {
+	GLHelper::window = glfwCreateWindow(GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT, "LODE RUNNER 2020 - Margitai Peter", NULL, NULL);
+	glfwSetWindowPosCallback(GLHelper::window, GLHelper::window_pos_callback);
+	glfwSetWindowPos(GLHelper::window, GLHelper::windowPosX, GLHelper::windowPosY);
+
+	if (GLHelper::window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		int a;
@@ -115,10 +112,10 @@ int main(int argc, char**argv) {
 		return -1;
 	}
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(GLHelper::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwMakeContextCurrent(GLHelper::window);
+	glfwSetFramebufferSizeCallback(GLHelper::window, GLHelper::framebuffer_size_callback);
 	
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -127,17 +124,17 @@ int main(int argc, char**argv) {
 		return -1;
 	}
 
-	glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
 
 	GLFWimage icon;
 	int iconNrComp;
-	icon.pixels = getRawCharArrayWithSTBI("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
-	glfwSetWindowIcon(window, 1, &icon);
+	icon.pixels = GLHelper::getRawCharArrayWithSTBI("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
+	glfwSetWindowIcon(GLHelper::window, 1, &icon);
 
-	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
-	mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt");
-	levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt");
-	playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt");
+	GLHelper::selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
+	GLHelper::mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt");
+	GLHelper::levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt");
+	GLHelper::playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt");
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -208,21 +205,21 @@ int main(int argc, char**argv) {
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 
-	float screenRatio = ((float)SCR_WIDTH) / SCR_HEIGHT;
+	float screenRatio = ((float)GLHelper::SCR_WIDTH) / GLHelper::SCR_HEIGHT;
 
-	playerShader->use();
+	GLHelper::playerShader->use();
 	glActiveTexture(GL_TEXTURE0);
-	unsigned int characterSet = loadTexture("Texture/NES - Lode Runner - Characters.png");
+	unsigned int characterSet = GLHelper::loadTexture("Texture/NES - Lode Runner - Characters.png");
 	glBindTexture(GL_TEXTURE_2D, characterSet);
-	playerShader->setInt("textureA", 0);
-	playerShader->setFloat("screenRatio", screenRatio);
+	GLHelper::playerShader->setInt("textureA", 0);
+	GLHelper::playerShader->setFloat("screenRatio", screenRatio);
 
-	levelShader->use();
+	GLHelper::levelShader->use();
 	glActiveTexture(GL_TEXTURE1);
-	unsigned int tileSet = loadTexture("Texture/NES - Lode Runner - Tileset.png");
+	unsigned int tileSet = GLHelper::loadTexture("Texture/NES - Lode Runner - Tileset.png");
 	glBindTexture(GL_TEXTURE_2D, tileSet);
-	levelShader->setInt("textureA", 1);
-	levelShader->setFloat("screenRatio", screenRatio);
+	GLHelper::levelShader->setInt("textureA", 1);
+	GLHelper::levelShader->setFloat("screenRatio", screenRatio);
 
 	std::string mainMenuTextureName = "Texture/MainMenu.png";
 	
@@ -233,21 +230,21 @@ int main(int argc, char**argv) {
 	
 	const char *mainMenuTextureNameChar = mainMenuTextureName.c_str();
 
-	mainShader->use();
+	GLHelper::mainShader->use();
 	glActiveTexture(GL_TEXTURE2);
-	unsigned int menuScreen = loadTexture(mainMenuTextureNameChar);
+	unsigned int menuScreen = GLHelper::loadTexture(mainMenuTextureNameChar);
 	glBindTexture(GL_TEXTURE_2D, menuScreen);
-	mainShader->setInt("textureA", 2);
-	mainShader->setInt("width", SCR_WIDTH);
-	mainShader->setInt("height", SCR_HEIGHT);
-	mainShader->setFloat("screenRatio", screenRatio);
+	GLHelper::mainShader->setInt("textureA", 2);
+	GLHelper::mainShader->setInt("width", GLHelper::SCR_WIDTH);
+	GLHelper::mainShader->setInt("height", GLHelper::SCR_HEIGHT);
+	GLHelper::mainShader->setFloat("screenRatio", screenRatio);
 
-	selectShader->use();
+	GLHelper::selectShader->use();
 	glActiveTexture(GL_TEXTURE3);
-	unsigned int selectScreenT = loadTexture("Texture/ABC.png");
+	unsigned int selectScreenT = GLHelper::loadTexture("Texture/ABC.png");
 	glBindTexture(GL_TEXTURE_2D, selectScreenT);
-	selectShader->setInt("textureA", 3);
-	selectShader->setFloat("screenRatio", screenRatio);
+	GLHelper::selectShader->setInt("textureA", 3);
+	GLHelper::selectShader->setFloat("screenRatio", screenRatio);
 
 	glGenTextures(1, &pauseScreenT);
 
@@ -272,10 +269,23 @@ int main(int argc, char**argv) {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
 
+#ifdef VIDEO_RECORDING
+	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
+	AudioParameters* audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
+
+	VideoParameters* videoIn = new VideoParameters(GLHelper::viewPortWidth, GLHelper::viewPortHeight, AV_CODEC_ID_NONE, 400000, AV_PIX_FMT_RGB24, STREAM_FRAME_RATE);
+	VideoParameters* videoOut = new VideoParameters(0, recordingHeight, AV_CODEC_ID_H264, 400000, AV_PIX_FMT_YUV420P, STREAM_FRAME_RATE);
+	
+	MultiMedia media(audioIn, audioOut, videoIn, videoOut);
+	media.setGLViewPortReferences(&GLHelper::viewPortX, &GLHelper::viewPortY, &GLHelper::viewPortWidth, &GLHelper::viewPortHeight);
+	media.setGenerateName(GLHelper::generateNewVideoName);
+	media.setVideoOutputSizeWanted(0, recordingHeight);
+	Audio::multiMedia = &media;
+	GLHelper::multiMedia = &media;
+#endif
 	std::chrono::system_clock::time_point prevFrameStart = std::chrono::system_clock::now();
 	
-	while (!glfwWindowShouldClose(window)) {
-
+	while (!glfwWindowShouldClose(GLHelper::window)) {
 		std::chrono::duration<double, std::milli> work_time = std::chrono::system_clock::now() - prevFrameStart;
 
 		if (work_time.count() < 1000.0f/FPS) {
@@ -287,8 +297,6 @@ int main(int argc, char**argv) {
 		prevFrameStart = std::chrono::system_clock::now();		
 
 		float currentFrame = glfwGetTime();
-		//if (currentFrame - lastFrame < (1.0f / STREAM_FRAME_RATE))
-		//	continue;
 
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -302,16 +310,17 @@ int main(int argc, char**argv) {
 			timeValue = timeValue.substr(0,timeValue.length()-5);
 			TextWriting("GAMETIME: " + timeValue + " SEC", -5, 0);
 		}
-			
+		
+		//Playerlocation
 		//if (menu == L04 || menu == C04 || menu == L06 || menu == C06) {
-			//std::string timeString = "POS X: " + std::to_string(enemies[0].Pos.x) + " Y: " + std::to_string(enemies[0].Pos.y);
+			//std::string timeString = "POS X: " + std::to_string(Enemy::enemies[0].Pos.x) + " Y: " + std::to_string(Enemy::enemies[0].Pos.y);
 			//TextWriting(timeString, -5, 0);
 		//}
 
-		processInput(window);
+		processInput(GLHelper::window);
 
 		if (lAlt.continous() && enter.simple())
-			FullscreenSwitch();
+			GLHelper::FullscreenSwitch();
 
 		switch (menu) {
 			//mainmenu
@@ -384,14 +393,14 @@ int main(int argc, char**argv) {
 
 		//take a screenshot
 		if (pButton.simple())
-			screenCapture();
+			GLHelper::screenCapture();
 
 #ifdef VIDEO_RECORDING
 		//With the help of this function you can record videos
-		RecordHandling();
+		media.recordAndControl(REC.simple());
 #endif
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(GLHelper::window);
 		glfwPollEvents();
 	}
 
@@ -420,10 +429,10 @@ int main(int argc, char**argv) {
 	glDeleteTextures(1, &tileSet);
 	glDeleteTextures(1, &selectScreenT);
 
-	delete levelShader;
-	delete mainShader;
-	delete playerShader;
-	delete selectShader;
+	delete GLHelper::levelShader;
+	delete GLHelper::mainShader;
+	delete GLHelper::playerShader;
+	delete GLHelper::selectShader;
 
 	glfwTerminate();
 	return 0;
