@@ -2,13 +2,6 @@
 
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
 
-unsigned int pauseScreenT;
-unsigned int selectVBO, selectVAO, selectEBO;
-unsigned int levelVBO, levelVAO, levelEBO;
-unsigned int playerVBO, playerVAO, playerEBO;
-unsigned int mainVBO, mainVAO, mainEBO;
-unsigned int cursorVAO, cursorVBO, cursorEBO;
-
 std::string levelFileName = "level/lodeRunner.baseLevel.txt";
 
 //variable for changing moving sound, going-0, laddering-1, poling-2
@@ -79,24 +72,5 @@ bool left_pit;
 float idleTime;
 float fallTime;
 float digTime;
-
-float blokk[16] = {
-	-0.5,	-0.5,
-	 0.5,	-0.5,
-	 0.5, 	 0.5,
-	-0.5,	 0.5,
-};
-
-float main_menu[16] = {
-    -1,	-1,		0.0, 0.0,
-	 1, -1,		1.0, 0.0,
-	 1,	 1,		1.0, 1.0,
-	-1,	 1,		0.0, 1.0,
-};
-
-const unsigned int indices[6] = {
-		 0,1,2,
-		 2,3,0
-};
 
 Menu menu = L01;

@@ -2,32 +2,32 @@
 
 //from left to right, from down to up
 void playerTextureMapping(int index) {
-	blokk[8] = ((index % 12) * 1.0) / 12;
-	blokk[9] = ((index / 12) * 1.0) / 5;
+	GLHelper::blokk[8] = ((index % 12) * 1.0) / 12;
+	GLHelper::blokk[9] = ((index / 12) * 1.0) / 5;
 
-	blokk[10] = ((index % 12 + 1) * 1.0) / 12;
-	blokk[11] = ((index / 12) * 1.0) / 5;
+	GLHelper::blokk[10] = ((index % 12 + 1) * 1.0) / 12;
+	GLHelper::blokk[11] = ((index / 12) * 1.0) / 5;
 
-	blokk[12] = ((index % 12 + 1) * 1.0) / 12;
-	blokk[13] = ((index / 12 + 1) * 1.0) / 5;
+	GLHelper::blokk[12] = ((index % 12 + 1) * 1.0) / 12;
+	GLHelper::blokk[13] = ((index / 12 + 1) * 1.0) / 5;
 
-	blokk[14] = ((index % 12) * 1.0) / 12;
-	blokk[15] = ((index / 12 + 1) * 1.0) / 5;
+	GLHelper::blokk[14] = ((index % 12) * 1.0) / 12;
+	GLHelper::blokk[15] = ((index / 12 + 1) * 1.0) / 5;
 }
 
 //from up to down, from left to right
 void levelTextureMapping(int index) {
-	blokk[8] = ((index / 6) * 1.0) / 11;
-	blokk[9] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
+	GLHelper::blokk[8] = ((index / 6) * 1.0) / 11;
+	GLHelper::blokk[9] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
 
-	blokk[10] = ((index / 6 + 1) * 1.0) / 11;
-	blokk[11] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
+	GLHelper::blokk[10] = ((index / 6 + 1) * 1.0) / 11;
+	GLHelper::blokk[11] = 5.0 / 6 - ((index % 6) * 1.0) / 6;
 
-	blokk[12] = ((index / 6 + 1) * 1.0) / 11;
-	blokk[13] = 1.0 - ((index % 6) * 1.0) / 6;
+	GLHelper::blokk[12] = ((index / 6 + 1) * 1.0) / 11;
+	GLHelper::blokk[13] = 1.0 - ((index % 6) * 1.0) / 6;
 
-	blokk[14] = ((index / 6) * 1.0) / 11;
-	blokk[15] = 1.0 - ((index % 6) * 1.0) / 6;
+	GLHelper::blokk[14] = ((index / 6) * 1.0) / 11;
+	GLHelper::blokk[15] = 1.0 - ((index % 6) * 1.0) / 6;
 }
 
 void abcTextureMapping(char karakter) {
@@ -35,82 +35,82 @@ void abcTextureMapping(char karakter) {
 
 	if (karakter == '.') {
 
-		blokk[8] = float(0) / 16;
-		blokk[9] = (3.0f) / 4;
+		GLHelper::blokk[8] = float(0) / 16;
+		GLHelper::blokk[9] = (3.0f) / 4;
 
-		blokk[10] = float(1) / 16;
-		blokk[11] = (3.0f) / 4;
+		GLHelper::blokk[10] = float(1) / 16;
+		GLHelper::blokk[11] = (3.0f) / 4;
 
-		blokk[12] = float(1) / 16;
-		blokk[13] = (4.0f) / 4;
+		GLHelper::blokk[12] = float(1) / 16;
+		GLHelper::blokk[13] = (4.0f) / 4;
 
-		blokk[14] = float(0) / 16;
-		blokk[15] = (4.0f) / 4;
+		GLHelper::blokk[14] = float(0) / 16;
+		GLHelper::blokk[15] = (4.0f) / 4;
 
 		return;
 	}
 
 	if (karakter == ':') {
 
-		blokk[8] = float(1) / 16;
-		blokk[9] = (3.0f) / 4;
+		GLHelper::blokk[8] = float(1) / 16;
+		GLHelper::blokk[9] = (3.0f) / 4;
 
-		blokk[10] = float(2) / 16;
-		blokk[11] = (3.0f) / 4;
+		GLHelper::blokk[10] = float(2) / 16;
+		GLHelper::blokk[11] = (3.0f) / 4;
 
-		blokk[12] = float(2) / 16;
-		blokk[13] = (4.0f) / 4;
+		GLHelper::blokk[12] = float(2) / 16;
+		GLHelper::blokk[13] = (4.0f) / 4;
 
-		blokk[14] = float(1) / 16;
-		blokk[15] = (4.0f) / 4;
+		GLHelper::blokk[14] = float(1) / 16;
+		GLHelper::blokk[15] = (4.0f) / 4;
 
 		return;
 	}
 
 	for (int j = 0; j < 10; j++)
 		if (j == (int(karakter) - 48)) {
-			blokk[8] = (1.0 * j + 0.01) / 16;
-			blokk[9] = (1.0) / 2;
+			GLHelper::blokk[8] = (1.0 * j + 0.01) / 16;
+			GLHelper::blokk[9] = (1.0) / 2;
 
-			blokk[10] = (j + 1.0) / 16;
-			blokk[11] = (1.0) / 2;
+			GLHelper::blokk[10] = (j + 1.0) / 16;
+			GLHelper::blokk[11] = (1.0) / 2;
 
-			blokk[12] = (j + 1.0) / 16;
-			blokk[13] = (3.0) / 4;
+			GLHelper::blokk[12] = (j + 1.0) / 16;
+			GLHelper::blokk[13] = (3.0) / 4;
 
-			blokk[14] = (1.0 * j + 0.01) / 16;
-			blokk[15] = (3.0) / 4;
+			GLHelper::blokk[14] = (1.0 * j + 0.01) / 16;
+			GLHelper::blokk[15] = (3.0) / 4;
 		}
 
 	for (int i = 0; i < ABC.length(); i++) {
 		if (karakter == ABC[i]) {
 			if (i < 15) {
-				blokk[8] = (float(1.01 + i)) / 16;
-				blokk[9] = (float(1)) / 4;
+				GLHelper::blokk[8] = (float(1.01 + i)) / 16;
+				GLHelper::blokk[9] = (float(1)) / 4;
 
-				blokk[10] = (float(2 + i)) / 16;
-				blokk[11] = (float(1)) / 4;
+				GLHelper::blokk[10] = (float(2 + i)) / 16;
+				GLHelper::blokk[11] = (float(1)) / 4;
 
-				blokk[12] = (float(2 + i)) / 16;
-				blokk[13] = (float(2)) / 4;
+				GLHelper::blokk[12] = (float(2 + i)) / 16;
+				GLHelper::blokk[13] = (float(2)) / 4;
 
-				blokk[14] = (float(1.01 + i)) / 16;
-				blokk[15] = (float(2)) / 4;
+				GLHelper::blokk[14] = (float(1.01 + i)) / 16;
+				GLHelper::blokk[15] = (float(2)) / 4;
 				return;
 			}
 
 			if (i > 14) {
-				blokk[8] = float(i - 14.99) / 16;
-				blokk[9] = (0.0) / 4;
+				GLHelper::blokk[8] = float(i - 14.99) / 16;
+				GLHelper::blokk[9] = (0.0) / 4;
 
-				blokk[10] = float(i - 14) / 16;
-				blokk[11] = (0.0) / 4;
+				GLHelper::blokk[10] = float(i - 14) / 16;
+				GLHelper::blokk[11] = (0.0) / 4;
 
-				blokk[12] = float(i - 14) / 16;
-				blokk[13] = (1.0) / 4;
+				GLHelper::blokk[12] = float(i - 14) / 16;
+				GLHelper::blokk[13] = (1.0) / 4;
 
-				blokk[14] = float(i - 14.99) / 16;
-				blokk[15] = (1.0) / 4;
+				GLHelper::blokk[14] = float(i - 14.99) / 16;
+				GLHelper::blokk[15] = (1.0) / 4;
 				return;
 			}
 		}
@@ -128,12 +128,12 @@ void TextWriting(std::string text, float i, float j) {
 
 			abcTextureMapping(text.at(k));
 			GLHelper::selectShader->use();
-			GLHelper::selectShader->setVec2("gPos", glm::vec2(i, j));
+			GLHelper::selectShader->setVec2("gPos", i, j);
 			GLHelper::selectShader->setInt("textureA", 3);
 
-			glBindVertexArray(selectVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, selectVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(blokk), blokk, GL_STATIC_DRAW);
+			glBindVertexArray(GLHelper::selectVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, GLHelper::selectVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLHelper::blokk), GLHelper::blokk, GL_STATIC_DRAW);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		i++;
@@ -148,9 +148,9 @@ void DrawLevel(float x, float y, int ref, float holeTimer) {
 	levelTextureMapping(ref);
 
 	GLHelper::levelShader->use();
-	glBindVertexArray(levelVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, levelVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(blokk), blokk, GL_STATIC_DRAW);
+	glBindVertexArray(GLHelper::levelVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, GLHelper::levelVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLHelper::blokk), GLHelper::blokk, GL_STATIC_DRAW);
 	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 8, (void*) &blokk[8]);
 	GLHelper::levelShader->setVec2("gPos", x, y);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -171,19 +171,18 @@ void DrawEnemy(float x, float y, int ref, Direction direction, Gold* gold) {
 	playerTextureMapping(ref);
 
 	GLHelper::playerShader->use();
-	glBindVertexArray(playerVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(blokk), blokk, GL_STATIC_DRAW);
-	GLHelper::playerShader->setVec2("gPos", glm::vec2(x, y));
+	glBindVertexArray(GLHelper::playerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, GLHelper::playerVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLHelper::blokk), GLHelper::blokk, GL_STATIC_DRAW);
+	GLHelper::playerShader->setVec2("gPos", x, y);
 	GLHelper::playerShader->setBool("direction", dirToShader);
 	GLHelper::playerShader->setBool("carryGold", carryGold);
-	GLHelper::playerShader->setFloat("ref", blokk[8]);
+	GLHelper::playerShader->setFloat("ref", GLHelper::blokk[8]);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void processInput(GLFWwindow* window) {
-
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 

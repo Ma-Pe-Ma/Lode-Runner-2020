@@ -22,6 +22,13 @@ public:
 	static Shader* levelShader;
 	static Shader* playerShader;
 
+	static unsigned int pauseScreenT;
+	static unsigned int selectVBO, selectVAO, selectEBO;
+	static unsigned int levelVBO, levelVAO, levelEBO;
+	static unsigned int playerVBO, playerVAO, playerEBO;
+	static unsigned int mainVBO, mainVAO, mainEBO;
+	static unsigned int cursorVAO, cursorVBO, cursorEBO;
+
 	static unsigned int viewPortX;
 	static unsigned int viewPortY;
 	static unsigned int viewPortWidth;
@@ -50,6 +57,18 @@ public:
 	static unsigned int FindScreenShotCount();
 	static unsigned int FindVideoCount();
 	static std::string generateNewVideoName();
+
+	static void Initialize(std::string);
+	static void Terminate();
+	static const unsigned int indices[];
+
+	static float blokk[16];
+	static float main_menu[16];
+
+	static unsigned int menuScreen;
+	static unsigned int characterSet;
+	static unsigned int tileSet;
+	static unsigned int selectScreenT;
 };
 
 #endif // !GLHELPER_H

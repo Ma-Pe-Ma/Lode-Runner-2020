@@ -104,4 +104,4 @@ This was my first complex project since I started programming. My earlier effort
 
 However, in the near future I'm not planning to address this issues as I have other projects and I got bored by this a little. So it's possible that the next big update will only come in a few years from the initial commit.
 
-** Have fun playing with it!**
+**Have fun playing with it!**

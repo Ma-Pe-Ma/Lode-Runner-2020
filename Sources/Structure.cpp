@@ -16,13 +16,13 @@ void mainMenu(float currentFrame) {
 	GLHelper::mainShader->use();
 	GLHelper::mainShader->setInt("mode", 0);
 	GLHelper::mainShader->setInt("textureA", 2);
-	glBindVertexArray(mainVAO);
+	glBindVertexArray(GLHelper::mainVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	//drawing cursor
 	if (!championShip) {
-		glBindVertexArray(cursorVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
+		glBindVertexArray(GLHelper::cursorVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, GLHelper::cursorVBO);
 		float cursorY = (1.0f - 2 * menuCursor) / 14;
 		float cursorLocation[] = { -3.0f / 14, cursorY - 1.0f / 14, -6.0f / 35, cursorY - 1.0f / 14, -6.0f / 35, cursorY, -3.0f / 14, cursorY };
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 8, cursorLocation);
@@ -677,7 +677,7 @@ void pauseScreen(float currentFrame) {
 		}
 	}
 
-	glBindVertexArray(mainVAO);
+	glBindVertexArray(GLHelper::mainVAO);
 	GLHelper::mainShader->use();
 	GLHelper::mainShader->setInt("textureA", 4);
 	GLHelper::mainShader->setInt("mode", 1);
@@ -704,7 +704,7 @@ void pauseScreenOut(float currentFrame) {
 		curSessionStartTime = currentFrame;
 	}
 
-	glBindVertexArray(mainVAO);
+	glBindVertexArray(GLHelper::mainVAO);
 	GLHelper::mainShader->use();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

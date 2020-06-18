@@ -10,11 +10,6 @@
 extern Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
 
 extern unsigned int pauseScreenT;
-extern unsigned int selectVBO, selectVAO, selectEBO;
-extern unsigned int levelVBO, levelVAO, levelEBO;
-extern unsigned int playerVBO, playerVAO, playerEBO;
-extern unsigned int mainVBO, mainVAO, mainEBO;
-extern unsigned int cursorVAO, cursorVBO, cursorEBO;
 
 extern std::string levelFileName;
 

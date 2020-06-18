@@ -5,16 +5,45 @@
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
 
+const unsigned int GLHelper::indices[6] = {
+		 0,1,2,
+		 2,3,0
+};
+
+float GLHelper::blokk[16] = {
+	-0.5,	-0.5,
+	 0.5,	-0.5,
+	 0.5, 	 0.5,
+	-0.5,	 0.5,
+};
+
+float GLHelper::main_menu[16] = {
+	-1,	-1,		0.0, 0.0,
+	 1, -1,		1.0, 0.0,
+	 1,	 1,		1.0, 1.0,
+	-1,	 1,		0.0, 1.0,
+};
+
 unsigned int GLHelper::scr = 0;
 unsigned int GLHelper::vid = 0;
 
 GLFWwindow* GLHelper::window;
 MultiMedia* GLHelper::multiMedia;
 
+unsigned int GLHelper::pauseScreenT;
 Shader* GLHelper::selectShader;
 Shader* GLHelper::mainShader;
 Shader* GLHelper::levelShader;
 Shader* GLHelper::playerShader;
+
+unsigned int pauseScreenT;
+unsigned int GLHelper::selectVBO, GLHelper::selectVAO, GLHelper::selectEBO;
+unsigned int GLHelper::levelVBO, GLHelper::levelVAO, GLHelper::levelEBO;
+unsigned int GLHelper::playerVBO, GLHelper::playerVAO, GLHelper::playerEBO;
+unsigned int GLHelper::mainVBO, GLHelper::mainVAO, GLHelper::mainEBO;
+unsigned int GLHelper::cursorVAO, GLHelper::cursorVBO, GLHelper::cursorEBO;
+
+unsigned int GLHelper::menuScreen, GLHelper::characterSet, GLHelper::tileSet, GLHelper::selectScreenT;
 
 unsigned int GLHelper::SCR_WIDTH = 1500;
 unsigned int GLHelper::SCR_HEIGHT = 900;
@@ -235,4 +264,163 @@ unsigned int GLHelper::FindVideoCount() {
 std::string GLHelper::generateNewVideoName() {
 	unsigned int vid = FindVideoCount();
 	return "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
+}
+
+void GLHelper::Initialize(std::string mainMenuTextureName) {
+	glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
+
+	GLFWimage icon;
+	int iconNrComp;
+	icon.pixels = GLHelper::getRawCharArrayWithSTBI("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
+	glfwSetWindowIcon(GLHelper::window, 1, &icon);
+
+	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
+	mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt");
+	levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt");
+	playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt");
+
+	glGenVertexArrays(1, &levelVAO);
+	glGenBuffers(1, &levelVBO);
+	glGenBuffers(1, &levelEBO);
+
+	glBindVertexArray(levelVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, levelVBO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, levelEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
+	glGenVertexArrays(1, &playerVAO);
+	glGenBuffers(1, &playerVBO);
+	glGenBuffers(1, &playerEBO);
+
+	glBindVertexArray(playerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, playerEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
+	glGenVertexArrays(1, &mainVAO);
+	glGenBuffers(1, &mainVBO);
+
+	glBindVertexArray(mainVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, mainVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(main_menu), main_menu, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, playerEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
+
+	glGenVertexArrays(1, &selectVAO);
+	glGenBuffers(1, &selectVBO);
+	glGenBuffers(1, &selectEBO);
+
+	glBindVertexArray(selectVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, selectVBO);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, selectEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
+
+	glGenVertexArrays(1, &cursorVAO);
+	glGenBuffers(1, &cursorVBO);
+	glGenBuffers(1, &cursorEBO);
+
+	glBindVertexArray(cursorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
+	float cursorMapping[] = { 21.0f / 22, 0, 1, 0, 1, 1.0f / 12, 21.0f / 22, 1.0f / 12 };
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * 8, sizeof(float) * 8, cursorMapping);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cursorEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
+
+	GLHelper::playerShader->use();
+	glActiveTexture(GL_TEXTURE0);
+	characterSet = GLHelper::loadTexture("Texture/NES - Lode Runner - Characters.png");
+	glBindTexture(GL_TEXTURE_2D, characterSet);
+	GLHelper::playerShader->setInt("textureA", 0);
+
+	GLHelper::levelShader->use();
+	glActiveTexture(GL_TEXTURE1);
+	tileSet = GLHelper::loadTexture("Texture/NES - Lode Runner - Tileset.png");
+	glBindTexture(GL_TEXTURE_2D, tileSet);
+	GLHelper::levelShader->setInt("textureA", 1);
+
+	const char* mainMenuTextureNameChar = mainMenuTextureName.c_str();
+
+	GLHelper::mainShader->use();
+	glActiveTexture(GL_TEXTURE2);
+	menuScreen = GLHelper::loadTexture(mainMenuTextureNameChar);
+	glBindTexture(GL_TEXTURE_2D, menuScreen);
+	GLHelper::mainShader->setInt("textureA", 2);
+
+	GLHelper::selectShader->use();
+	glActiveTexture(GL_TEXTURE3);
+	selectScreenT = GLHelper::loadTexture("Texture/ABC.png");
+	glBindTexture(GL_TEXTURE_2D, selectScreenT);
+	GLHelper::selectShader->setInt("textureA", 3);
+
+	glGenTextures(1, &pauseScreenT);
+}
+
+void GLHelper::Terminate() {
+	glDeleteVertexArrays(1, &levelVAO);
+	glDeleteBuffers(1, &levelVBO);
+	glDeleteBuffers(1, &levelEBO);
+
+	glDeleteVertexArrays(1, &playerVAO);
+	glDeleteBuffers(1, &playerVBO);
+	glDeleteBuffers(1, &playerEBO);
+
+	glDeleteVertexArrays(1, &cursorVAO);
+	glDeleteBuffers(1, &cursorVBO);
+	glDeleteBuffers(1, &cursorEBO);
+
+	glDeleteVertexArrays(1, &mainVAO);
+	glDeleteBuffers(1, &mainVBO);
+	glDeleteBuffers(1, &mainEBO);
+
+	glDeleteVertexArrays(1, &selectVAO);
+	glDeleteBuffers(1, &selectVBO);
+	glDeleteBuffers(1, &selectEBO);
+
+	glDeleteTextures(1, &menuScreen);
+	glDeleteTextures(1, &characterSet);
+	glDeleteTextures(1, &tileSet);
+	glDeleteTextures(1, &selectScreenT);
+
+	delete GLHelper::levelShader;
+	delete GLHelper::mainShader;
+	delete GLHelper::playerShader;
+	delete GLHelper::selectShader;
 }
