@@ -327,7 +327,7 @@ void loadConfig() {
 
 				if (std::stoi(setup.substr(9)) == 1) {
 					levelFileName = "level/lodeRunner.champLevel.txt";
-					championShip = true;
+					championship = true;
 
 					if (level[0] > 51) {
 						level[0] = 51;
@@ -348,7 +348,7 @@ void loadConfig() {
 				level[0] = levelNr;
 				level[1] = levelNr;
 
-				if (championShip)
+				if (championship)
 					if (level[0] > 51) {
 						level[0] = 51;
 						level[1] = 51;

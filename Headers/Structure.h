@@ -7,6 +7,7 @@
 #include "Enemy.h"
 #include "Functions.h"
 #include "Level.h"
+#include "Button.h"
 
 void mainMenu(float currentFrame);
 void introScreen(float currentFrame);

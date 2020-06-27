@@ -6,7 +6,7 @@ void mainMenu(float currentFrame) {
 		Audio::SFX[5].PlayPause();
 
 	//Drawing main menu
-	if (championShip)
+	if (championship)
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	else
 		glClearColor(110.0 / 256, 93.0 / 256, 243.0 / 256, 1.0f);
@@ -20,7 +20,7 @@ void mainMenu(float currentFrame) {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	//drawing cursor
-	if (!championShip) {
+	if (!championship) {
 		glBindVertexArray(GLHelper::cursorVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, GLHelper::cursorVBO);
 		float cursorY = (1.0f - 2 * menuCursor) / 14;
@@ -42,7 +42,7 @@ void mainMenu(float currentFrame) {
 		if (--menuCursor == -1)
 			menuCursor = 2;
 
-	if (championShip)
+	if (championship)
 		menuCursor = 0;
 
 	//choosing selected gamemode
@@ -129,7 +129,7 @@ void introScreen(float currentFrame) {
 		std::string hiscore = "HISCORE  " + zeros + record;
 
 		TextWriting(levelName, 8, 12);
-		if (!championShip)
+		if (!championship)
 			TextWriting(playerName, 12, 6);
 
 		TextWriting(lifeLeft, 19, 12);
@@ -209,7 +209,7 @@ void selectScreen(float currentFrame) {
 	}
 
 
-	if (championShip) {
+	if (championship) {
 		if (level[playerNr] < 1)
 			level[playerNr] = 51 + level[playerNr];
 
@@ -482,18 +482,18 @@ void gameScreen(float currentFrame) {
 		}
 
 	//player input
-	if (rightButton.continous() && leftButton.continous())
+	if (rightButton.continuous() && leftButton.continuous())
 		Enemy::enemies[0].dPos.x = 0;
-	else if (rightButton.continous())
+	else if (rightButton.continuous())
 		Enemy::enemies[0].dPos.x = playerSpeed * speed;
-	else if (leftButton.continous())
+	else if (leftButton.continuous())
 		Enemy::enemies[0].dPos.x = -playerSpeed * speed;
 
-	if (up.continous() && down.continous())
+	if (up.continuous() && down.continuous())
 		Enemy::enemies[0].dPos.y = 0;
-	else if (up.continous())
+	else if (up.continuous())
 		Enemy::enemies[0].dPos.y = playerSpeed * speed;
-	else if (down.continous())
+	else if (down.continuous())
 		Enemy::enemies[0].dPos.y = -playerSpeed * speed;
 
 	//moving runner and enemies by the input
@@ -836,38 +836,45 @@ void gameOverScreen(float currentFrame) {
 }
 
 void generatorScreen(float currentFrame) {
-	if (rightButton.simple())
-		if (++geX > 28)
+	if (rightButton.simple()) {
+		if (++geX > 28) {
 			geX = 28;
+		}
 		else {
 			Audio::SFX[9].StopAndRewind();
 			Audio::SFX[9].PlayPause();
 		}
+	}	
 
-	if (leftButton.simple())
-		if (--geX < 1)
+	if (leftButton.simple()) {
+		if (--geX < 1) {
 			geX = 1;
+		}
 		else {
 			Audio::SFX[9].StopAndRewind();
 			Audio::SFX[9].PlayPause();
 		}
+	}
 
-	if (up.simple())
-		if (++geY > 16)
+	if (up.simple()) {
+		if (++geY > 16) {
 			geY = 16;
+		}
 		else {
 			Audio::SFX[9].StopAndRewind();
 			Audio::SFX[9].PlayPause();
 		}
+	}
 
-
-	if (down.simple())
-		if (--geY < 1)
+	if (down.simple()) {
+		if (--geY < 1) {
 			geY = 1;
+		}
 		else {
 			Audio::SFX[9].StopAndRewind();
 			Audio::SFX[9].PlayPause();
 		}
+	}
 
 	//chaning element upwards
 	if (rightDigButton.simple()) {
@@ -896,24 +903,36 @@ void generatorScreen(float currentFrame) {
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 17; j++) {
 			int ref = -1;
-			if (gen[i][j] == 1)
+
+			switch (gen[i][j]) {
+			case 1:
 				ref = 0;
-			if (gen[i][j] == 2)
+				break;
+			case 2:
 				ref = 6;
-			if (gen[i][j] == 3)
+				break;
+			case 3:
 				ref = 12;
-			if (gen[i][j] == 4)
+				break;
+			case 4:
 				ref = 18;
-			if (gen[i][j] == 5)
+				break;
+			case 5:
 				ref = 24;
-			if (gen[i][j] == 6)
+				break;
+			case 6:
 				ref = 30;
-			if (gen[i][j] == 7)
+				break;
+			case 7:
 				ref = 36;
-			if (gen[i][j] == 8)
+				break;
+			case 8:
 				ref = 42;
-			if (gen[i][j] == 9)
+				break;
+			case 9:
 				ref = 48;
+				break;
+			}
 
 			if (ref >= 0)
 				DrawLevel(i, j, ref, 0);
@@ -934,50 +953,59 @@ void generatorScreen(float currentFrame) {
 			for (int j = 0; j < 17; j++) {
 				holeTimer[i][j] = 0;
 
-				if (gen[i][j] == 0)
+				switch (gen[i][j]) {
+				case 0:
 					layout[i][j] = empty;
-				if (gen[i][j] == 1)
+					break;
+				case 1:
 					layout[i][j] = brick;
-				if (gen[i][j] == 2)
+					break;
+				case 2:
 					layout[i][j] = concrete;
-				if (gen[i][j] == 3)
+					break;
+				case 3:
 					layout[i][j] = ladder;
-				if (gen[i][j] == 4)
+					break;
+				case 4:
 					layout[i][j] = pole;
-				if (gen[i][j] == 5)
+					break;
+				case 5:
 					layout[i][j] = trapDoor;
-				if (gen[i][j] == 7) {
+					break;
+				case 7:
+					layout[i][j] = empty;
 
 					layout[i][j] = empty;
 
-					Vector2D Pos = { i, j };
+					Vector2D goldPos;
+					goldPos.x = i;
+					goldPos.y = j;
 
-					Gold::gold[Gold::goldNr].Initialize(Gold::goldNr, Pos);
+					Gold::gold[Gold::goldNr].Initialize(Gold::goldNr, goldPos);
 					Gold::goldNr++;
-				}
-				if (gen[i][j] == 8) {
-
+					break;
+				case 8:
 					layout[i][j] = empty;
 					if (Enemy::enemyNr < 11) {
 
-						Vector2D Pos;
-						Pos.x = i;
-						Pos.y = j;
+						Vector2D playerPos;
+						playerPos.x = i;
+						playerPos.y = j;
 
-						Enemy::enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, Pos);
+						Enemy::enemies[Enemy::enemyNr].Initialize(Enemy::enemyNr, playerPos);
 
 						Enemy::enemyNr++;
 					}
-				}
-
-				if (gen[i][j] == 9) {
+					break;
+				case 9:
 					layout[i][j] = empty;
 
-					Vector2D Pos;
-					Pos.x = i;
-					Pos.y = j;
+					Vector2D enemyPos;
+					enemyPos.x = i;
+					enemyPos.y = j;
 
-					Enemy::enemies[0].Initialize(0, Pos);
+					Enemy::enemies[0].Initialize(0, enemyPos);
+					break;
 				}
 			}
 

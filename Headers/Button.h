@@ -1,18 +1,19 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include <time.h>  
+#include <time.h>
+#include <atomic>
 
 class Button {
 	private:
-		bool pushed;
+		std::atomic_bool pushed{false};
 		float pushStartTime;
 		float debounceTime = 0.05f;
 		bool prevState = false;
 
-		bool SimplePushed;
+		bool simplePushed;
 		bool impulsePushed;
-		bool continousPushed;
+		bool continuousPushed;
 		bool fasteningPushed;
 		
 		bool impulseChange;
@@ -26,9 +27,10 @@ class Button {
 		
 	public:
 		void detect(bool);
+		void detectAlter(bool);
 		bool simple();			
 		bool impulse();			
-		bool continous();		
+		bool continuous();
 		bool fastening();		
 
 		void setDebounceTime(float);

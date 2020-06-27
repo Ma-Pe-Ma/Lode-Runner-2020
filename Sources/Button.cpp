@@ -9,7 +9,6 @@ void Button::setImpulseTime(float time) {
 }
 
 void Button::detect(bool physPush) {
-
 	if (physPush) {
 		if (!pushed) {
 			pushed = true;
@@ -30,32 +29,39 @@ void Button::detect(bool physPush) {
 	prevState = pushed;
 }
 
-bool Button::simple()
-{
-	if (impulsePushed || continousPushed || fasteningPushed) {
+void Button::detectAlter(bool physPush) {
+	if (physPush) {
+		pushStartTime = ((float)clock() / CLOCKS_PER_SEC);
+	}
+
+	pushed = physPush;
+}
+
+bool Button::simple() {
+	if (impulsePushed || continuousPushed || fasteningPushed) {
 		impulsePushed = false;
-		continousPushed = false;
+		continuousPushed = false;
 		fasteningPushed = false;
 		change = true;
 	}
 
 	if (change) {
-		SimplePushed = true;
+		simplePushed = true;
 		change = false;
 		return 0;
 	}
 
-	if (pushed && !SimplePushed) {
-		SimplePushed = true;
+	if (pushed && !simplePushed) {
+		simplePushed = true;
 		return 1;
 
 	}
-	else if (pushed && SimplePushed) {
+	else if (pushed && simplePushed) {
 		return 0;
 
 	}
 	else if (!pushed) {
-		SimplePushed = false;
+		simplePushed = false;
 		return 0;
 	}
 
@@ -64,9 +70,9 @@ bool Button::simple()
 
 bool Button::impulse()
 {
-	if (SimplePushed || continousPushed || fasteningPushed) {
-		SimplePushed = false;
-		continousPushed = false;
+	if (simplePushed || continuousPushed || fasteningPushed) {
+		simplePushed = false;
+		continuousPushed = false;
 		fasteningPushed = false;
 		change = true;
 	}
@@ -100,37 +106,36 @@ bool Button::impulse()
 	return 0;
 }
 
-bool Button::continous()
+bool Button::continuous()
 {
-	if (impulsePushed || SimplePushed || fasteningPushed) {
-		SimplePushed = false;
+	if (impulsePushed || simplePushed || fasteningPushed) {
+		simplePushed = false;
 		impulsePushed = false;
 		fasteningPushed = false;
 		change = true;
 	}
 
-	if (change)
-	{
+    if (change)	{
 		if (!pushed) change = false;
 		return 0;
 	}
 
 	if (pushed) {
-		continousPushed = true;
+		continuousPushed = true;
 		return 1;
 	}
 	else {
-		continousPushed = false;
+		continuousPushed = false;
 		return 0;
 	}
-	return 0;
+	return false;
 }
 
 bool Button::fastening() {
-	if (impulsePushed || SimplePushed || continousPushed) {
-		SimplePushed = false;
+	if (impulsePushed || simplePushed || continuousPushed) {
+		simplePushed = false;
 		impulsePushed = false;
-		continousPushed = false;
+		continuousPushed = false;
 		change = true;
 	}
 
@@ -146,8 +151,7 @@ bool Button::fastening() {
 		fasteningRef = pushStartTime;
 		return 1;
 	}
-	else if (pushed && fasteningPushed)
-	{
+	else if (pushed && fasteningPushed) {
 		int time = int((((float)clock() / CLOCKS_PER_SEC) - fasteningRef) / fasteningTime);
 
 		if (time % 2 == 1) {

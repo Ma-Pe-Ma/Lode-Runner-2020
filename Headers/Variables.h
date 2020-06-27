@@ -16,7 +16,7 @@ extern std::string levelFileName;
 //variable for changing moving sound, going-0, laddering-1, poling-2
 extern int going[3];
 
-extern bool championShip;
+extern bool championship;
 extern bool usCover;
 
 extern int FPS;

@@ -117,30 +117,43 @@ void LevelLoading(unsigned int levelNumber) {
 }
 
 void HighestLadder() {
+	highestLadder = 0;
 
-	for (int i = 0; i < 30; i++)
-		for (int j = 0; j < 17; j++) {
+	for (int j = 0; j < 17; j++) {
+		for (int i = 0; i < 30; i++) {
 
-			if (holeTimer[i][j] == -3.0f)
+			if (holeTimer[i][j] == -3.0f) {
 				layout[i][j] = ladder;
+				holeTimer[i][j] = 0;
+			}
 
-			if (j > highestLadder)
-				highestLadder = j;
-		}
-}
-
-void HighestLadderGen() {
-
-	for (int i = 0; i < 30; i++)
-		for (int j = 0; j < 17; j++) {
-
-			if (gen[i][j] == 3)
-				highestLadder = j;
-
-			if (gen[i][j] == 6) {
-
-				layout[i][j] = ladder;
+			if (layout[i][j] == ladder) {
 				highestLadder = j;
 			}
 		}
+	}
+
+	//my level ending conditions are different than the original, in most levels it's OK apart from this:
+	//original conditions check if player is at the highest block or not
+	if (level[playerNr] == 115 && !championship) {
+		highestLadder--;
+	}
+}
+
+void HighestLadderGen() {
+	highestLadder = 0;
+
+	for (int j = 0; j < 17; j++) {
+		for (int i = 0; i < 30; i++) {
+			
+			if (gen[i][j] == 6) {
+				layout[i][j] = ladder;
+				holeTimer[i][j] = 0;
+			}
+
+			if (layout[i][j] == ladder) {
+				highestLadder = j;
+			}
+		}
+	}		
 }

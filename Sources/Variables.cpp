@@ -7,7 +7,7 @@ std::string levelFileName = "level/lodeRunner.baseLevel.txt";
 //variable for changing moving sound, going-0, laddering-1, poling-2
  int going[3] = {};
 
- bool championShip = false;
+ bool championship = false;
  bool usCover = false;
 
  int FPS = 35;

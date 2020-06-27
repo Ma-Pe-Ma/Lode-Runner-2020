@@ -51,7 +51,7 @@ int main(int argc, char**argv) {
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
 			levelFileName = "level/lodeRunner.champLevel.txt";
-			championShip = true;
+			championship = true;
 
 			if (level[0] > 51) {
 				level[0] = 51;
@@ -122,7 +122,7 @@ int main(int argc, char**argv) {
 	}
 
 	std::string mainMenuTextureName = "Texture/MainMenu.png";
-	if (championShip)
+	if (championship)
 		mainMenuTextureName = "Texture/Championship.png";
 	else if (usCover)
 		mainMenuTextureName = "Texture/MainMenuU.png";
@@ -185,7 +185,7 @@ int main(int argc, char**argv) {
 
 		processInput(GLHelper::window);
 
-		if (lAlt.continous() && enter.simple())
+		if (lAlt.continuous() && enter.simple())
 			GLHelper::FullscreenSwitch();
 
 		switch (menu) {

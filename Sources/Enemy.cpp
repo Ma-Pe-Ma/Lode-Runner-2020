@@ -891,7 +891,7 @@ void Enemy::Falling() {
 			holeTimer[curX][int(Pos.y + 0.5)] = -2;
 
 	//Falling into pit
-	if (blockUnderFallingEnemy == empty && holeTimer[curX][nextY] != 0 && index > 0 && !EnemyChecker(curX, nextY)) {
+	if (blockUnderFallingEnemy == empty && holeTimer[curX][nextY] > 0 && index > 0 && !EnemyChecker(curX, nextY)) {
 
 		holePos.x = curX;
 		holePos.y = nextY;
@@ -1626,7 +1626,8 @@ void Enemy::ScanDown(int x, int curPath) {
 	int curRating = 255;
 
 	if (y == runnerY)
-		curRating = abs(int(Pos.x + 0.5) - x);				// update best rating and direct.
+		//curRating = abs(int(Pos.x + 0.5) - x);				// update best rating and direct.
+		curRating = abs(int(enemies[0].Pos.x + 0.5) - x);
 	else if (y < runnerY)
 		curRating = runnerY - y + 200;			// position below runner
 	else
@@ -1669,7 +1670,8 @@ void Enemy::ScanUp(int x, int curPath) {
 	int curRating = 255;
 
 	if (y == runnerY)
-		curRating = abs(int(Pos.x + 0.5) - x);			// update best rating and direct.
+		//curRating = abs(int(Pos.x + 0.5) - x);			// update best rating and direct.
+		curRating = abs(int(enemies[0].Pos.x + 0.5) - x);
 	else if (y < runnerY)
 		curRating = runnerY - y + 200;		// position below runner   
 	else
