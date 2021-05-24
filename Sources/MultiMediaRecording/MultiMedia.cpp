@@ -28,7 +28,6 @@ void MultiMedia::Initialize() {
 	char* filename = new char[fileNameString.length() + 1];
 	fileNameString.copy(filename, fileNameString.length(), 0);
 	filename[fileNameString.length()] = '\0';
-
 	//const char *name = sname.c_str();
 
 	std::cout << "\n Recording started: " << fileNameString << " ..." << std::endl;

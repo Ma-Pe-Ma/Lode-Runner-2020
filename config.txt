@@ -1,21 +1,28 @@
-## given resolutions: 0=1500×900, 1=750×450, 2=3000×1800, 3=1750×1050, if custom resolution is given then this entry is neglected
-resolution 3
+# given resolutions: 0=1500×900, 1=750×450, 2=3000×1800, 3=1750×1050, 4=custom
+resolution 3n
 
 #custom resolution
-#width 1500
-#height 900
+width 1280
+height 720
 
 # levelset: 0 = original levels, 1 = Championship LR levels
-levelSet 0
+levelset 0
 
 # jumping to level (only at startup) (original levels: 1-150, championship levels: 1-51)
 levelNr 1
 
 # setting US cover for main menu: 0 - false, other values - true
-US COVER 0
+USCOVER 0
 
-#Set framerate, please note that currently the video recording only works with 60 fps
-#FPS 60	
+# Set framerate, please note that currently the video recording only works with 60 fps
+FPS 60
 
-#downscaling video height (and proportionally width also) to this value (only when the window's height is bigger than this value)
-Recording height 600
+# downscaling video height (and proportionally width also) to this value (only when the window's height is bigger than this value)
+RecordingHeight 720
+
+#Speed of the runner
+playerSpeed 0.900000
+
+#Speed of the guards
+enemySpeed 0.415000
+

@@ -4,13 +4,15 @@ void MultiMediaHelper::determineOutput(unsigned int inputX, unsigned int inputY,
 	if (0 < wantedOutputY && wantedOutputY< inputY) {
 		outputY = wantedOutputY;
 
-		if (outputY % 2 == 1)
+		if (outputY % 2 == 1) {
 			outputY--;
+		}			
 
 		outputX = (unsigned int) (((1.0f * inputX / inputY)) * outputY);
 
-		if (outputX % 2 == 1)
+		if (outputX % 2 == 1) {
 			outputX--;
+		}			
 	}
 	else {
 		outputX = inputX;
@@ -25,18 +27,21 @@ void MultiMediaHelper::FFMPEG_ERROR(int ret) {
 		av_strerror(ret, buffer, bufsize);
 
 		std::cout << "\n Thrown error message: ";
-		for (int i = 0; i < bufsize; i++)
+		for (int i = 0; i < bufsize; i++) {
 			std::cout << buffer[i];
+		}			
 	}
 }
 
 //mirror image horizontally https://emvlo.wordpress.com/2016/03/10/sws_scale/
 void MultiMediaHelper::MirrorFrameHorizontallyJ420(AVFrame* pFrame) {
 	for (int i = 0; i < 4; i++) {
-		if (i)
+		if (i) {
 			pFrame->data[i] += pFrame->linesize[i] * ((pFrame->height >> 1) - 1);
-		else
+		}
+		else {
 			pFrame->data[i] += pFrame->linesize[i] * (pFrame->height - 1);
+		}			
 
 		pFrame->linesize[i] = -pFrame->linesize[i];
 	}
@@ -45,10 +50,13 @@ void MultiMediaHelper::MirrorFrameHorizontallyJ420(AVFrame* pFrame) {
 float MultiMediaHelper::fromShortToFloat(short input) {
 	float ret = ((float) input) / (float) 32768;
 
-	if (ret > 1)
+	if (ret > 1) {
 		ret = 1;
-	if (ret < -1)
+	}
+		
+	if (ret < -1) {
 		ret = -1;
+	}		
 
 	return ret;
 }

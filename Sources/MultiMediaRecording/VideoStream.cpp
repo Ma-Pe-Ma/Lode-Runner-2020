@@ -50,7 +50,7 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 		//return -1;
 	}
 
-	std::cout << "widt: " << output->GetWidth();
+	std::cout << "width: " << output->GetWidth();
 	std::cout << "height: " << output->GetHeight();
 
 	codecContext->codec_id = output->GetCodecID();

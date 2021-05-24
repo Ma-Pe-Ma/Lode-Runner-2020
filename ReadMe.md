@@ -5,43 +5,44 @@ The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/D
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
+This repository contains the source for the Windows version only. For the details of the Android port please click here!
+
 ## Features of the game
-### Hardver requirements
-Your graphics card has to support OpenGL 4.5 to run it.
-### Configuration file
+### Hardware and software requirements
+Your graphics card has to support OpenGL 4.5 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
+### Configuration files
 In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
 
 ### Differences from the original (NES) version:
-- controller input is supported but the mappings differ from the original 
-- the whole level layout can be seen, no scrolling needed
-- original Apple II levelset is used
-- collision detection is not the same as in the original one I implemented a new one 
-- guards' moving are calculated at every frame while in the original one they only moved at every nth (varying) frame
-- if the runner falls through a trapdoor it will be marked
-- enemies "wear" different suits when they carry gold
-- level timer at top of the screen
+- Controller input is supported but the mappings differ from the original 
+- The whole level layout can be seen, no scrolling needed
+- Original Apple II levelset is used
+- Collision detection is not the same as in the original one I implemented a new one 
+- Guards' moving are calculated at every frame while in the original one they only moved at every nth (varying) frame
+- If the runner falls through a trapdoor it will be marked
+- Enemies "wear" different suits when they carry gold
+- Level-timer at top of the screen
 
 The levels are ripped from the original Apple II version. The NES port has only 50 levels and this remake includes the missing 100 levels too. Note: The levels ported to the NES are not 100% identical to the original ones, as some rows or columns are missing in the ported levels. If you have the proper NES levelset I will happily include it.
 
 A conspicious difference about the collision detection: in the original when there are 3 guards circling around a ladder, they do not stop, while in this version they do, but this does not effect the gameplay much, I think...)
 
 ### Extra features:
-- taking screenshot
-- recording gameplay video
+- Taking screenshot
+- Recording gameplay video
 
 ### Missing Features:
-- in the NES version after collecting every lode a bonus fruit pickup appears randomly but I could not find the ripped textures so I could not include them
+- In the NES version after collecting every lode a bonus fruit pickup appears randomly but I could not find the ripped textures so I could not include them
 - Demo in main menu is not implented :(
 
 ### Summarizing what I did not create in this project:
-- the game logic (naturally..)
-- the textures (I found them on the web they were ripped from the nes cartridge)
-- the soundeffects/music (some of them are form online sources but the rest were recorded by me with the help of an emulator)
-- guard AI (the AI is the same as the original it was published in a book which I couldn't get but I found it in an other [remake](https://github.com/SimonHung/LodeRunner) and I translated it to C++)
-- level design - same as original but copied from the mentioned remake
+- The game logic (naturally..)
+- The textures (I found them on the web they were ripped from the nes cartridge)
+- The soundeffects/music (some of them are form online sources but the rest were recorded by me with the help of an emulator)
+- Guard AI (the AI is the same as the original it was published in a book which I couldn't get but I found it in an other [remake](https://github.com/SimonHung/LodeRunner) and I translated it back to C++)
+- Level design - same as original but copied from the aforementioned remake
 
 Every other feature was developed by me using existing libraries.
-
 
 ## Compilation help
 
@@ -50,14 +51,21 @@ Libraries needed to be linked to compile:
 - [RTAUDIO](https://www.music.mcgill.ca/~gary/rtaudio/) - used to play sound effects
 - [libogg / libvorbis / libvorbisfile](https://xiph.org/downloads/) - used to decode vorbis sound files
 - [FFMPEG](https://ffmpeg.org/) (avformat, avutil, avcodec, swscale, swresample) - needed for video recording
-(Note: if VIDEO_RECORDING macro is not defined at the begining of main.cpp this one is not needed!)
 
 Headers needed to be included:
 - [STBI Image + Write](https://github.com/nothings/stb) - used to read textures and write screnshots
 - [this shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) - used to handle shaders easily
 
-Source file needed to be included:
+Source file needed to be linked:
 - [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL
+
+A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.
+
+At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
+
+Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.
+
+And of course, the libraries' proper dll-s are needed to put in the built executable's folder.
 
 ## Controls:
 The game uses XInput API for controller handling.
@@ -78,7 +86,7 @@ The game uses XInput API for controller handling.
 
 ## Downloading built versions
 
-Check out the repository's Builds folder!
+At the release section you can find a simple and a video recording version. Choose the one that you want!
 
 Just simply unpack the 7z archive and launch the Lode Runner.exe.
 
@@ -87,21 +95,19 @@ If you want to play with the Championship Lode Runner levels modify the proper l
 Note: linux ports are currently not available.
 
 ## Developer Notes
+This was my first complex project since I started programming. My earlier efforts were limited to calculate/solve math problems.
+
+This was a good starting project as I learned a lot about programming and designing code.
+
 I tested the game, I completed much of it but I realised there was a quite serious problem with the guard AI.
+
 I fixed the problem, but it's possible that other bugs arised. Later I will play through it again and check if everything is OK or not.
 
-This was my first complex project since I started programming. My earlier efforts were limited to calculate/solve math problems. This was a good starting project as I learned a lot about programming and designing code.
-
-(Note: Midway through development I realized that some of my used techinques were quite bad so I rewrote many of it but some parts of it are still quite bad.)
-
 ## Future tasks for this project:
-- rewrite code to follow a C++ style guide
-- further FFMPEG optimization
-- android version porting
-- rewrite move interraction code as it is quite messy now
-- adding some useful extras, eg. score counter, leaderboard, saving level completion time etc.
-- create CMake geneator (note: currently Windows version is built but only a few lines needed to be rewritten to compile for linux)
-
-However, in the near future I'm not planning to address this issues as I have other projects and I got bored by this a little. So it's possible that the next big update will only come in a few years from the initial commit.
+- Rewrite code to follow a C++ style guide (+ some parts are still badly implemented)
+- Further FFMPEG optimization
+- Adding some useful extras, eg. score counter, leaderboard, saving level, completion time etc.
+- Linux port (probably CMAKE support?)
+- List this repo on osgameclones
 
 **Have fun playing with it!**

@@ -1,9 +1,16 @@
 #include "GLHelper.h"
+#include "IOHandler.h"
 
+#ifdef ANDROID_VERSION
+
+#else
 #define	 STB_IMAGE_IMPLEMENTATION
 #define  STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
+#endif
+
+#include <thread>
 
 const unsigned int GLHelper::indices[6] = {
 		 0,1,2,
@@ -24,19 +31,15 @@ float GLHelper::main_menu[16] = {
 	-1,	 1,		0.0, 1.0,
 };
 
-unsigned int GLHelper::scr = 0;
-unsigned int GLHelper::vid = 0;
-
-GLFWwindow* GLHelper::window;
+#ifdef VIDEO_RECORDING
 MultiMedia* GLHelper::multiMedia;
+#endif // VIDEO_RECORDING
 
-unsigned int GLHelper::pauseScreenT;
 Shader* GLHelper::selectShader;
 Shader* GLHelper::mainShader;
 Shader* GLHelper::levelShader;
 Shader* GLHelper::playerShader;
 
-unsigned int pauseScreenT;
 unsigned int GLHelper::selectVBO, GLHelper::selectVAO, GLHelper::selectEBO;
 unsigned int GLHelper::levelVBO, GLHelper::levelVAO, GLHelper::levelEBO;
 unsigned int GLHelper::playerVBO, GLHelper::playerVAO, GLHelper::playerEBO;
@@ -60,8 +63,6 @@ unsigned int GLHelper::viewPortHeight = SCR_HEIGHT;
 unsigned int GLHelper::viewPortX = 0;
 unsigned int GLHelper::viewPortY = 0;
 
-bool GLHelper::fullScreen = false;
-
 void GLHelper::updateViewPortValues(int width, int height) {
 	SCR_WIDTH = width;
 	SCR_HEIGHT = height;
@@ -69,11 +70,13 @@ void GLHelper::updateViewPortValues(int width, int height) {
 	viewPortWidth = SCR_WIDTH;
 	viewPortHeight = SCR_HEIGHT;
 
-	if (viewPortHeight % 2 == 1)
+	if (viewPortHeight % 2 == 1) {
 		viewPortHeight--;
+	}		
 
-	if (viewPortWidth % 2 == 1)
+	if (viewPortWidth % 2 == 1) {
 		viewPortWidth--;
+	}		
 
 	viewPortX = (width - 15.0f / 9 * height) / 2;
 	viewPortY = (height - 9.0f / 15 * width) / 2;
@@ -81,17 +84,18 @@ void GLHelper::updateViewPortValues(int width, int height) {
 	float screenRatio = ((float)width) / height;
 
 	if (screenRatio >= 15.0f / 9) {
-
 		viewPortY = 0;
 		viewPortHeight = height;
 
-		if (viewPortHeight % 2 == 1)
+		if (viewPortHeight % 2 == 1) {
 			viewPortHeight--;
+		}			
 
 		viewPortWidth = 15.0f / 9 * height;
 
-		if (viewPortWidth % 2 == 1)
+		if (viewPortWidth % 2 == 1) {
 			viewPortWidth--;
+		}			
 
 		viewPortX = (width - viewPortWidth) / 2;
 	}
@@ -99,17 +103,33 @@ void GLHelper::updateViewPortValues(int width, int height) {
 		viewPortX = 0;
 		viewPortWidth = width;
 
-		if (viewPortWidth % 2 == 1)
+		if (viewPortWidth % 2 == 1) {
 			viewPortWidth--;
+		}			
 
 		viewPortHeight = 9.0f / 15 * viewPortWidth;
 
-		if (viewPortHeight % 2 == 1)
+		if (viewPortHeight % 2 == 1) {
 			viewPortHeight--;
+		}			
 
 		viewPortY = (height - viewPortHeight) / 2;
 	}
 }
+
+#ifdef ANDROID_VERSION
+void GLHelper::UpdateViewPort() {
+    ndk_helper::GLContext* context = ndk_helper::GLContext::GetInstance();
+    updateViewPortValues(context->GetScreenWidth(), context->GetScreenHeight());
+
+    Helper::log("Width: "+std::to_string(context->GetScreenWidth())+", height: "+std::to_string(context->GetScreenHeight()));
+
+    glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
+}
+
+#else
+GLFWwindow* GLHelper::window;
+bool GLHelper::fullScreen = false;
 
 void GLHelper::errorCallback(int error, const char* description) {
 	std::cout << "\n error: " << error << ", description: " << description;
@@ -123,77 +143,20 @@ void GLHelper::framebuffer_size_callback(GLFWwindow* window, int width, int heig
 
 	updateViewPortValues(width, height);
 
+#ifdef VIDEO_RECORDING
 	if (multiMedia != nullptr) {
 		multiMedia->windowResized();
 	}
+#endif // VIDEO_RECORDING
 
 	glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
 }
 
 void GLHelper::window_pos_callback(GLFWwindow* window, int xpos, int ypos) {
-
 	if (!fullScreen) {
 		windowPosX = xpos;
 		windowPosY = ypos;
 	}
-}
-
-//Taking Screenshot
-void GLHelper::screenCapture() {
-	unsigned char* buffer = new unsigned char[GLHelper::SCR_WIDTH * GLHelper::SCR_HEIGHT * 3];
-	glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-
-	//find next non-existing screenshot identifier
-	unsigned int scr = FindScreenShotCount();
-
-	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
-
-	const char* name = sname.c_str();
-
-	stbi_flip_vertically_on_write(true);
-
-	if (!stbi_write_png(name, SCR_WIDTH, SCR_HEIGHT, 3, buffer, 0)) {
-		std::cout << "\nERROR: Could not write screenshot file: " << name;
-	}
-	else std::cout << "\nScreenshot taken as: " << name;
-
-	delete[] buffer;
-}
-
-unsigned int GLHelper::loadTexture(char const* path) {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data) {
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
 }
 
 unsigned char* GLHelper::getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type) {
@@ -225,59 +188,102 @@ void GLHelper::FullscreenSwitch() {
 	glfwMakeContextCurrent(window);
 }
 
-unsigned int GLHelper::FindScreenShotCount() {
-	while (true) {
-		std::string stringName = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
+#endif // !ANDROID_VERSION
 
-		std::ifstream fileStream;
-		fileStream.open(stringName);
+void GLHelper::saveImage(unsigned char* buffer) {
+	std::cout << "\n trying to save image!";
+	//find next non-existing screenshot identifier
+	unsigned int scr = FindScreenShotCount();
 
-		if (fileStream.fail()) {
-			fileStream.close();
-			return scr;
-		}
-		else {
-			scr++;
-			fileStream.close();
-		}
+	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
+
+	const char* name = sname.c_str();
+
+	stbi_flip_vertically_on_write(true);
+
+	if (!stbi_write_png(name, SCR_WIDTH, SCR_HEIGHT, 3, buffer, 0)) {
+		std::cout << "\nERROR: Could not write screenshot file: " << name;
 	}
+	else std::cout << "\nScreenshot taken as: " << name;
+
+	delete[] buffer;
 }
 
-unsigned int GLHelper::FindVideoCount() {
-	while (true) {
-		std::string stringName = "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
+//Taking Screenshot
+void GLHelper::screenCapture() {
+#ifdef ANDROID_VERSION
 
-		std::ifstream fileStream;
-		fileStream.open(stringName);
+#else
+	unsigned char* buffer = new unsigned char[GLHelper::SCR_WIDTH * GLHelper::SCR_HEIGHT * 3];
+	glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
-		if (fileStream.fail()) {
-			fileStream.close();
-			return vid;
-		}
-		else {
-			vid++;
-			fileStream.close();
-		}
-	}
+	std::thread saveThread(saveImage, buffer);
+	saveThread.detach();
+#endif
 }
 
-std::string GLHelper::generateNewVideoName() {
-	unsigned int vid = FindVideoCount();
-	return "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
+unsigned int GLHelper::loadTexture(char const* path) {
+#ifdef ANDROID_VERSION
+	return ndk_helper::JNIHelper::GetInstance()->LoadTexture(path);
+#else
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height, nrComponents;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data) {
+		GLenum format;
+		if (nrComponents == 1) {
+			format = GL_RED;
+		}
+		else if (nrComponents == 3) {
+			format = GL_RGB;
+		}			
+		else if (nrComponents == 4) {
+			format = GL_RGBA;
+		}			
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		stbi_image_free(data);
+	}
+	else {
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
+#endif
 }
 
 void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
 
+#ifndef ANDROID_VERSION
 	GLFWimage icon;
 	int iconNrComp;
 	icon.pixels = GLHelper::getRawCharArrayWithSTBI("Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
 	glfwSetWindowIcon(GLHelper::window, 1, &icon);
-
-	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
-	mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt");
-	levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt");
-	playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt");
+    selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt");
+    mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt");
+    levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt");
+    playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt");
+#else
+    std::map<std::string, std::string> param;
+	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt", param);
+	mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt", param);
+	levelShader = new Shader("Shaders/level_VS.txt", "Shaders/level_FS.txt", param);
+	playerShader = new Shader("Shaders/player_VS.txt", "Shaders/player_FS.txt", param);
+#endif
 
 	glGenVertexArrays(1, &levelVAO);
 	glGenBuffers(1, &levelVBO);
@@ -390,7 +396,10 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glBindTexture(GL_TEXTURE_2D, selectScreenT);
 	GLHelper::selectShader->setInt("textureA", 3);
 
-	glGenTextures(1, &pauseScreenT);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 void GLHelper::Terminate() {
