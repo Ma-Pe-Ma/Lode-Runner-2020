@@ -6,7 +6,7 @@
 #include "Gold.h"
 
 void Death::start() {	
-	//Audio::SFX[7].StopAndRewind();
+	Audio::SFX[7].StopAndRewind();
 	Audio::SFX[17].StopAndRewind();
 	Audio::SFX[3].StopAndRewind();
 	Audio::SFX[3].PlayPause();

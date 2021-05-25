@@ -47,6 +47,10 @@ JNIEXPORT void JNICALL
 Java_com_mpm_lodeRunner_GameActivity_initializeGame( JNIEnv* env, jobject thiz, jboolean champ, jboolean ntscCover, jboolean joystick, jint levelIn, jfloat player, jfloat enemy) {
     championship = (bool) champ;
 
+	if (championship) {
+		levelFileName = "level/ChampionshipLevels.txt";
+	}
+
 	usCover = (bool) ntscCover;
     startingLevel = (unsigned int) levelIn;
 

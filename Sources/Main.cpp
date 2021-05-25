@@ -47,7 +47,7 @@ int main(int argc, char**argv) {
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
-			levelFileName = "level/lodeRunner.champLevel.txt";
+			levelFileName = "level/ChampionshipLevels.txt";
 			championship = true;
 			break;
 		}

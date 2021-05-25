@@ -188,8 +188,6 @@ void GLHelper::FullscreenSwitch() {
 	glfwMakeContextCurrent(window);
 }
 
-#endif // !ANDROID_VERSION
-
 void GLHelper::saveImage(unsigned char* buffer) {
 	std::cout << "\n trying to save image!";
 	//find next non-existing screenshot identifier
@@ -208,6 +206,8 @@ void GLHelper::saveImage(unsigned char* buffer) {
 
 	delete[] buffer;
 }
+
+#endif // !ANDROID_VERSION
 
 //Taking Screenshot
 void GLHelper::screenCapture() {
