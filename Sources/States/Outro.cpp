@@ -55,7 +55,7 @@ void Outro::update(float currentFrame) {
 				DrawLevel(i, k, 12 + timeFactor);
 			}
 			//drawing bricks
-			if (k == 2) {
+			else if (k == 2) {
 				DrawLevel(i, k, 0);
 			}
 		}

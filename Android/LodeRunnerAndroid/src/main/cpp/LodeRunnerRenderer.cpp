@@ -8,16 +8,6 @@
 #include "States/State.h"
 #include "States/StateContext.h"
 
-//létra probléma végzésnél - animáció
-//transzparenciaprobléma játék közben pl létránál
-//texttúramapping probléma
-//joystick
-//gombok pozícionálása
-
-//forgatás 180 fokkal?
-//forgatásinput?
-//screenshot
-
 void LodeRunnerRenderer::Initialize() {
     std::string mainMenuTextureName = "Texture/MainMenu.png";
     if (championship) {
@@ -54,12 +44,6 @@ void LodeRunnerRenderer::Initialize() {
         State::initialize(new StateContext());
         GameState::initialize(State::stateContext->gamePlay);
 	}
-	else {
-	  std::chrono::duration<double, std::milli> pauseTime = (std::chrono::system_clock::now() - prevFrameStart);
-      offset += pauseTime.count() / 1000;
-	}
-
-    Helper::log("offset: "+std::to_string(offset));
 
     start = std::chrono::system_clock::now();
     prevFrameStart = std::chrono::system_clock::now();
@@ -70,6 +54,9 @@ void LodeRunnerRenderer::ResumeWindow() {
 }
 
 void LodeRunnerRenderer::CloseWindow() {
+    std::chrono::duration<double, std::milli> sessionTime = (std::chrono::system_clock::now() - start);
+    offset += sessionTime.count() / 1000;
+
     Audio::OnWindowClose();
 }
 
@@ -79,11 +66,7 @@ void LodeRunnerRenderer::Terminate() {
 }
 
 void LodeRunnerRenderer::PauseGame() {
-    /*if (menu == L04) {
-        if (Enemy::enemies[0].state != dying) {
 
-        }
-    }*/
 }
 
 void LodeRunnerRenderer::Render(float currentFrameX) {
@@ -97,9 +80,9 @@ void LodeRunnerRenderer::Render(float currentFrameX) {
     State::stateContext->update(GameTime::getCurrentFrame());
 
     //take a screenshot
-    if (pButton.simple()) {
-        GLHelper::screenCapture();
-    }
+    //if (pButton.simple()) {
+        //GLHelper::screenCapture();
+    //}
 
 #ifdef VIDEO_RECORDING
     //With the help of this function you can record videos

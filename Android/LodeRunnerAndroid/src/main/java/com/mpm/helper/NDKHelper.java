@@ -49,7 +49,7 @@ public class NDKHelper {
 
     public void loadLibrary(String soname) {
         if (soname.isEmpty() == false) {
-            Log.i("CPP", "Loaded library: "+soname);
+            //Log.i("CPP", "Loaded library: "+soname);
             System.loadLibrary(soname);
             loadedSO = true;
         }

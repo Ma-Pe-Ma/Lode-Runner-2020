@@ -40,13 +40,10 @@ void Engine::UnloadResources() {
  * Initialize an EGL context for the current display.
  */
 int Engine::InitDisplay(android_app *app) {
-    Helper::log("init display!");
-
     if (!initialized_resources_) {
         gl_context_->Init(app_->window);
         LoadResources();
         initialized_resources_ = true;
-        Helper::log("init resource!");
     } else if(app->window != gl_context_->GetANativeWindow()) {
         // Re-initialize ANativeWindow.
         // On some devices, ANativeWindow is re-created when the app is resumed
@@ -57,9 +54,7 @@ int Engine::InitDisplay(android_app *app) {
         gl_context_->Init(app->window);
         LoadResources();
         initialized_resources_ = true;
-        Helper::log("init anative");
     } else {
-        Helper::log("INIT OGL ES and EGL");
         // initialize OpenGL ES and EGL
         if (EGL_SUCCESS == gl_context_->Resume(app_->window)) {
             UnloadResources();
@@ -128,7 +123,6 @@ void Engine::ResumeWindow() {
 }
 
 void Engine::CloseWindow() {
-    Helper::log("Closing window!");
     LRrenderer.CloseWindow();
 }
 /**
@@ -200,10 +194,10 @@ void Engine::HandleCmd(struct android_app* app, int32_t cmd) {
     Engine* eng = (Engine*)app->userData;
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-            Helper::log("Window state change to: APP_CMD_SAVE_STATE");
+            //Helper::log("Window state change to: APP_CMD_SAVE_STATE");
             break;
         case APP_CMD_INIT_WINDOW:
-            Helper::log("Window state change to: APP_CMD_INIT_WINDOW");
+            //Helper::log("Window state change to: APP_CMD_INIT_WINDOW");
             // The window is being shown, get it ready.
             if (app->window != NULL) {
                 eng->InitDisplay(app);
@@ -212,24 +206,24 @@ void Engine::HandleCmd(struct android_app* app, int32_t cmd) {
             }
             break;
         case APP_CMD_TERM_WINDOW:
-            Helper::log("Window state change to: APP_CMD_TERM_WINDOW");
+            //Helper::log("Window state change to: APP_CMD_TERM_WINDOW");
             // The window is being hidden or closed, clean it up.
             eng->TermDisplay();
             eng->has_focus_ = false;
             break;
         case APP_CMD_STOP:
-            Helper::log("Window state change to: APP_CMD_STOP");
+            //("Window state change to: APP_CMD_STOP");
             //exit(EXIT_SUCCESS);
             break;
         case APP_CMD_GAINED_FOCUS:
-            Helper::log("Window state change to: APP_CMD_GAINED_FOCUS");
+            //Helper::log("Window state change to: APP_CMD_GAINED_FOCUS");
             eng->ResumeWindow();
             eng->ResumeSensors();
             // Start animation
             eng->has_focus_ = true;
             break;
         case APP_CMD_LOST_FOCUS:
-            Helper::log("Window state change to: APP_CMD_LOST_FOCUS");
+            //Helper::log("Window state change to: APP_CMD_LOST_FOCUS");
             eng->CloseWindow();
             eng->SuspendSensors();
             // Also stop animating.
@@ -237,7 +231,7 @@ void Engine::HandleCmd(struct android_app* app, int32_t cmd) {
             eng->DrawFrame();
             break;
         case APP_CMD_LOW_MEMORY:
-            Helper::log("Window state change to: APP_CMD_LOW_MEMORY");
+            //Helper::log("Window state change to: APP_CMD_LOW_MEMORY");
             // Free up GL resources
             eng->TrimMemory();
             break;

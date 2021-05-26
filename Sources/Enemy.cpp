@@ -708,7 +708,7 @@ void Enemy::CheckCollisionWithOthers() {
 	for (auto& enemy : enemies) {
 		if (enemy.get() != this) {
 			//stop if other enemy under is moving!
-			if (abs(enemy->Pos.x - Pos.x) < 1.0f && enemy->Pos.y == Pos.y - 1 && enemy->dPrevPos.x != 0 && middle != ladder && middle != pole && enemy->state != pitting) {
+			if (abs(enemy->Pos.x - Pos.x) < 1.0f && enemy->Pos.y == Pos.y - 1 && enemy->dPrevPos.x != 0 && middle != ladder && middle != pole && downBlock != ladder && enemy->state != pitting) {
 				dPos.x = 0;
 				return;
 			}

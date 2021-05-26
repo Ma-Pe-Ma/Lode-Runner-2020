@@ -48,7 +48,7 @@ public class GameActivity extends NativeActivity {
         super.onCreate(savedInstanceState);
         //Hide toolbar
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        Log.i("OnCreate", "OnCreate!!!");
+        
         if(SDK_INT >= 19)
         {
             setImmersiveSticky();
@@ -178,8 +178,6 @@ public class GameActivity extends NativeActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.configPreferences), Context.MODE_PRIVATE);
         boolean joystick = sharedPreferences.getBoolean("joystick", true);
 
-        Log.i("CPP", "joystick1: "+joystick);
-
         up = (ImageButton) popupView.findViewById(R.id.up);
         right = (ImageButton) popupView.findViewById(R.id.right);
         down = (ImageButton) popupView.findViewById(R.id.down);
@@ -245,11 +243,9 @@ public class GameActivity extends NativeActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                //Log.i("CPP", "Pushed");
                 processInput(ID, true);
             }
             else if (event.getAction() == MotionEvent.ACTION_UP) {
-                //Log.i("CPP", "Released");
                 processInput(ID,false);
             }
 
