@@ -1,0 +1,15 @@
+#version 300 es
+out highp vec4 FragColor;
+
+in highp vec2 TexCoord;
+
+uniform sampler2D textureA;
+
+void main() {
+	highp vec4 color = texture(textureA, TexCoord);
+	
+	if(color.a == 0.0)
+		discard;
+	
+	FragColor = color;
+}

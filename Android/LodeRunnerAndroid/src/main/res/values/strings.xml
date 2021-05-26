@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Lode Runner</string>
+    <string name="fps">0.0 FPS</string>
+    <string name="title_activity_startup">Lode Runner</string>
+    <string name="configPreferences">configPreferences</string>
+
+    <string name="levelText">Levels</string>
+    <string name="championShipLevels">Championship</string>
+    <string name="originalLevels">Original</string>
+
+    <string name="inputType">Input</string>
+    <string name="jostick">Joystick</string>
+    <string name="dpad">D-Pad</string>
+
+    <string name="cover">Cover</string>
+
+    <string name="lastlevelText">Starting level</string>
+    <string name="lastPlayedLevel">Last played level</string>
+    <string name="chosenLevel">Chosen: </string>
+
+    <string name="playerSpeed">Player speed</string>
+    <string name="enemySpeed">Enemy speed</string>
+
+    <string name="alphaText">Button transparency</string>
+
+    <string name="info">Information</string>
+    <string name="note">About</string>
+    <string name="back">Back</string>
+    <string name="creator">Created by: Margitai Péter, 2020</string>
+    <string name="websiteDesc">Github repository</string>
+    <string name="websiteURL">https://github.com/Ma-Pe-Ma/Lode-Runner-2020</string>
+</resources>
