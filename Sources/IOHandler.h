@@ -21,8 +21,6 @@ extern std::string levelFileName;
 extern bool championship;
 extern bool usCover;
 extern unsigned int startingLevel;
-extern float customPlayerSpeed;
-extern float customEnemySpeed;
 extern unsigned int recordingHeight;
 
 #ifdef ANDROID_VERSION

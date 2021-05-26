@@ -28,3 +28,8 @@ display-p3/third_party
 /keystore.properties
 
 /common/bin
+
+/LodeRunnerAndroid/src/main/cpp/Sources
+/LodeRunnerAndroid/src/main/assets/Level
+/LodeRunnerAndroid/src/main/assets/SFX
+/LodeRunnerAndroid/src/main/assets/Texture

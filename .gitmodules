@@ -1,0 +1,12 @@
+[submodule "Android/common/stb"]
+	path = Android/common/stb
+	url = https://github.com/nothings/stb.git
+[submodule "Android/common/ogg"]
+	path = Android/common/ogg
+	url = https://github.com/xiph/ogg.git
+[submodule "Android/common/vorbis"]
+	path = Android/common/vorbis
+	url = https://github.com/xiph/vorbis.git
+[submodule "Android/common/oboe"]
+	path = Android/common/oboe
+	url = https://github.com/google/oboe.git

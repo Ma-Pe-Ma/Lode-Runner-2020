@@ -2,14 +2,12 @@
 #include <map>
 
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
-std::string levelFileName = "level/OriginalLevels.txt";
+std::string levelFileName = "Level/OriginalLevels.txt";
 Vector2D debugPos[2];
 
 bool championship = false;
 bool usCover = false;
 unsigned int startingLevel = 1;
-float customPlayerSpeed;
-float customEnemySpeed;
 unsigned int recordingHeight;
 
 #ifdef ANDROID_VERSION
@@ -48,15 +46,16 @@ Java_com_mpm_lodeRunner_GameActivity_initializeGame( JNIEnv* env, jobject thiz, 
     championship = (bool) champ;
 
 	if (championship) {
-		levelFileName = "level/ChampionshipLevels.txt";
+		levelFileName = "Level/ChampionshipLevels.txt";
 	}
 
 	usCover = (bool) ntscCover;
     startingLevel = (unsigned int) levelIn;
 
-    customPlayerSpeed = (float) player;
-    customEnemySpeed = (float) enemy;
+	Enemy::SetPlayerSpeed((float) player);
+	Enemy::SetEnemySpeed((float) enemy);
 }
+
 JNIEXPORT void JNICALL
 Java_com_mpm_lodeRunner_GameActivity_processJoystick( JNIEnv* env, jobject thiz, jint jangle, jint jstrength) {
     int angle = (int) jangle;
