@@ -82,9 +82,11 @@ void processInput(GLFWwindow* window) {
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
+#ifndef RELEASE_VERSION
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
-	}
+	}	
+#endif
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5) {
 		leftButton.detect(1);
@@ -287,7 +289,7 @@ void loadConfig() {
 	Enemy::SetEnemySpeed(getFloatByKey("enemySpeed", 0.415f));
 
 	GameTime::setFPS(getIntByKey("FPS", 60));
-	int levelSet = getIntByKey("levelSet", 0);
+	int levelSet = getIntByKey("levelset", 0);
 
 	switch (levelSet) {
 	case 1:

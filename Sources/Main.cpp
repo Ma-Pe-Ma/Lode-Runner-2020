@@ -85,7 +85,7 @@ int main(int argc, char**argv) {
 	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLHelper::window = glfwCreateWindow(GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT, "LODE RUNNER 2020 - Margitai Peter", NULL, NULL);
+	GLHelper::window = glfwCreateWindow(GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT, "Lode Runner 2020 - Margitai Peter", NULL, NULL);
 	glfwSetWindowPosCallback(GLHelper::window, GLHelper::window_pos_callback);
 	glfwSetWindowPos(GLHelper::window, GLHelper::windowPosX, GLHelper::windowPosY);
 	//GLHelper::framebuffer_size_callback(GLHelper::window, GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT);

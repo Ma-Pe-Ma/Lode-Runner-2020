@@ -1,0 +1,28 @@
+# Ignore everything
+
+/.vs
+/x64
+/Debug
+/Screenshots
+/GameplayVideos
+/Release
+
+
+__TemplateIcon.ico
+vc141.pdb
+MyTemplate.vstemplate
+lode.vcxproj.user
+LR_Paths.props
+
+# Except git tidbits
+!.gitignore
+!.gitattributes
+
+# The actually needed content
+!/Assets/
+!/ProjectSettings/
+!/Packages/manifest.json
+
+# And maybe some readmes
+!/readme.md
+!/readme.txt

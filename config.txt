@@ -1,9 +1,9 @@
 # given resolutions: 0=1500×900, 1=750×450, 2=3000×1800, 3=1750×1050, 4=custom
-resolution 3n
+resolution 3
 
-#custom resolution
+# custom resolution
 width 1280
-height 720
+height 600
 
 # levelset: 0 = original levels, 1 = Championship LR levels
 levelset 0
@@ -20,9 +20,9 @@ FPS 60
 # downscaling video height (and proportionally width also) to this value (only when the window's height is bigger than this value)
 RecordingHeight 720
 
-#Speed of the runner
+# speed of the runner
 playerSpeed 0.900000
 
-#Speed of the guards
+# speed of the guards
 enemySpeed 0.415000
 
