@@ -55,8 +55,10 @@ Headers needed to be included:
 Source file needed to be linked:
 - [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL
 
-A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.<br>
-At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.<br>
+A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.
+
+At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
+
 Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.<br>
 And of course, the libraries' proper dll-s are needed to put in the built executable's folder.
 
@@ -112,10 +114,10 @@ I know that there are parts that are still badly implemented those parts will be
 
 ## Screenshots
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Lode Runner &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Championship  Lode Runner
-- | - 
-![](./Screenshots/Original.png) |![](./Screenshots/Championship.png)
-![](./Screenshots/Orignal-Gameplay.png) |![](./Screenshots/Championship-Gameplay.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lode Runner&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Championship Lode Runner
+--- | ---
+![](./Screenshots/Original.png) | ![](./Screenshots/Championship.png)
+![](./Screenshots/Original-Gameplay.png) | ![](./Screenshots/Championship-Gameplay.png)
 
 
 ## Future tasks for this project:

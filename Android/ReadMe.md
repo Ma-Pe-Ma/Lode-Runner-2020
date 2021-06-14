@@ -37,9 +37,9 @@ Your smartphone has to support OpenGl ES 3.0 and it has to run Lollipop or newer
 
 ## Screenshots
 
- Config-screen |&nbsp; &nbsp; Gameplay &nbsp; &nbsp;
-- | - 
-![](../Screenshots/Android-config.jpg) |![](../Screenshots/Android-gameplay.jpg)
+Config-screen | Gameplay
+--- | --- 
+![](../Screenshots/Android-Config.jpg) |![](../Screenshots/Android-Gameplay.jpg)
 
 ## Known bugs
 

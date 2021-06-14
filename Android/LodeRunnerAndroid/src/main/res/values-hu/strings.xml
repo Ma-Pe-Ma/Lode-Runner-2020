@@ -10,7 +10,7 @@
     <string name="originalLevels">Eredeti</string>
 
     <string name="inputType">Irányítás</string>
-    <string name="jostick">Joystick</string>
+    <string name="joystick">Virtuális joystick</string>
     <string name="dpad">D-Pad</string>
 
     <string name="cover">Borítókép</string>
