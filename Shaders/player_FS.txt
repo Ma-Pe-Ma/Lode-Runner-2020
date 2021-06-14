@@ -8,21 +8,25 @@ uniform bool direction;
 uniform bool carryGold;
 uniform float ref;
 
-void main() {		
-
+void main() {
 	vec4 texColor;
 
-	if(direction)		
+	if(direction) {
 		texColor = texture(textureA, TexCoord);
-	else 
+	}		
+	else {
 		texColor = texture(textureA, vec2(-TexCoord.x + 2 * ref + 1.0 / 12, TexCoord.y));
+	}		
 	
-	if(texColor.r < 0.01 && texColor.g < 0.01 && texColor.b < 0.01)
+	if(texColor.r < 0.01 && texColor.g < 0.01 && texColor.b < 0.01) {
 		discard;
+	}
 	
-	if(carryGold)
-		if(texColor.r == 112.0/255 && texColor.g == 224.0/255 && texColor.b == 144.0/255)
+	if(carryGold) {
+		if(texColor.r == 112.0/255 && texColor.g == 224.0/255 && texColor.b == 144.0/255) {
 			texColor.b = 1.0;
+		}
+	}		
 	
 	FragColor = texColor;
 } 

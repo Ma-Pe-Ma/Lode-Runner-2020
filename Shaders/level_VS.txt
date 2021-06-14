@@ -8,8 +8,7 @@ uniform vec2 gPos;
 vec2 abs;
 vec2 pos;
 
-void main() {
-	
+void main() {	
 	abs.x = 1.0 / 15 * gPos.x - 29.0 / 30;
 	abs.y = 1.0 / 9 * gPos.y - 17.0 / 18;
 	

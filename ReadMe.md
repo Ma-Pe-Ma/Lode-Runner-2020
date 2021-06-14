@@ -1,18 +1,14 @@
 # Lode Runner 2020
+![](./Launcher/LRTITLE.png)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
-This repository contains the source for the Windows version only. For the details of the Android port please click here!
+In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md)!
 
 ## Features of the game
-### Hardware and software requirements
-Your graphics card has to support OpenGL 4.5 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
-### Configuration files
-In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
-
 ### Differences from the original (NES) version:
 - Controller input is supported but the mappings differ from the original 
 - The whole level layout can be seen, no scrolling needed
@@ -36,13 +32,13 @@ A conspicious difference about the collision detection: in the original when the
 - Demo in main menu is not implented :(
 
 ### Summarizing what I did not create in this project:
-- The game logic (naturally..)
-- The textures (I found them on the web they were ripped from the nes cartridge)
+- The textures (I found them on the web they were ripped from the NES cartridge)
 - The soundeffects/music (some of them are form online sources but the rest were recorded by me with the help of an emulator)
 - Guard AI (the AI is the same as the original it was published in a book which I couldn't get but I found it in an other [remake](https://github.com/SimonHung/LodeRunner) and I translated it back to C++)
 - Level design - same as original but copied from the aforementioned remake
+- The game logic (naturally...)
 
-Every other feature was developed by me using existing libraries.
+Every other feature was developed by me (using existing libraries).
 
 ## Compilation help
 
@@ -59,12 +55,9 @@ Headers needed to be included:
 Source file needed to be linked:
 - [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL
 
-A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.
-
-At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
-
-Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.
-
+A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.<br>
+At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.<br>
+Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.<br>
 And of course, the libraries' proper dll-s are needed to put in the built executable's folder.
 
 ## Controls:
@@ -76,38 +69,61 @@ The game uses XInput API for controller handling.
 	q		LB/LT		    dig to the left
 	w		RB/RT		    dig to the right
 	enter		start		    pause, skip intro/outro
-	space		back		    change level during gameplay
+	space		back		    change level during gameplay (just like in the original)
 	
 	p		-		    take screenshot
 	r		-		    start/end recording gameplay video
 	
 	alt + enter  	-   		    change window mode (full or windowed)
-	esc  		-	    	    close application
 
-## Downloading built versions
+## Downloading and running built versions
 
-At the release section you can find a simple and a video recording version. Choose the one that you want!
+Check out the release section you can find simple and video recording versions (with/without a launcher). Choose the one that you want!
 
-Just simply unpack the 7z archive and launch the Lode Runner.exe.
+Just simply unpack the 7z archive and launch the Lode Runner.exe. 
 
-If you want to play with the Championship Lode Runner levels modify the proper line in the config.txt file or launch the app with "Championship" command line argument! (I suggest you to create a shortcut for it!)
+For the Android notes please check the [aforementioned readme](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md).
 
-Note: linux ports are currently not available.
+Note: Linux port currently is not available.
+
+### Configurating the game
+In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
+
+Moreover you can use the provided launcher (LR-Launcher.exe) to configure and launch the game in a GUI window. (It just simply recreates the config txt acording to the GUI input).
+
+In the release section the name of file tells you which version contains the launcher.
+
+For the notes regarding the launcher please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Launcher/ReadMe.md)!
+
+### Championship Lode Runner ###
+To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.
+
+### Hardware and software requirements
+Your graphics card has to support OpenGL 4.5 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
 
 ## Developer Notes
 This was my first complex project since I started programming. My earlier efforts were limited to calculate/solve math problems.
 
+I tested the game, I completed much of it but much of the code was rewritten so an other deep testing is needed.
+
 This was a good starting project as I learned a lot about programming and designing code.
 
-I tested the game, I completed much of it but I realised there was a quite serious problem with the guard AI.
+I know that there are parts that are still badly implemented those parts will be fixed up sporadically as those are not high priorieties for me right now.
 
-I fixed the problem, but it's possible that other bugs arised. Later I will play through it again and check if everything is OK or not.
+## Screenshots
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Lode Runner &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Championship  Lode Runner
+- | - 
+![](./Screenshots/Original.png) |![](./Screenshots/Championship.png)
+![](./Screenshots/Orignal-Gameplay.png) |![](./Screenshots/Championship-Gameplay.png)
+
 
 ## Future tasks for this project:
-- Rewrite code to follow a C++ style guide (+ some parts are still badly implemented)
+- Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, saving level, completion time etc.
 - Linux port (probably CMAKE support?)
-- List this repo on osgameclones
+- [Dear Imgui](https://github.com/ocornut/imgui) in-game configurer
+
 
 **Have fun playing with it!**

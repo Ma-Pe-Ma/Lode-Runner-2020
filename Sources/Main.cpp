@@ -32,12 +32,9 @@
 #include "IOHandler.h"
 
 int main(int argc, char**argv) {
+#ifndef RELEASE_VERSION
 	HWND hWnd = GetConsoleWindow();
-	ShowWindow(hWnd, SW_HIDE);
-
-#ifdef RELEASE_VERSION
-	ShowWindow(hWnd, SW_HIDE);
-#else
+	//ShowWindow(hWnd, SW_HIDE);
 	ShowWindow(hWnd, SW_SHOW);
 #endif
 

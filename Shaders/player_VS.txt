@@ -10,8 +10,7 @@ uniform bool front;
 vec2 abs;
 vec2 pos;
 
-void main() {
-	
+void main() {	
 	abs.x = 1.0 / 15 * gPos.x - 29.0 / 30;
 	abs.y = 1.0 / 9 * gPos.y - 17.0 / 18;
 	
@@ -20,8 +19,10 @@ void main() {
 	
 	TexCoord = aTexturePos;
 	
-	if (front != true)
+	if (front != true) {
 		gl_Position = vec4(pos.x, pos.y, -0.998, 1.0);
-	else
+	}		
+	else {
 		gl_Position = vec4(pos.x, pos.y, -0.999, 1.0);
+	}		
 }
