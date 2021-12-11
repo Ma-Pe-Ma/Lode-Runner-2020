@@ -6,7 +6,7 @@ The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/D
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
-In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md)!
+In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/ReadMe.md)!
 
 ## Features of the game
 ### Differences from the original (NES) version:
@@ -84,7 +84,7 @@ Check out the release section you can find simple and video recording versions (
 
 Just simply unpack the 7z archive and launch the Lode Runner.exe. 
 
-For the Android notes please check the [aforementioned readme](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md).
+For the Android notes please check the [aforementioned readme](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/ReadMe.md).
 
 Note: Linux port currently is not available.
 
