@@ -16,6 +16,7 @@
 
 # custom project-wide macro, used to differentiate android and pc solutions
 add_definitions(-DANDROID_VERSION)
+add_definitions(-DRELEASE_VERSION)
 
 cmake_minimum_required(VERSION 3.4.1)
 project(LodeRunnerNativeActivity LANGUAGES C CXX)
