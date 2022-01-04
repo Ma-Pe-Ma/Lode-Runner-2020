@@ -99,7 +99,7 @@ void GLHelper::updateViewPortValues(int width, int height) {
 }
 
 #ifdef ANDROID_VERSION
-void GLHelper::UpdateViewPort() {
+void GLHelper::updateViewPort() {
     ndk_helper::GLContext* context = ndk_helper::GLContext::GetInstance();
     updateViewPortValues(context->GetScreenWidth(), context->GetScreenHeight());
 

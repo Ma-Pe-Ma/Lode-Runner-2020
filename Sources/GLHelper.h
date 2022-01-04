@@ -48,7 +48,7 @@ public:
 	static unsigned int windowPosY;
 
 	#ifdef ANDROID_VERSION
-    static void UpdateViewPort();
+    static void updateViewPort();
     #else
 	static bool fullScreen;
 	static GLFWwindow* window;

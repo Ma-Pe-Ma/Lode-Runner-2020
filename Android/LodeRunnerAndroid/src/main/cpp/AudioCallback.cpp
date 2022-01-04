@@ -9,12 +9,12 @@ oboe::DataCallbackResult AudioCallback::onAudioReady(oboe::AudioStream *audioStr
 
     int s = 0;
     for (int i = 0; i < SOUND_FILE_NR; i++)
-        if (Audio::SFX[i].GetPlayStatus() == playing) {
+        if (Audio::sfx[i].getPlayStatus() == AudioStatus::playing) {
 
-            long ret = Audio::SFX[i].ReadNextBuffer(Audio::pcmout[s]);
+            long ret = Audio::sfx[i].readNextBuffer(Audio::pcmout[s]);
 
             if (ret == 0)
-                Audio::SFX[i].StopAndRewind();
+                Audio::sfx[i].stopAndRewind();
 
             s++;
         }
