@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId  'com.mpm.lodeRunner'
         minSdkVersion   21
-        targetSdkVersion 28
+        targetSdkVersion 29
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a','x86', 'x86_64'
         }
