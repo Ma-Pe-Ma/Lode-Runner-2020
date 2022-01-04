@@ -1,6 +1,6 @@
 #include "Audio.h"
 
-Audio Audio::SFX[SOUND_FILE_NR];
+Audio Audio::sfx[SOUND_FILE_NR];
 
 char Audio::pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
 
@@ -17,61 +17,61 @@ const char Audio::soundNames[SOUND_FILE_NR][25] = { "SFX/gold.ogg", "SFX/dig.ogg
 MultiMedia* Audio::multiMedia;
 #endif
 
-void Audio::PlayPause() {
-	if (playStatus == playing) {
-		playStatus = paused;
+void Audio::playPause() {
+	if (playStatus == AudioStatus::playing) {
+		playStatus = AudioStatus::paused;
 	}
 	else {
-		playStatus = playing;
+		playStatus = AudioStatus::playing;
 	}		
 }
 
-void Audio::StopAndRewind() {
-	playStatus = stopped;
+void Audio::stopAndRewind() {
+	playStatus = AudioStatus::stopped;
 	ov_pcm_seek(sound, 0);
 }
 
-AudioStatus Audio::GetPlayStatus() {
+AudioStatus Audio::getPlayStatus() {
 	return playStatus;
 }
 
 Audio::Audio(const char* fileName) {
-	OpenSoundFile(fileName);
-	playStatus = stopped;
+	openSoundFile(fileName);
+	playStatus = AudioStatus::stopped;
 }
 
 Audio::Audio(int indexIn, const char* fileName) {
 	index = indexIn;
-	OpenSoundFile(fileName);
-	playStatus = stopped;
+	openSoundFile(fileName);
+	playStatus = AudioStatus::stopped;
 }
 
-double Audio::LengthInSec() {
+double Audio::lengthInSec() {
 	return ov_time_total(sound, -1);
 }
 
-long Audio::ReadNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]) {
+long Audio::readNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]) {
 	return ov_read(sound, pcmChar, sizeof(pcmChar), 1, 2, 1, nullptr);
 }
 
-void Audio::OpenSoundFile(const char* fileName) {
+void Audio::openSoundFile(const char* fileName) {
 	sound = new OggVorbis_File;
 	ov_fopen(fileName, sound);
 }
 
-void Audio::CloseSoundFile() {
+void Audio::closeSoundFile() {
 	ov_clear(sound);
 }
 
-void Audio::OpenAudioFiles(const char soundNames[SOUND_FILE_NR][25]) {
+void Audio::openAudioFiles(const char soundNames[SOUND_FILE_NR][25]) {
 	for (int i = 0; i < SOUND_FILE_NR; i++) {
-		SFX[i] = Audio(i, soundNames[i]);
+		sfx[i] = Audio(i, soundNames[i]);
 	}		
 }
 
-void Audio::CloseAudioFiles() {
+void Audio::closeAudioFiles() {
 	for (int i = 0; i < SOUND_FILE_NR; i++) {
-		SFX[i].CloseSoundFile();
+		sfx[i].closeSoundFile();
 	}
 #ifdef ANDROID_VERSION
 	managedStream->requestStop();
@@ -84,15 +84,15 @@ void Audio::CloseAudioFiles() {
 oboe::ManagedStream Audio::managedStream;
 AudioCallback* Audio::audioCallback;
 
-void Audio::OnWindowClose() {
+void Audio::onWindowClose() {
 	managedStream->requestPause();
 }
 
-void Audio::OnWindowResume() {
+void Audio::onWindowResume() {
 	managedStream->requestStart();
 }
 
-void Audio::InitializeAudioStream(AudioCallback* audioCallback1) {
+void Audio::initializeAudioStream(AudioCallback* audioCallback1) {
 	oboe::AudioStreamBuilder builder;
 	builder.setDirection(oboe::Direction::Output);
 	builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
@@ -114,7 +114,7 @@ void Audio::InitializeAudioStream(AudioCallback* audioCallback1) {
 }
 #else
 
-int Audio::RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
+int Audio::rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
 	short* out = (short*)outputBuffer;
 	Audio* data = (Audio*)userData;
 
@@ -124,11 +124,11 @@ int Audio::RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBu
 
 	int s = 0;
 	for (int i = 0; i < SOUND_FILE_NR; i++) {
-		if ((data + i)->GetPlayStatus() == playing) {
-			long ret = (data + i)->ReadNextBuffer(pcmout[s]);
+		if ((data + i)->getPlayStatus() == AudioStatus::playing) {
+			long ret = (data + i)->readNextBuffer(pcmout[s]);
 
 			if (ret == 0) {
-				(data + i)->StopAndRewind();
+				(data + i)->stopAndRewind();
 			}
 
 			s++;

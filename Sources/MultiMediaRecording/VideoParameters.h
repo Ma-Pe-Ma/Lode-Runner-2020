@@ -18,13 +18,13 @@ private:
 public:
 	VideoParameters(int, int, AVCodecID, int, AVPixelFormat, int);
 
-	int GetWidth() { return width; }
-	int GetHeight() { return height; }
-	AVCodecID GetCodecID() { return codecID; }
-	int GetBitrate() { return bitrate; }
-	AVPixelFormat GetPixelFormat() { return pixelFormat; }
-	int GetStreamFrameRate() { return streamFrameRate; }
-	void FreeFrames();
+	int getWidth() { return width; }
+	int getHeight() { return height; }
+	AVCodecID getCodecID() { return codecID; }
+	int getBitrate() { return bitrate; }
+	AVPixelFormat getPixelFormat() { return pixelFormat; }
+	int getStreamFrameRate() { return streamFrameRate; }
+	void freeFrames();
 
 	void setWidth(int width) { this->width = width; }
 	void setHeight(int height) { this->height = height;  }

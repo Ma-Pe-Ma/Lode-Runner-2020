@@ -15,31 +15,31 @@ unsigned int Enemy::killCounter = 0;;
 float Enemy::playerSpeed = 0.9f;
 float Enemy::enemySpeed = 0.415f;
 
-void Enemy::DrawPaused() {
-	DrawEnemy(player->Pos.x, player->Pos.y, player->TextureRef, player->direction, false);
+void Enemy::drawPaused() {
+	Drawing::drawEnemy(player->pos.x, player->pos.y, player->textureRef, player->direction, false);
 
 	for (auto& enemy : enemies) {
-		DrawEnemy(enemy->Pos.x, enemy->Pos.y, enemy->TextureRef, enemy->direction, enemy->carriedGold != nullptr);
+		Drawing::drawEnemy(enemy->pos.x, enemy->pos.y, enemy->textureRef, enemy->direction, enemy->carriedGold != nullptr);
 	}
 }
 
-void Enemy::DrawPlayerDeath() {
+void Enemy::drawPlayerDeath() {
 	//player->Dying();
 
 	for (auto& enemy : enemies) {
-		DrawEnemy(enemy->Pos.x, enemy->Pos.y, enemy->TextureRef, enemy->direction, enemy->carriedGold != nullptr);
+		Drawing::drawEnemy(enemy->pos.x, enemy->pos.y, enemy->textureRef, enemy->direction, enemy->carriedGold != nullptr);
 	}
 }
 
-unsigned int Enemy::GetKillCounter() {
+unsigned int Enemy::getKillCounter() {
 	return Enemy::killCounter;
 }
 
-void Enemy::SetPlayerSpeed(float playerSpeed) {
+void Enemy::setPlayerSpeed(float playerSpeed) {
 	Enemy::playerSpeed = playerSpeed;
 }
 
-void Enemy::SetEnemySpeed(float enemySpeed) {
+void Enemy::setEnemySpeed(float enemySpeed) {
 	Enemy::enemySpeed = enemySpeed;
 }
 
@@ -48,11 +48,11 @@ float Enemy::gameTime = 0;
 int Enemy::bestPath;
 float Enemy::bestRating;
 
-void Enemy::HandlePlayerDying() {
-	player->Dying();
+void Enemy::handlePlayerDying() {
+	player->dying();
 }
 
-bool Enemy::HasGold() {
+bool Enemy::hasGold() {
 	for (auto& enemy : enemies) {
 		if (enemy->carriedGold) {
 			return true;
@@ -69,18 +69,18 @@ void Enemy::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** bri
 	Enemy::trapdoors = trapdoors;
 }
 
-void Enemy::AddEnemy(Vector2DInt position) {
+void Enemy::addEnemy(Vector2DInt position) {
 	Enemy* enemy = new Enemy();
-	enemy->Pos = { (float) position.x, (float) position.y };
-	enemy->prevPos = enemy->Pos;
+	enemy->pos = { (float) position.x, (float) position.y };
+	enemy->prevPos = enemy->pos;
 
 	std::unique_ptr<Enemy> uniquePointer(enemy);
 
 	enemies.push_back(std::move(uniquePointer));
 }
 
-void Enemy::NotifyPlayerAboutDigEnd() {
-	player->ReleaseFromDigging();
+void Enemy::notifyPlayerAboutDigEnd() {
+	player->releaseFromDigging();
 }
 
 void Enemy::clearEnemyVector() {
@@ -95,19 +95,19 @@ Enemy::Enemy() {
 	dPrevPos.x = 0;
 	dPrevPos.y = 0;
 
-	direction = right;
-	pitState = fallingToPit;
-	state = freeRun;
+	direction = Direction::right;
+	pitState = PitState::fallingToPit;
+	state = EnemyState::freeRun;
 
-	TextureRef = textureMap.going;
+	textureRef = textureMap.going;
 
 	carriedGold = nullptr;
 	charSpeed = enemySpeed;
 }
 
-bool Enemy::CheckDigPrevention(int x, int y) {
+bool Enemy::checkDigPrevention(int x, int y) {
 	for (auto& enemy : enemies) {
-		if (abs(enemy->Pos.x - x) <= 0.75f && y + 1 <= enemy->Pos.y && enemy->Pos.y < y + 1.5f) {
+		if (abs(enemy->pos.x - x) <= 0.75f && y + 1 <= enemy->pos.y && enemy->pos.y < y + 1.5f) {
 			return true;
 		}
 	}
@@ -115,25 +115,25 @@ bool Enemy::CheckDigPrevention(int x, int y) {
 	return false;
 }
 
-void Enemy::CheckDeaths(int x, int y) {
-	player->CheckDeath(x, y);
+void Enemy::checkDeaths(int x, int y) {
+	player->checkDeath(x, y);
 	
 	for (auto& enemy : enemies) {
-		enemy->CheckDeath(x, y);
+		enemy->checkDeath(x, y);
 	}
 }
 
-void Enemy::CheckDeath(int x, int y) {
-	if (abs(Pos.x - x) < 0.5f && y - 0.5f <= Pos.y && Pos.y < y + 0.75f) {
-		Die();
+void Enemy::checkDeath(int x, int y) {
+	if (abs(pos.x - x) < 0.5f && y - 0.5f <= pos.y && pos.y < y + 0.75f) {
+		die();
 	}
 }
 
-bool Enemy::EnemyChecker(float x, float y) {
+bool Enemy::enemyChecker(float x, float y) {
 	for (auto& enemy : enemies) {
 		if (enemy.get() != this) {
-			//if (abs(Pos.x - enemy->Pos.x) < 0.5 && abs(Pos.x - enemy->Pos.y) < 0.5) {
-			if (abs(x - enemy->Pos.x) < 0.5f && abs(y - enemy->Pos.y) < 0.5f) {
+			//if (abs(pos.x - enemy->pos.x) < 0.5 && abs(pos.x - enemy->pos.y) < 0.5) {
+			if (abs(x - enemy->pos.x) < 0.5f && abs(y - enemy->pos.y) < 0.5f) {
 				return true;
 			}
 		}
@@ -142,9 +142,9 @@ bool Enemy::EnemyChecker(float x, float y) {
 	return false;
 }
 
-bool Enemy::EnemyCheckerGlobal(float x, float y) {
+bool Enemy::enemyCheckerGlobal(float x, float y) {
 	for (auto& enemy : enemies) {
-		if (abs(x - enemy->Pos.x) < 0.5 && abs(y - enemy->Pos.y) < 0.5) {
+		if (abs(x - enemy->pos.x) < 0.5 && abs(y - enemy->pos.y) < 0.5) {
 			return true;
 		}
 	}
@@ -178,52 +178,52 @@ void Enemy::handleCharacters() {
 }
 
 void Enemy::handle() {
-	DetermineNearbyObjects();
-	FindPath();	
-	Move();
+	determineNearbyObjects();
+	findPath();	
+	move();
 
-	Pos.x += dPos.x;
-	Pos.y += dPos.y;
+	pos.x += dPos.x;
+	pos.y += dPos.y;
 
-	if (prevPos.x != Pos.x && state != digging) {
-		if (Pos.x - prevPos.x > 0) {
-			direction = right;
+	if (prevPos.x != pos.x && state != EnemyState::digging) {
+		if (pos.x - prevPos.x > 0) {
+			direction = Direction::right;
 		}
-		else if (Pos.x - prevPos.x < 0) {
-			direction = left;
+		else if (pos.x - prevPos.x < 0) {
+			direction = Direction::left;
 		}
 	}
 
 	dPos.x = 0;
 	dPos.y = 0;
 
-	Animate();
+	animate();
 
-	DrawEnemy(Pos.x, Pos.y, TextureRef, direction, carriedGold != nullptr);
+	Drawing::drawEnemy(pos.x, pos.y, textureRef, direction, carriedGold != nullptr);
 
-	dPrevPos.x = Pos.x - prevPos.x;
-	dPrevPos.y = Pos.y - prevPos.y;
+	dPrevPos.x = pos.x - prevPos.x;
+	dPrevPos.y = pos.y - prevPos.y;
 
-	prevPos.x = Pos.x;
-	prevPos.y = Pos.y;
+	prevPos.x = pos.x;
+	prevPos.y = pos.y;
 }
 
-void Enemy::DetermineNearbyObjects() {
-	curX = int(Pos.x + 0.5);
-	curY = int(Pos.y + 0.5);
+void Enemy::determineNearbyObjects() {
+	curX = int(pos.x + 0.5);
+	curY = int(pos.y + 0.5);
 
 	middle = layout[curX][curY];
 	downBlock = layout[curX][curY - 1];
 }
 
-void Enemy::DetermineDirection() {
+void Enemy::determineDirection() {
 
 }
 
 //-----------------------------------------------------------
 //----------------------PATH FINDING-------------------------
 
-void Enemy::FindPath() {
+void Enemy::findPath() {
 	//reminder for implementing the moving from the other document
 	//base is untouched - ie. it is the same as the text file
 	//golds are in .base 
@@ -238,16 +238,16 @@ void Enemy::FindPath() {
 	int runnerY = player->curY;
 	
 	//while
-	if (y == runnerY && player->state != falling) {
+	if (y == runnerY && player->state != EnemyState::falling) {
 		while (x != runnerX) {
 			//std::cout << "\n x != runnerx";
 			LayoutBlock checkable = layout[x][y];
 			LayoutBlock belowCheckable = layout[x][y - 1];
 
-			bool checkGold = Gold::GoldChecker(x, y - 1);
+			bool checkGold = Gold::goldChecker(x, y - 1);
 
-			if (checkable == ladder || checkable == pole || /*belowCheckable == brick ||*/ brickO[x][y - 1] || belowCheckable == concrete 
-				|| belowCheckable == ladder	|| EnemyChecker(x, y - 1) || belowCheckable == pole || checkGold) {
+			if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole || /*belowCheckable == LayoutBlock::brick ||*/ brickO[x][y - 1] || belowCheckable == LayoutBlock::concrete
+				|| belowCheckable == LayoutBlock::ladder	|| enemyChecker(x, y - 1) || belowCheckable == LayoutBlock::pole || checkGold) {
 
 				//guard left to runner
 				if (x < runnerX) {
@@ -266,11 +266,11 @@ void Enemy::FindPath() {
 
 		//scan for a path ignoring walls is a success
 		if (x == runnerX) {
-			if (Pos.x < runnerX) {
+			if (pos.x < runnerX) {
 				dPos.x = actualSpeed;
 				dPos.y = 0;
 			}
-			else if (Pos.x > runnerX) {
+			else if (pos.x > runnerX) {
 				dPos.x = -actualSpeed;
 				dPos.y = 0;
 			}
@@ -287,10 +287,10 @@ void Enemy::FindPath() {
 		}
 	}
 
-	ScanFloor();
+	scanFloor();
 }
 
-void Enemy::ScanFloor() {
+void Enemy::scanFloor() {
 	int startX = curX;
 	//int startY = curY;
 
@@ -304,11 +304,11 @@ void Enemy::ScanFloor() {
 		LayoutBlock checkable = layout[x - 1][y];
 		LayoutBlock belowCheckable = layout[x - 1][y - 1];
 
-		if (checkable == brick || checkable == concrete) {
+		if (checkable == LayoutBlock::brick || checkable == LayoutBlock::concrete) {
 			break;
 		}
 
-		if (checkable == ladder || checkable == pole /*|| belowCheckable == brick*/	|| brickO[x - 1][y - 1] || belowCheckable == concrete || belowCheckable == ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick*/	|| brickO[x - 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			--x;
 		}		
 		else {
@@ -325,10 +325,10 @@ void Enemy::ScanFloor() {
 		LayoutBlock checkable = layout[x + 1][y];;
 		LayoutBlock belowCheckable = layout[x + 1][y - 1];
 
-		if (checkable == brick || checkable == concrete) {
+		if (checkable == LayoutBlock::brick || checkable == LayoutBlock::concrete) {
 			break;
 		}			
-		if (checkable == ladder || checkable == pole /*|| belowCheckable == brick */ || brickO[x + 1][y - 1] || belowCheckable == concrete || belowCheckable == ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick */ || brickO[x + 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			++x;
 		}			
 		else {                                         // go on right anyway
@@ -349,11 +349,11 @@ void Enemy::ScanFloor() {
 	//  3: up
 	//  4: down
 
-	if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != concrete) {
-		ScanDown(x, 4);
+	if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+		scanDown(x, 4);
 	}		
-	if (checkable == ladder) {
-		ScanUp(x, 3);
+	if (checkable == LayoutBlock::ladder) {
+		scanUp(x, 3);
 	}
 
 	//first checking left direction, if curpath is 1 then we are checking the left side of the enemy, if 2, then the right side
@@ -374,12 +374,12 @@ void Enemy::ScanFloor() {
 		checkable = layout[x][y];
 		belowCheckable = layout[x][y - 1];
 
-		if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != concrete) {
-			ScanDown(x, curPath);
+		if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+			scanDown(x, curPath);
 		}
 
-		if (checkable == ladder) {
-			ScanUp(x, curPath);
+		if (checkable == LayoutBlock::ladder) {
+			scanUp(x, curPath);
 		}			
 
 		if (curPath == 1) {
@@ -417,22 +417,22 @@ void Enemy::ScanFloor() {
 	}
 }
 
-void Enemy::ScanDown(int x, int curPath) {
+void Enemy::scanDown(int x, int curPath) {
 	int y = curY;
 	int runnerY = player->curY;
 
 	LayoutBlock belowCheckable = layout[x][y - 1];
 
-	while (y > 0 && (belowCheckable = layout[x][y - 1]) != brick && !brickO[x][y - 1] && belowCheckable != concrete) {
-		bool checkGold = Gold::GoldChecker(x, y);
+	while (y > 0 && (belowCheckable = layout[x][y - 1]) != LayoutBlock::brick && !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+		bool checkGold = Gold::goldChecker(x, y);
 
 		//here is a problem, with champ 19?
-		if (layout[x][y] != empty || checkGold || brickO[x][y]) {
+		if (layout[x][y] != LayoutBlock::empty || checkGold || brickO[x][y]) {
 			if (x > 1) {
 				LayoutBlock leftSideBelow = layout[x - 1][y - 1];
 				LayoutBlock leftSide = layout[x - 1][y];
 
-				if (leftSideBelow == brick || brickO[x - 1][y - 1] || leftSideBelow == concrete || leftSideBelow == ladder || leftSide == pole) {
+				if (leftSideBelow == LayoutBlock::brick || brickO[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -443,7 +443,7 @@ void Enemy::ScanDown(int x, int curPath) {
 				LayoutBlock rightSideBelow = layout[x + 1][y - 1];
 				LayoutBlock rightSide = layout[x + 1][y];
 
-				if (rightSideBelow == brick || brickO[x + 1][y - 1] || rightSideBelow == concrete || rightSideBelow == ladder || rightSide == pole) {
+				if (rightSideBelow == LayoutBlock::brick || brickO[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -471,11 +471,11 @@ void Enemy::ScanDown(int x, int curPath) {
 	}
 }
 
-void Enemy::ScanUp(int x, int curPath) {
+void Enemy::scanUp(int x, int curPath) {
 	int y = curY;
 	int runnerY = player->curY;
 
-	while (y < 18 && layout[x][y] == ladder) {
+	while (y < 18 && layout[x][y] == LayoutBlock::ladder) {
 		++y;
 
 		LayoutBlock leftSideBelow = layout[x - 1][y - 1];
@@ -485,7 +485,7 @@ void Enemy::ScanUp(int x, int curPath) {
 		LayoutBlock rightSide = layout[x + 1][y];
 
 		if (x > 1) {
-			if (/*leftSideBelow == brick ||*/ brickO[x - 1][y - 1] || leftSideBelow == concrete || leftSideBelow == ladder || leftSide == pole) {
+			if (/*leftSideBelow == brick ||*/ brickO[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -493,7 +493,7 @@ void Enemy::ScanUp(int x, int curPath) {
 		}
 
 		if (x < 28) {
-			if (/*rightSideBelow == brick ||*/ brickO[x + 1][y - 1] || rightSideBelow == concrete || rightSideBelow == ladder || rightSide == pole) {
+			if (/*rightSideBelow == brick ||*/ brickO[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -522,69 +522,69 @@ void Enemy::ScanUp(int x, int curPath) {
 //-----------------------------------------------------------
 //--------------------------MOVE-----------------------------
 
-void Enemy::Move() {
+void Enemy::move() {
 	actualSpeed = charSpeed * GameTime::getSpeed();
 
 	switch (state) {
-	case freeRun:
-		FreeRun();
+	case EnemyState::freeRun:
+		freeRun();
 		break;
-	case startingToFall:
-		StartingToFall();
+	case EnemyState::startingToFall:
+		startingToFall();
 		break;
-	case falling:
-		Falling();
+	case EnemyState::falling:
+		falling();
 		break;
-	case digging:
-		Digging();
+	case EnemyState::digging:
+		digging();
 		break;
-	case pitting:
-		Pitting();
+	case EnemyState::pitting:
+		pitting();
 		break;
-	case dying:
-		Dying();
+	case EnemyState::dying:
+		dying();
 		break;
 	}	
 }
 
-void Enemy::Animate() {
+void Enemy::animate() {
 	switch (state) {
-	case freeRun:
-		AnimateFreeRun();
+	case EnemyState::freeRun:
+		animateFreeRun();
 		break;
-	case startingToFall:
-		AnimateFalling();
+	case EnemyState::startingToFall:
+		animateFalling();
 		break;
-	case falling:
-		AnimateFalling();
+	case EnemyState::falling:
+		animateFalling();
 		break;
-	case digging:
-		AnimateDigging();
+	case EnemyState::digging:
+		animateDigging();
 		break;
-	case pitting:
-		AnimatePitting();
+	case EnemyState::pitting:
+		animatePitting();
 		break;
-	case dying:
-		AnimateDying();
+	case EnemyState::dying:
+		animateDying();
 		break;
 	}
 }
 
-void Enemy::StartingToFall() {
+void Enemy::startingToFall() {
 	//falling back to pit, when enemy did not come out from it!
-	if (Pos.x == curX) {
+	if (pos.x == curX) {
 		//std::cout << "\n exiting stf";
-		state = falling;
+		state = EnemyState::falling;
 		return;
 	}
 
 	//falling from edge left->right
-	else if (Pos.x < curX) {
-		direction = right;
+	else if (pos.x < curX) {
+		direction = Direction::right;
 
-		if (Pos.x + actualSpeed > curX) {
-			dPos.x = curX - Pos.x;
-			state = falling;
+		if (pos.x + actualSpeed > curX) {
+			dPos.x = curX - pos.x;
+			state = EnemyState::falling;
 		}
 		else {
 			dPos.x = actualSpeed;
@@ -592,11 +592,11 @@ void Enemy::StartingToFall() {
 	}
 	//falling from edge right->left
 	else  {
-		direction = left;
+		direction = Direction::left;
 
-		if (Pos.x - actualSpeed < curX) {
-			dPos.x = curX - Pos.x;
-			state = falling;
+		if (pos.x - actualSpeed < curX) {
+			dPos.x = curX - pos.x;
+			state = EnemyState::falling;
 		}
 		else {
 			dPos.x = -actualSpeed;
@@ -606,41 +606,41 @@ void Enemy::StartingToFall() {
 	dPos.y = -actualSpeed;
 }
 
-void Enemy::Digging() {
+void Enemy::digging() {
 	
 }
 //------FREERUN------
 
 //To properly use ladder characters need to be adjusted into center!
-void Enemy::LadderTransformation() {
+void Enemy::ladderTransformation() {
 	/*if (middle == ladder && dPos.y > 0) {
 		dPos.y = 0;
 	}*/
 
 	//you can move on a ladder 1.5 unit vertically, middle block only covers the bottom 2/3 of the ladder, tophalfladder covers the upper 2/3 of ladder
-	LayoutBlock topHalfOfLadder = layout[curX][int(Pos.y)];
+	LayoutBlock topHalfOfLadder = layout[curX][int(pos.y)];
 
-	if (dPos.y > 0 && middle != ladder && topHalfOfLadder != ladder) {
+	if (dPos.y > 0 && middle != LayoutBlock::ladder && topHalfOfLadder != LayoutBlock::ladder) {
 		dPos.y = 0;
 	}
 
-	if (dPos.y < 0 && middle != ladder && downBlock != ladder && middle != pole) {
+	if (dPos.y < 0 && middle != LayoutBlock::ladder && downBlock != LayoutBlock::ladder && middle != LayoutBlock::pole) {
 		dPos.y = 0;
 	}
 
 	//Handle when multiple buttons pushed (only used by runner)
 	if (dPos.x != 0 && dPos.y != 0) {
 		if (dPos.y > 0) {
-			if (middle == ladder) {
+			if (middle == LayoutBlock::ladder) {
 				dPos.x = 0;
 			}
-			else if (downBlock == ladder) {
+			else if (downBlock == LayoutBlock::ladder) {
 				dPos.y = 0;
 			}
 		}
 		else {
-			if (middle == ladder) {
-				if (downBlock == ladder || downBlock == pole || downBlock == empty || downBlock == trapDoor) {
+			if (middle == LayoutBlock::ladder) {
+				if (downBlock == LayoutBlock::ladder || downBlock == LayoutBlock::pole || downBlock == LayoutBlock::empty || downBlock == LayoutBlock::trapDoor) {
 					dPos.x = 0;
 				}
 				else {//if (downBlock != ladder) {
@@ -648,7 +648,7 @@ void Enemy::LadderTransformation() {
 				}
 			}
 			else {
-				if (downBlock == ladder) {
+				if (downBlock == LayoutBlock::ladder) {
 					dPos.x = 0;
 				}
 				else {
@@ -659,39 +659,39 @@ void Enemy::LadderTransformation() {
 	}
 
 	//adjust character to middle! (used by everyone)
-	if (middle == ladder || downBlock == ladder) {
-		if (dPos.x != 0 && Pos.y != curY) {
+	if (middle == LayoutBlock::ladder || downBlock == LayoutBlock::ladder) {
+		if (dPos.x != 0 && pos.y != curY) {
 			dPos.x = 0;
-			if (Pos.y > curY) {
-				if (Pos.y - actualSpeed < curY) {
-					dPos.y = curY - Pos.y;
+			if (pos.y > curY) {
+				if (pos.y - actualSpeed < curY) {
+					dPos.y = curY - pos.y;
 				}
 				else {
 					dPos.y = -actualSpeed;
 				}
 			}
-			else if (Pos.y < curY) {
-				if (Pos.y + actualSpeed > curY) {
-					dPos.y = curY - Pos.y;
+			else if (pos.y < curY) {
+				if (pos.y + actualSpeed > curY) {
+					dPos.y = curY - pos.y;
 				}
 				else {
 					dPos.y = actualSpeed;
 				}
 			}
 		}
-		else if (dPos.y != 0 && Pos.x != curX) {
+		else if (dPos.y != 0 && pos.x != curX) {
 			dPos.y = 0;
-			if (Pos.x > curX) {
-				if (Pos.x - actualSpeed < curX) {
-					dPos.x = curX - Pos.x;
+			if (pos.x > curX) {
+				if (pos.x - actualSpeed < curX) {
+					dPos.x = curX - pos.x;
 				}
 				else {
 					dPos.x = -actualSpeed;
 				}
 			}
-			else if (Pos.x < curX) {
-				if (Pos.x + actualSpeed > curX) {
-					dPos.x = curX - Pos.x;
+			else if (pos.x < curX) {
+				if (pos.x + actualSpeed > curX) {
+					dPos.x = curX - pos.x;
 				}
 				else {
 					dPos.x = actualSpeed;
@@ -702,23 +702,23 @@ void Enemy::LadderTransformation() {
 }
 
 //enemy does not go into other enemy!
-void Enemy::CheckCollisionWithOthers() {
-	bool checkPit = int(Pos.x) != int(Pos.x + dPos.x);
+void Enemy::checkCollisionWithOthers() {
+	bool checkPit = int(pos.x) != int(pos.x + dPos.x);
 
 	for (auto& enemy : enemies) {
 		if (enemy.get() != this) {
 			//stop if other enemy under is moving!
-			if (abs(enemy->Pos.x - Pos.x) < 1.0f && enemy->Pos.y == Pos.y - 1 && enemy->dPrevPos.x != 0 && middle != ladder && middle != pole && downBlock != ladder && enemy->state != pitting) {
+			if (abs(enemy->pos.x - pos.x) < 1.0f && enemy->pos.y == pos.y - 1 && enemy->dPrevPos.x != 0 && middle != LayoutBlock::ladder && middle != LayoutBlock::pole && downBlock != LayoutBlock::ladder && enemy->state != EnemyState::pitting) {
 				dPos.x = 0;
 				return;
 			}
 
 			//check X collision
-			if (dPos.x != 0 && abs(enemy->Pos.x - (Pos.x + dPos.x)) < 1.0f && abs(Pos.y - enemy->Pos.y) < 1.0f) {	
+			if (dPos.x != 0 && abs(enemy->pos.x - (pos.x + dPos.x)) < 1.0f && abs(pos.y - enemy->pos.y) < 1.0f) {	
 				//stop if enemy is coming out from hole
 				if (checkPit) {
-					if (enemy->state == pitting && enemy->pitState == climbing) {
-						dPos.x = curX - Pos.x;
+					if (enemy->state == EnemyState::pitting && enemy->pitState == PitState::climbing) {
+						dPos.x = curX - pos.x;
 						break;
 					}
 				}
@@ -731,7 +731,7 @@ void Enemy::CheckCollisionWithOthers() {
 				}
 				//do not go inside other enemy
 				else {
-					float enemyDiff = enemy->Pos.x - Pos.x;
+					float enemyDiff = enemy->pos.x - pos.x;
 					short enemyDirectionX = (enemyDiff > 0) - (enemyDiff < 0);
 					if (enemyDirectionX == directionX) {
 						dPos.x = 0;
@@ -740,7 +740,7 @@ void Enemy::CheckCollisionWithOthers() {
 			}
 
 			//check Y collision
-			if (dPos.y != 0 && abs(enemy->Pos.y - (Pos.y + dPos.y)) < 1.0f && abs(Pos.x - enemy->Pos.x) < 1.0f) {
+			if (dPos.y != 0 && abs(enemy->pos.y - (pos.y + dPos.y)) < 1.0f && abs(pos.x - enemy->pos.x) < 1.0f) {
 				//when exiting the same ladder from different sides, who goes from up to down, stop!
 				if (-directionY == enemy->directionY) {
 					if (directionY == -1) {
@@ -749,7 +749,7 @@ void Enemy::CheckCollisionWithOthers() {
 				}
 				//do not go inside other enemy
 				else {
-					float enemyDiff = enemy->Pos.y - Pos.y;
+					float enemyDiff = enemy->pos.y - pos.y;
 					short enemyDirectionY = (enemyDiff > 0) - (enemyDiff < 0);
 					if (enemyDirectionY == directionY) {
 						dPos.y = 0;
@@ -760,14 +760,14 @@ void Enemy::CheckCollisionWithOthers() {
 	}
 }
 
-void Enemy::CheckCollisionsWithEnvironment() {	
+void Enemy::checkCollisionsWithEnvironment() {	
 	if (dPos.x != 0) {
 		short directionX = (dPos.x > 0) - (dPos.x < 0);
 		int nextX = curX + directionX;
 		LayoutBlock nextXBlock = layout[nextX][curY];
 
-		if ((nextXBlock == brick || nextXBlock == concrete || nextXBlock == trapDoor) && abs(nextX - Pos.x - dPos.x) < 1.0f) {
-			dPos.x = curX - Pos.x;
+		if ((nextXBlock == LayoutBlock::brick || nextXBlock == LayoutBlock::concrete || nextXBlock == LayoutBlock::trapDoor) && abs(nextX - pos.x - dPos.x) < 1.0f) {
+			dPos.x = curX - pos.x;
 		}
 	}	
 
@@ -777,50 +777,50 @@ void Enemy::CheckCollisionsWithEnvironment() {
 		LayoutBlock nextYBlock = layout[curX][nextY];
 
 		if (dPos.y > 0) {
-			if ((nextYBlock == brick || nextYBlock == concrete || nextYBlock == trapDoor) && abs(nextY - Pos.y - dPos.y) < 1.0f) {
-				dPos.y = curY - Pos.y;
+			if ((nextYBlock == LayoutBlock::brick || nextYBlock == LayoutBlock::concrete || nextYBlock == LayoutBlock::trapDoor) && abs(nextY - pos.y - dPos.y) < 1.0f) {
+				dPos.y = curY - pos.y;
 			}
 		}
 		else {
-			if ((nextYBlock == brick || nextYBlock == concrete) && abs(nextY - Pos.y - dPos.y) < 1.0f) {
-				dPos.y = curY - Pos.y;
+			if ((nextYBlock == LayoutBlock::brick || nextYBlock == LayoutBlock::concrete) && abs(nextY - pos.y - dPos.y) < 1.0f) {
+				dPos.y = curY - pos.y;
 			}
 		}
 	}	
 }
 
-void Enemy::FreeRun() {
-	LadderTransformation();
+void Enemy::freeRun() {
+	ladderTransformation();
 
 	directionX = (dPos.x > 0) - (dPos.x < 0);
 	directionY = (dPos.y > 0) - (dPos.y < 0);
 
-	CheckCollisionWithOthers();
-	CheckCollisionsWithEnvironment();
+	checkCollisionWithOthers();
+	checkCollisionsWithEnvironment();
 
-	int nextY = int(Pos.y + 0.5 + dPos.y);
+	int nextY = int(pos.y + 0.5 + dPos.y);
 	LayoutBlock nextYBlock = layout[curX][nextY];
 
 	//fall from ladder to empty, pole or trapDoor
-	if (dPos.y < 0 && middle == ladder && (nextYBlock == empty || nextYBlock == pole || nextYBlock == trapDoor)) {
-		InitiateFallingStart();
+	if (dPos.y < 0 && middle == LayoutBlock::ladder && (nextYBlock == LayoutBlock::empty || nextYBlock == LayoutBlock::pole || nextYBlock == LayoutBlock::trapDoor)) {
+		initiateFallingStart();
 		return;
 	}
 
 	//fall from pole
-	if (dPos.y < 0 && middle == pole && (downBlock == empty || downBlock == pole || downBlock == trapDoor)) {
-		if (EnemyChecker(curX, curY - 1)) {
+	if (dPos.y < 0 && middle == LayoutBlock::pole && (downBlock == LayoutBlock::empty || downBlock == LayoutBlock::pole || downBlock == LayoutBlock::trapDoor)) {
+		if (enemyChecker(curX, curY - 1)) {
 			dPos.y = 0;
 		}
 		else {
-			Pos.x = curX;
+			pos.x = curX;
 			dPos.x = 0;
-			InitiateFallingStart();
+			initiateFallingStart();
 			return;
 		}
 	}
 
-	int nextX = int(Pos.x + 0.5 + dPos.x);
+	int nextX = int(pos.x + 0.5 + dPos.x);
 
 	bool enemyUnder = false;
 	bool enemyNextUnder = false;
@@ -838,8 +838,8 @@ void Enemy::FreeRun() {
 	}
 
 	//character has to fall when an other character which was under him before, leaves the block under
-	if ((middle == empty || middle == trapDoor) && (downBlock == empty || downBlock == pole || downBlock == trapDoor) && !enemyUnder) {
-		InitiateFallingStart();
+	if ((middle == LayoutBlock::empty || middle == LayoutBlock::trapDoor) && (downBlock == LayoutBlock::empty || downBlock == LayoutBlock::pole || downBlock == LayoutBlock::trapDoor) && !enemyUnder) {
+		initiateFallingStart();
 		return;
 	}
 	
@@ -848,18 +848,18 @@ void Enemy::FreeRun() {
 	LayoutBlock nextUnderBlock = layout[nextX][curY - 1];
 
 	//falling from the edge of a block (brick, concrete, enemy, ladder)
-	if (dPos.x != 0 && nextXBlock == empty && (nextUnderBlock == empty || nextUnderBlock == trapDoor || nextUnderBlock == pole) && !enemyNextUnder) {
-		InitiateFallingStart();
+	if (dPos.x != 0 && nextXBlock == LayoutBlock::empty && (nextUnderBlock == LayoutBlock::empty || nextUnderBlock == LayoutBlock::trapDoor || nextUnderBlock == LayoutBlock::pole) && !enemyNextUnder) {
+		initiateFallingStart();
 		return;
 	}
 
 	//if some probem arised and character is stuck in air, unstuck it!
-	if (Pos.x != curX && Pos.y != curY) {
+	if (pos.x != curX && pos.y != curY) {
 		bool correct = true;
 
 		for (auto& enemy : enemies) {
 			if (enemy.get() != this) {
-				if (abs(enemy->Pos.x - Pos.x) < 1.0f && Pos.y < enemy->Pos.y + 1.0f) {
+				if (abs(enemy->pos.x - pos.x) < 1.0f && pos.y < enemy->pos.y + 1.0f) {
 					correct = false;
 					break;
 				}
@@ -867,32 +867,32 @@ void Enemy::FreeRun() {
 		}
 
 		if (correct) {
-			InitiateFallingStart();
+			initiateFallingStart();
 		}
 	}
 
-	CheckGoldCollect();
-	CheckGoldDrop();
+	checkGoldCollect();
+	checkGoldDrop();
 }
 
-void Enemy::InitiateFallingStart() {
-	/*if (Pos.x > curX) {
+void Enemy::initiateFallingStart() {
+	/*if (pos.x > curX) {
 		direction = left;
 	}
 	else {
 		direction = right;
 	}*/
 
-	state = startingToFall;
+	state = EnemyState::startingToFall;
 }
 
-void Enemy::InitiateFallingStop() {
-	dPos.y = int(Pos.y + dPos.y) + 1 - Pos.y;
-	state = freeRun;
+void Enemy::initiateFallingStop() {
+	dPos.y = int(pos.y + dPos.y) + 1 - pos.y;
+	state = EnemyState::freeRun;
 }
 
-bool Enemy::CheckHole() {
-	if (layout[curX][curY] == empty && brickO[curX][curY] && dPos.x == 0 && Pos.y > curY) {
+bool Enemy::checkHole() {
+	if (layout[curX][curY] == LayoutBlock::empty && brickO[curX][curY] && dPos.x == 0 && pos.y > curY) {
 		this->holeBrick = brickO[curX][curY].get();
 		return true;
 	}
@@ -900,52 +900,52 @@ bool Enemy::CheckHole() {
 	return false;
 }
 
-void Enemy::Falling() {
+void Enemy::falling() {
 	dPos.x = 0;
 	dPos.y = -actualSpeed;
 
-	if (CheckHole()) {
-		state = pitting;
-		pitState = fallingToPit;
+	if (checkHole()) {
+		state = EnemyState::pitting;
+		pitState = PitState::fallingToPit;
 		return;
 	}
 
 	//falling into pit from falling
-	int nextY = int(Pos.y + dPos.y);
+	int nextY = int(pos.y + dPos.y);
 
 	LayoutBlock blockUnderFallingEnemy = layout[curX][nextY];
 	//Falling to brick, concrete, ladder, enemy
-	if (blockUnderFallingEnemy == brick || blockUnderFallingEnemy == concrete || blockUnderFallingEnemy == ladder) {
-		InitiateFallingStop();
+	if (blockUnderFallingEnemy == LayoutBlock::brick || blockUnderFallingEnemy == LayoutBlock::concrete || blockUnderFallingEnemy == LayoutBlock::ladder) {
+		initiateFallingStop();
 		return;
 	}
 
 	//falling onto enemy!
 	for (auto& enemy : enemies) {
 		if (enemy.get() != this) {
-			if (curX == enemy->curX && enemy->Pos.y < Pos.y && abs((Pos.y + dPos.y) - enemy->Pos.y) < 1.0f && layout[enemy->curX][enemy->curY] != pole) {
-				InitiateFallingStop();
+			if (curX == enemy->curX && enemy->pos.y < pos.y && abs((pos.y + dPos.y) - enemy->pos.y) < 1.0f && layout[enemy->curX][enemy->curY] != LayoutBlock::pole) {
+				initiateFallingStop();
 				return;
 			}
 		}
 	}
 
 	//falling to pole
-	if (layout[curX][curY] == pole && Pos.y + dPos.y <= curY && Pos.y > curY) {
-		InitiateFallingStop();
+	if (layout[curX][curY] == LayoutBlock::pole && pos.y + dPos.y <= curY && pos.y > curY) {
+		initiateFallingStop();
 		return;
 	}
 
-	CheckGoldCollect();
+	checkGoldCollect();
 }
 
-void Enemy::Die() {
+void Enemy::die() {
 	Enemy::killCounter++;
 
 	if (carriedGold) {
 		carriedGold.reset();
-		if (!Enemy::HasGold() && Gold::GetUncollectedSize() == 0) {
-			Audio::SFX[4].PlayPause();
+		if (!Enemy::hasGold() && Gold::getUncollectedSize() == 0) {
+			Audio::sfx[4].playPause();
 			play->generateFinishingLadders();
 		}
 	}
@@ -956,9 +956,9 @@ void Enemy::Die() {
 	//finding a row with an empty block starting from the 15th row, and going down
 	while (true) {
 		for (int i = 1; i < 29; i++) {
-			bool checkGold = Gold::GoldChecker(i, vertical);
+			bool checkGold = Gold::goldChecker(i, vertical);
 
-			if (layout[i][vertical] == empty && !EnemyChecker(i, vertical) && !checkGold && !brickO[i][vertical]) {
+			if (layout[i][vertical] == LayoutBlock::empty && !enemyChecker(i, vertical) && !checkGold && !brickO[i][vertical]) {
 				nonEmptyBlocks.push_back(i);
 			}
 		}
@@ -970,50 +970,50 @@ void Enemy::Die() {
 		vertical--;
 	}
 
-	Pos.y = vertical;
+	pos.y = vertical;
 	short randomX = rand() % nonEmptyBlocks.size();
-	Pos.x = nonEmptyBlocks[randomX];
+	pos.x = nonEmptyBlocks[randomX];
 	dPos.x = 0;
 	dPos.y = 0;
-	state = dying;
-	pitState = fallingToPit;
+	state = EnemyState::dying;
+	pitState = PitState::fallingToPit;
 	holeBrick = nullptr;
 
 	dieTimer = gameTime;
 }
 
-void Enemy::Dying() {
+void Enemy::dying() {
 	dPos.x = 0;
 	dPos.y = 0;
 
 	if ((gameTime - dieTimer) > 1) {
-		state = falling;
+		state = EnemyState::falling;
 	}
 }
 
-void Enemy::Pitting() {
+void Enemy::pitting() {
 	switch (pitState) {
-	case fallingToPit:
-		FallingToPit();
+	case PitState::fallingToPit:
+		fallingToPit();
 		break;
-	case moving:
-		MovingInPit();
+	case PitState::moving:
+		movingInPit();
 		break;
-	case climbing:
-		Climbing();
+	case PitState::climbing:
+		climbing();
 		break;
 	}	
 }
 
-void Enemy::FallingToPit() {
-	if (Pos.x != holeBrick->getPosition().x) {
+void Enemy::fallingToPit() {
+	if (pos.x != holeBrick->getPosition().x) {
 
 		//falling from edge left->right
-		if (Pos.x < holeBrick->getPosition().x) {
-			direction = right;
+		if (pos.x < holeBrick->getPosition().x) {
+			direction = Direction::right;
 
-			if (Pos.x + actualSpeed > holeBrick->getPosition().x) {
-				dPos.x = holeBrick->getPosition().x - Pos.x;
+			if (pos.x + actualSpeed > holeBrick->getPosition().x) {
+				dPos.x = holeBrick->getPosition().x - pos.x;
 			}
 			else {
 				dPos.x = actualSpeed;
@@ -1021,10 +1021,10 @@ void Enemy::FallingToPit() {
 		}
 		//falling from edge right->left
 		else {
-			direction = left;
+			direction = Direction::left;
 
-			if (Pos.x - actualSpeed < holeBrick->getPosition().x) {
-				dPos.x = holeBrick->getPosition().x - Pos.x;
+			if (pos.x - actualSpeed < holeBrick->getPosition().x) {
+				dPos.x = holeBrick->getPosition().x - pos.x;
 			}
 			else {
 				dPos.x = -actualSpeed;
@@ -1038,16 +1038,16 @@ void Enemy::FallingToPit() {
 	}
 
 	//do not fall into if rebuilt
-	if (layout[holeBrick->getPosition().x][holeBrick->getPosition().y] == brick && abs(Pos.y - holeBrick->getPosition().y) >= 0.75) {
-		state = freeRun;
-		pitState = fallingToPit;
-		Pos.y = holeBrick->getPosition().y + 1;
+	if (layout[holeBrick->getPosition().x][holeBrick->getPosition().y] == LayoutBlock::brick && abs(pos.y - holeBrick->getPosition().y) >= 0.75) {
+		state = EnemyState::freeRun;
+		pitState = PitState::fallingToPit;
+		pos.y = holeBrick->getPosition().y + 1;
 
-		if (layout[holeBrick->getPosition().y][holeBrick->getPosition().y + 1] == brick) {	
-			Die();
+		if (layout[holeBrick->getPosition().y][holeBrick->getPosition().y + 1] == LayoutBlock::brick) {
+			die();
 		}
 		else {
-			state = freeRun;
+			state = EnemyState::freeRun;
 		}
 
 		holeBrick = nullptr;
@@ -1059,19 +1059,19 @@ void Enemy::FallingToPit() {
 
 	Vector2DInt brickPosition = holeBrick->getPosition();
 
-	if (int(Pos.y + dPos.y) < brickPosition.y) {
-		dPos.y = brickPosition.y - Pos.y;
-		pitState = moving;
+	if (int(pos.y + dPos.y) < brickPosition.y) {
+		dPos.y = brickPosition.y - pos.y;
+		pitState = PitState::moving;
 		holeTimer = gameTime;
 
 		if (carriedGold) {
-			carriedGold->SetPos({ float(brickPosition.x), float(brickPosition.y + 1.0f) });
+			carriedGold->setPos({ float(brickPosition.x), float(brickPosition.y + 1.0f) });
 			Gold::addGoldToUncollected(std::move(carriedGold));
 		}
 	}
 }
 
-void Enemy::MovingInPit() {
+void Enemy::movingInPit() {
 	//being idle in the hole for a moment
 	if (gameTime - holeTimer < holeIdle) {
 		dPos.x = 0;
@@ -1081,37 +1081,37 @@ void Enemy::MovingInPit() {
 	//moving horizontally in hole after being idle
 	else if (holeIdle < gameTime - holeTimer && gameTime - holeTimer < holeIdle + holeHorizontalTime) {
 		//"harmonic motion" in pit
-		Pos.x = holeBrick->getPosition().x + 0.25f * sin(2 * 3.14159265359f / holeHorizontalTime * (gameTime - (holeIdle + holeTimer)));
+		pos.x = holeBrick->getPosition().x + 0.25f * sin(2 * 3.14159265359f / holeHorizontalTime * (gameTime - (holeIdle + holeTimer)));
 		dPos.x = 0;
 		dPos.y = 0;
 	}
 
 	//going up to the half of the hole block!
 	else if (gameTime - holeTimer > holeIdle + holeHorizontalTime) {
-		Pos.x = holeBrick->getPosition().x;
+		pos.x = holeBrick->getPosition().x;
 
 		//if higher than 3/4 of the block try climbing
-		if (Pos.y + actualSpeed > holeBrick->getPosition().y + 0.75f) {
-			Pos.y = holeBrick->getPosition().y + 0.75f;
+		if (pos.y + actualSpeed > holeBrick->getPosition().y + 0.75f) {
+			pos.y = holeBrick->getPosition().y + 0.75f;
 			dPos.y = 0;
 
-			pitState = climbing;
+			pitState = PitState::climbing;
 
 			if (dPos.x > 0) {
-				direction = right;
+				direction = Direction::right;
 			}
 			if (dPos.x < 0) {
-				direction = left;
+				direction = Direction::left;
 			}
 		}
 		else {
-			Pos.y += actualSpeed;
+			pos.y += actualSpeed;
 			dPos.y = 0;
 
 			for (auto& enemy : enemies) {
 				if (enemy.get() != this) {
-					if (abs(enemy->Pos.x - holeBrick->getPosition().x) < 0.5f && enemy->Pos.y < holeBrick->getPosition().y + 2) {
-						pitState = fallingToPit;
+					if (abs(enemy->pos.x - holeBrick->getPosition().x) < 0.5f && enemy->pos.y < holeBrick->getPosition().y + 2) {
+						pitState = PitState::fallingToPit;
 						break;
 					}
 				}
@@ -1123,22 +1123,22 @@ void Enemy::MovingInPit() {
 	return;
 }
 
-void Enemy::Climbing() {
+void Enemy::climbing() {
 	//if horizontally stopped, fall back!
 	if (dPos.x == 0) {
 		//this needed when coming out from hole and next it there is a pole or ladder
 		//needed because different pathfinding implemantation
 		if (dPos.y != 0) {
-			if (direction == left) {
+			if (direction == Direction::left) {
 				dPos.x = -actualSpeed;
 			}
-			if (direction == right) {
+			if (direction == Direction::right) {
 				dPos.x = +actualSpeed;
 			}
 		}
 		else {
 			//std::cout << "\n falling back dpx0";
-			pitState = fallingToPit;
+			pitState = PitState::fallingToPit;
 			return;
 		}
 	}
@@ -1146,8 +1146,8 @@ void Enemy::Climbing() {
 	Vector2DInt brickPosition = holeBrick->getPosition();
 
 	//if direction changed, fall back!
-	if ((dPos.x > 0 && direction == left) || (dPos.x < 0 && direction == right)) {
-		pitState = fallingToPit;
+	if ((dPos.x > 0 && direction == Direction::left) || (dPos.x < 0 && direction == Direction::right)) {
+		pitState = PitState::fallingToPit;
 		return;
 	}
 	//continue climbing
@@ -1155,28 +1155,28 @@ void Enemy::Climbing() {
 		dPos.y = actualSpeed;
 
 		//do not go higher than block
-		if (Pos.y + dPos.y > brickPosition.y + 1) {
-			dPos.y = brickPosition.y + 1 - Pos.y;
+		if (pos.y + dPos.y > brickPosition.y + 1) {
+			dPos.y = brickPosition.y + 1 - pos.y;
 		}
 
 		//fall back if the above brick is rebuilt
-		if (layout[brickPosition.x][brickPosition.y + 1] == brick) {
-			pitState = fallingToPit;
+		if (layout[brickPosition.x][brickPosition.y + 1] == LayoutBlock::brick) {
+			pitState = PitState::fallingToPit;
 			return;
 		}
 
 		//fallback if exit block is rebuilt on left
 		if (dPos.x < 0) {
-			if (layout[brickPosition.x - 1][brickPosition.y + 1] == brick) {
-				pitState = fallingToPit;
+			if (layout[brickPosition.x - 1][brickPosition.y + 1] == LayoutBlock::brick) {
+				pitState = PitState::fallingToPit;
 				return;
 			}
 		}
 
 		//fallback if exit block is rebuilt on right
 		else if (dPos.x > 0) {
-			if (layout[brickPosition.x + 1][brickPosition.y + 1] == brick) {
-				pitState = fallingToPit;
+			if (layout[brickPosition.x + 1][brickPosition.y + 1] == LayoutBlock::brick) {
+				pitState = PitState::fallingToPit;
 				return;
 			}
 		}
@@ -1184,40 +1184,40 @@ void Enemy::Climbing() {
 		//fall back if 'exit block' is occupied by an other enemy (exit block == the block where enemy will got after exiting -  x = hole.x+-1, y = hole.y+1
 		for (auto& enemy : enemies) {
 			if (dPos.x < 0) {
-				//if (holePos.x - 1.55 < enemies[i]->Pos.x && enemies[i]->Pos.x < holePos.x && int(enemies[i]->Pos.y + 0.5) == holePos.y + 1) {
-				if (Pos.x - 1 < enemy->Pos.x && enemy->Pos.x < Pos.x && enemy->curY == brickPosition.y + 1) {
+				//if (holepos.x - 1.55 < enemies[i]->pos.x && enemies[i]->pos.x < holepos.x && int(enemies[i]->pos.y + 0.5) == holepos.y + 1) {
+				if (pos.x - 1 < enemy->pos.x && enemy->pos.x < pos.x && enemy->curY == brickPosition.y + 1) {
 					//std::cout << "\n falling back from left to right, because enemy is above!";
-					pitState = fallingToPit;
+					pitState = PitState::fallingToPit;
 					return;
 				}
 			}
 			else if (dPos.x > 0) {
-				//if (holePos.x < enemies[i]->Pos.x && enemies[i]->Pos.x < holePos.x + 1.55 && int(enemies[i]->Pos.y + 0.5) == holePos.y + 1) {
-				if (Pos.x < enemy->Pos.x && enemy->Pos.x < Pos.x + 1 && enemy->curY == brickPosition.y + 1) {
+				//if (holepos.x < enemies[i]->pos.x && enemies[i]->pos.x < holepos.x + 1.55 && int(enemies[i]->pos.y + 0.5) == holepos.y + 1) {
+				if (pos.x < enemy->pos.x && enemy->pos.x < pos.x + 1 && enemy->curY == brickPosition.y + 1) {
 					//std::cout << "\n falling back from right to left, because enemy is above!";
-					pitState = fallingToPit;
+					pitState = PitState::fallingToPit;
 					return;
 				}
 			}
 		}
 
 		//out!!
-		if (abs((Pos.x + dPos.x) - brickPosition.x) > 0.55f) {
+		if (abs((pos.x + dPos.x) - brickPosition.x) > 0.55f) {
 			//std::cout << "\n out from pit!";
 				
 			if (dPos.x < 0) {
-				Pos.x = brickPosition.x - 0.55f;
+				pos.x = brickPosition.x - 0.55f;
 				dPos.x = 0;
 			}
 			else if (dPos.x > 0) {
-				Pos.x = brickPosition.x + 0.55f;
+				pos.x = brickPosition.x + 0.55f;
 				dPos.x = 0;
 			}
 
 			dPos.y = 0;
 
-			state = freeRun;
-			pitState = fallingToPit;
+			state = EnemyState::freeRun;
+			pitState = PitState::fallingToPit;
 			holeBrick = nullptr;
 		}
 	}
@@ -1225,108 +1225,108 @@ void Enemy::Climbing() {
 
 //-----------------------------------------------------------
 //------------------------ANIMATE----------------------------
-void Enemy::AnimateFreeRun() {
+void Enemy::animateFreeRun() {
 	//going animation
-	if (Pos.x - prevPos.x != 0  && (middle == empty || middle == ladder || middle == trapDoor)) {
-		AnimateGoing();
+	if (pos.x - prevPos.x != 0  && (middle == LayoutBlock::empty || middle == LayoutBlock::ladder || middle == LayoutBlock::trapDoor)) {
+		animateGoing();
 	}
 	//on ladder, or coming out from pit
-	else if (Pos.y - prevPos.y != 0 && (middle == ladder || downBlock == ladder)) {
-		AnimateOnLadder();
+	else if (pos.y - prevPos.y != 0 && (middle == LayoutBlock::ladder || downBlock == LayoutBlock::ladder)) {
+		animateOnLadder();
 	}
 	//on pole
-	else if (middle == pole && (Pos.x - prevPos.x != 0 || Pos.y - prevPos.y != 0) && curY == Pos.y) {
-		AnimateOnPole();
+	else if (middle == LayoutBlock::pole && (pos.x - prevPos.x != 0 || pos.y - prevPos.y != 0) && curY == pos.y) {
+		animateOnPole();
 	}
 }
 
-void Enemy::AnimateDying() {
-	TextureRef = textureMap.death + int(4 * (gameTime - dieTimer)) % 4;
+void Enemy::animateDying() {
+	textureRef = textureMap.death + int(4 * (gameTime - dieTimer)) % 4;
 }
 
-void Enemy::AnimateDigging() {
+void Enemy::animateDigging() {
 	
 }
 
-void Enemy::AnimateFalling() {
+void Enemy::animateFalling() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	TextureRef = textureMap.falling + timeFactor;
+	textureRef = textureMap.falling + timeFactor;
 }
 
-void Enemy::AnimateGoing() {
+void Enemy::animateGoing() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	TextureRef = textureMap.going + timeFactor;
+	textureRef = textureMap.going + timeFactor;
 }
 
-void Enemy::AnimateOnLadder() {
+void Enemy::animateOnLadder() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	TextureRef = textureMap.ladder + timeFactor;
+	textureRef = textureMap.ladder + timeFactor;
 }
 
-void Enemy::AnimateOnPole() {
+void Enemy::animateOnPole() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	TextureRef = textureMap.pole + timeFactor;
+	textureRef = textureMap.pole + timeFactor;
 }
 
-void Enemy::AnimatePitting() {
+void Enemy::animatePitting() {
 	switch (pitState) {
-		case fallingToPit:
-			AnimateFalling();
-			break;
+	case PitState::fallingToPit:
+		animateFalling();
+		break;
 
-		case moving:
-			if (Pos.y - prevPos.y != 0 && gameTime - holeTimer > 1) {
-				AnimateOnLadder();
-			}
-			else {
-				TextureRef = textureMap.falling;
-			}
+	case PitState::moving:
+		if (pos.y - prevPos.y != 0 && gameTime - holeTimer > 1) {
+			animateOnLadder();
+		}
+		else {
+			textureRef = textureMap.falling;
+		}
 			
-			break;
+		break;
 
-		case climbing:
-			if (Pos.y - prevPos.y != 0) {
-				AnimateOnLadder();
-			}
-			else {
-				AnimateGoing();
-			}
+	case PitState::climbing:
+		if (pos.y - prevPos.y != 0) {
+			animateOnLadder();
+		}
+		else {
+			animateGoing();
+		}
 
-			break;
+		break;
 	}
 }
 
-void Enemy::CheckGoldCollect() {
+void Enemy::checkGoldCollect() {
 	//if not carryiing and there is one, carry it
 	if (!carriedGold) {
-		if ((carriedGold = Gold::GoldCollectChecker(Pos.x, Pos.y))) {
-			carriedGold->SetReleaseCounter(rand() % 26 + 14);
+		if ((carriedGold = Gold::goldCollectChecker(pos.x, pos.y))) {
+			carriedGold->setReleaseCounter(rand() % 26 + 14);
 		}		
 	}
 }
 
 //if already carrying, check to drop
-void Enemy::CheckGoldDrop() {
+void Enemy::checkGoldDrop() {
 	if (carriedGold) {
 		int prevX = int(prevPos.x + 0.5);
 		int prevY = int(prevPos.y + 0.5);
 
-		if (int(Pos.x + dPos.x + 0.5) != prevX || int(Pos.y + dPos.y + 0.5) != prevY) {
+		if (int(pos.x + dPos.x + 0.5) != prevX || int(pos.y + dPos.y + 0.5) != prevY) {
 			if (carriedGold->shouldBeReleased()) {
-				bool checkGold = Gold::GoldChecker(prevX, prevY);
+				bool checkGold = Gold::goldChecker(prevX, prevY);
 				LayoutBlock prevBlock = layout[prevX][prevY];
 				LayoutBlock prevBlockUnder = layout[prevX][prevY - 1];
 
-				if (prevBlock == empty && !brickO[prevX][prevY] && !checkGold && (prevBlockUnder == brick || prevBlockUnder == concrete || prevBlockUnder == ladder)) {
-					carriedGold->SetPos({ (float)prevX, (float)prevY });
+				if (prevBlock == LayoutBlock::empty && !brickO[prevX][prevY] && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
+					carriedGold->setPos({ (float)prevX, (float)prevY });
 					Gold::addGoldToUncollected(std::move(carriedGold));
 				}
 			}

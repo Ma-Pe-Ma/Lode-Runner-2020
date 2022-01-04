@@ -22,7 +22,7 @@ void MultiMedia::setGLViewPortReferences(unsigned int* viewPortX, unsigned int* 
 	this->viewPortHeight = viewPortHeight;
 }
 
-void MultiMedia::Initialize() {
+void MultiMedia::initialize() {
 	std::string fileNameString = generateName();
 
 	char* filename = new char[fileNameString.length() + 1];
@@ -67,24 +67,24 @@ void MultiMedia::Initialize() {
 	ret = avio_open(&formatContext->pb, filename, AVIO_FLAG_WRITE);
 
 	if (ret < 0) {
-		MultiMediaHelper::FFMPEG_ERROR(ret);
+		MultiMediaHelper::ffmpegError(ret);
 		exit(1);
 	}
 
 	ret = avformat_write_header(formatContext, NULL);
 
 	if (ret < 0) {
-		MultiMediaHelper::FFMPEG_ERROR(ret);
+		MultiMediaHelper::ffmpegError(ret);
 		exit(1);
 	}
 
 	initialized = true;
-	video->SetRecordStartTime();
+	video->setRecordStartTime();
 }
 
-void MultiMedia::CloseVideo() {
+void MultiMedia::closeVideo() {
 	initialized = false;
-	video->FirstFrameDeInitialize();
+	video->firstFrameDeInitialize();
 
 	av_write_trailer(formatContext);
 
@@ -92,8 +92,8 @@ void MultiMedia::CloseVideo() {
 	//video.audioStream->duration = av_rescale_q(video.audio_next_pts, video.AudioCodecContext->time_base, video.audioStream->time_base);;
 	//video.videoStream->duration = av_rescale_q(video.video_next_pts, video.VideoCodecContext->time_base, video.videoStream->time_base);;
 
-	audio->FreeFrames();
-	video->FreeFrames();
+	audio->freeFrames();
+	video->freeFrames();
 
 	delete[] video->buffer;
 	delete video;
@@ -113,7 +113,7 @@ void MultiMedia::CloseVideo() {
 
 void MultiMedia::writeVideoFrame() {
 	if (initialized) {
-		video->EncodeFrame();
+		video->encodeFrame();
 
 		while (audio->have || video->have) {
 			if (video->have && (!audio->have)) {
@@ -134,7 +134,7 @@ void MultiMedia::writeVideoFrame() {
 
 void MultiMedia::writeAudioFrame(short out) {
 	if (recordingState == recording && initialized) {
-		audio->EncodeFrame(out);
+		audio->encodeFrame(out);
 	}
 }
 
@@ -142,7 +142,7 @@ void MultiMedia::recordAndControl(bool impulse) {
 	if (recordingState == uninitialized) {
 
 		if (impulse) {
-			Initialize();
+			initialize();
 			recordingState = recording;
 		}
 	}
@@ -156,7 +156,7 @@ void MultiMedia::recordAndControl(bool impulse) {
 	}
 
 	if (recordingState == closing) {
-		CloseVideo();
+		closeVideo();
 		recordingState = uninitialized;
 	}
 }

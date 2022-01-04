@@ -10,30 +10,30 @@ void Pause::start() {
 
 void Pause::update(float) {
 	if (enter.simple()) {
-		Audio::SFX[7].PlayPause();		
-		Audio::SFX[14].PlayPause();
+		Audio::sfx[7].playPause();		
+		Audio::sfx[14].playPause();
 
-		gamePlay->TransitionTo(gamePlay->play);
+		gamePlay->transitionTo(gamePlay->play);
 	}
 
 	//levelselect with space
 	if (space.simple()) {
-		Audio::SFX[17].StopAndRewind();
-		Audio::SFX[4].StopAndRewind();
-		Audio::SFX[7].StopAndRewind();
+		Audio::sfx[17].stopAndRewind();
+		Audio::sfx[4].stopAndRewind();
+		Audio::sfx[7].stopAndRewind();
 
 		if (gamePlay->stateContext->menuCursor < 2) {
-			gamePlay->stateContext->TransitionTo(gamePlay->stateContext->select);
+			gamePlay->stateContext->transitionTo(gamePlay->stateContext->select);
 		}
 		else {
-			gamePlay->stateContext->TransitionTo(gamePlay->stateContext->generator);
+			gamePlay->stateContext->transitionTo(gamePlay->stateContext->generator);
 		}
 	}
 
-	Gold::DrawGolds();
-	Enemy::DrawPaused();
+	Gold::drawGolds();
+	Enemy::drawPaused();
 	gamePlay->play->drawLevel();
-	gamePlay->WriteGameTime();
+	gamePlay->writeGameTime();
 }
 
 void Pause::end() {

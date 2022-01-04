@@ -5,10 +5,10 @@
 std::vector<std::unique_ptr<Gold>> Gold::uncollectedGold;
 std::vector<std::unique_ptr<Gold>> Gold::collectedGold;
 
-short Gold::GetCollectedSize() {
+short Gold::getCollectedSize() {
 	return collectedGold.size();
 }
-short Gold::GetUncollectedSize() {
+short Gold::getUncollectedSize() {
 	return uncollectedGold.size();
 }
 
@@ -16,18 +16,18 @@ void Gold::addGoldToCollected(std::unique_ptr<Gold> collectedGold) {
 	Gold::collectedGold.push_back(std::move(collectedGold));
 }
 
-void Gold::ClearGoldHolders() {
+void Gold::clearGoldHolders() {
 	uncollectedGold.clear();
 	collectedGold.clear();
 }
 
-void Gold::Initialize(int indexIn, Vector2D PosIn) {
-	Pos = PosIn;
+void Gold::initialize(int indexIn, Vector2D pos) {
+	this->pos = pos;
 }
 
-void Gold::DrawGolds() {
+void Gold::drawGolds() {
 	for (auto& gol : uncollectedGold) {
-		gol->Draw();
+		gol->draw();
 	}
 }
 
@@ -35,9 +35,9 @@ void Gold::addGoldToUncollected(std::unique_ptr<Gold> newGold) {
 	uncollectedGold.push_back(std::move(newGold));
 }
 
-bool Gold::GoldChecker(int x, int y) {
+bool Gold::goldChecker(int x, int y) {
 	for (auto& gol : uncollectedGold) {
-		if (gol->Pos.x == x && gol->Pos.y == y) {
+		if (gol->pos.x == x && gol->pos.y == y) {
 			return true;
 		}
 	}
@@ -45,9 +45,9 @@ bool Gold::GoldChecker(int x, int y) {
 	return false;
 }
 
-std::unique_ptr<Gold> Gold::GoldCollectChecker(float x, float y) {
+std::unique_ptr<Gold> Gold::goldCollectChecker(float x, float y) {
 	for (auto it = uncollectedGold.begin(); it != uncollectedGold.end(); it++) {
-		if (abs(it->get()->Pos.x - x) < 0.15f && abs(it->get()->Pos.y - y) < 0.15f) {
+		if (abs(it->get()->pos.x - x) < 0.15f && abs(it->get()->pos.y - y) < 0.15f) {
 			std::unique_ptr<Gold> foundGold = std::move(*it);
 			uncollectedGold.erase(it);
 
@@ -59,14 +59,14 @@ std::unique_ptr<Gold> Gold::GoldCollectChecker(float x, float y) {
 	return nullptr;
 }
 
-void Gold::Draw() {
+void Gold::draw() {
 	int timeFactor = int(GameTime::getGameTime()) % 4;
 
 	if (timeFactor == 3) {
 		timeFactor = 1;
 	}
 
-	DrawLevel(Pos.x, Pos.y, 36 + timeFactor);
+	Drawing::drawLevel(pos.x, pos.y, 36 + timeFactor);
 }
 
 bool Gold::shouldBeReleased() {

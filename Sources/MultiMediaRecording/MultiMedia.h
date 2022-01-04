@@ -46,8 +46,8 @@ public:
 	
 	void setGLViewPortReferences(unsigned int*, unsigned int*, unsigned int*, unsigned int*);
 	
-	void Initialize();
-	void CloseVideo();
+	void initialize();
+	void closeVideo();
 
 	void writeVideoFrame();
 	void writeAudioFrame(short);

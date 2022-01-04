@@ -16,19 +16,19 @@ Brick::Brick(Vector2DInt position) {
 	this->position = position;
 }
 
-void Brick::Handle(float gameTime) {
+void Brick::handle(float gameTime) {
 	switch (brickState)	{
-	case original:
-		DrawLevel(position.x, position.y, 0);
+	case BrickState::original:
+		Drawing::drawLevel(position.x, position.y, 0);
 		break;
-	case diggingS:
-		Digging(gameTime);
+	case BrickState::digging:
+		digging(gameTime);
 		break;
-	case watiting:
-		Waiting(gameTime);
+	case BrickState::watiting:
+		waiting(gameTime);
 		break;
-	case building:
-		Building(gameTime);
+	case BrickState::building:
+		building(gameTime);
 		break;
 	default:
 
@@ -36,16 +36,16 @@ void Brick::Handle(float gameTime) {
 	}
 }
 
-bool Brick::InitiateDig() {	
-	int checkGold = Gold::GoldChecker(position.x, position.y + 1);
+bool Brick::initiateDig() {	
+	int checkGold = Gold::goldChecker(position.x, position.y + 1);
 	LayoutBlock upBlock = layout[position.x][position.y + 1];
 
-	if (brickState == original && upBlock == empty && !checkGold) {
-		brickState = diggingS;
+	if (brickState == original && upBlock == LayoutBlock::empty && !checkGold) {
+		brickState = BrickState::digging;
 		timer = GameTime::getGameTime();
 
-		Audio::SFX[1].StopAndRewind();
-		Audio::SFX[1].PlayPause();
+		Audio::sfx[1].stopAndRewind();
+		Audio::sfx[1].playPause();
 		randomDebris = rand() % 3;
 
 		return true;
@@ -54,53 +54,53 @@ bool Brick::InitiateDig() {
 	return false;
 }
 
-void Brick::Digging(float gameTime) {
+void Brick::digging(float gameTime) {
 	if (gameTime - timer > destroyTime) {
-		brickState = watiting;
+		brickState = BrickState::watiting;
 		timer = gameTime;
-		Enemy::NotifyPlayerAboutDigEnd();
-		layout[position.x][position.y] = empty;
+		Enemy::notifyPlayerAboutDigEnd();
+		layout[position.x][position.y] = LayoutBlock::empty;
 	}
 	else {
 		//growing hole
 		int timeFactor = int(5 * (gameTime - timer) / (destroyTime)) % 5;
-		DrawLevel(position.x, position.y, 1 + timeFactor);
+		Drawing::drawLevel(position.x, position.y, 1 + timeFactor);
 
-		if (Enemy::CheckDigPrevention(position.x, position.y)) {
-			Audio::SFX[2].PlayPause();
-			Audio::SFX[1].StopAndRewind();
-			Enemy::NotifyPlayerAboutDigEnd();
-			layout[position.x][position.y] = brick;
-			brickState = original;
-			DrawLevel(position.x, position.y, 0);
+		if (Enemy::checkDigPrevention(position.x, position.y)) {
+			Audio::sfx[2].playPause();
+			Audio::sfx[1].stopAndRewind();
+			Enemy::notifyPlayerAboutDigEnd();
+			layout[position.x][position.y] = LayoutBlock::brick;
+			brickState = BrickState::original;
+			Drawing::drawLevel(position.x, position.y, 0);
 			return;
 		}
 
 		//drawing debris above hole
-		if (layout[position.x][position.y + 1] != brick) {
+		if (layout[position.x][position.y + 1] != LayoutBlock::brick) {
 			int debrisFactor = 19 + randomDebris * 6;
-			DrawLevel(position.x, position.y + 1, debrisFactor + timeFactor);
+			Drawing::drawLevel(position.x, position.y + 1, debrisFactor + timeFactor);
 		}
 	}		
 }
 
-void Brick::Waiting(float gameTime) {
+void Brick::waiting(float gameTime) {
 	if (gameTime - timer > diggingTime - destroyTime - buildTime) {
-		brickState = building;
+		brickState = BrickState::building;
 		timer = gameTime;
 	}
 }
 
-void Brick::Building(float gameTime) {
+void Brick::building(float gameTime) {
 	if (gameTime - timer > buildTime) {
-		brickState = original;
-		DrawLevel(position.x, position.y, 0);
+		brickState = BrickState::original;
+		Drawing::drawLevel(position.x, position.y, 0);
 
-		Enemy::CheckDeaths(position.x, position.y);
-		layout[position.x][position.y] = brick;
+		Enemy::checkDeaths(position.x, position.y);
+		layout[position.x][position.y] = LayoutBlock::brick;
 	}
 	else {
 		int timeFactor = int(5 * (gameTime - timer) / buildTime) % 5;
-		DrawLevel(position.x, position.y, 11 - timeFactor);
+		Drawing::drawLevel(position.x, position.y, 11 - timeFactor);
 	}	
 }

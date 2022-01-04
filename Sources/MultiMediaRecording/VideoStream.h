@@ -38,9 +38,9 @@ private:
 public:
 	unsigned char* buffer;
 	VideoStream(VideoParameters*, VideoParameters*, AVFormatContext*);
-	void FirstFrameDeInitialize();
-	void EncodeFrame();
-	void SetRecordStartTime();
+	void firstFrameDeInitialize();
+	void encodeFrame();
+	void setRecordStartTime();
 	void setGLViewPortReferences(unsigned int* viewPortX, unsigned int* viewPortY, unsigned int* viewPortWidth, unsigned int* viewPortHeight);
 };
 

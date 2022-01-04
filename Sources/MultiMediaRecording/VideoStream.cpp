@@ -7,11 +7,11 @@ void VideoStream::setGLViewPortReferences(unsigned int* viewPortX, unsigned int*
 	this->viewPortHeight = viewPortHeight;
 }
 
-void VideoStream::SetRecordStartTime() {
+void VideoStream::setRecordStartTime() {
 	recordStartTime = std::chrono::system_clock::now();
 }
 
-void VideoStream::FirstFrameDeInitialize() {
+void VideoStream::firstFrameDeInitialize() {
 	firstVideoFrameInitialised = false;
 }
 
@@ -20,7 +20,7 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 	output = outputIn;
 
 	//video
-	codec = avcodec_find_encoder(output->GetCodecID());
+	codec = avcodec_find_encoder(output->getCodecID());
 	if (!(codec)) {
 		//fprintf(stderr, "Could not find encoder for '%s'\n",avcodec_get_name(codec_id));
 		exit(1);
@@ -50,17 +50,17 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 		//return -1;
 	}
 
-	std::cout << "width: " << output->GetWidth();
-	std::cout << "height: " << output->GetHeight();
+	std::cout << "width: " << output->getWidth();
+	std::cout << "height: " << output->getHeight();
 
-	codecContext->codec_id = output->GetCodecID();
-	codecContext->bit_rate = output->GetBitrate();
-	codecContext->width = output->GetWidth();
-	codecContext->height = output->GetHeight();
+	codecContext->codec_id = output->getCodecID();
+	codecContext->bit_rate = output->getBitrate();
+	codecContext->width = output->getWidth();
+	codecContext->height = output->getHeight();
 	stream->time_base = { 1, STREAM_FRAME_RATE };
 	codecContext->time_base = stream->time_base;
 	codecContext->gop_size = 12; // emit one intra frame every twelve frames at most 
-	codecContext->pix_fmt = output->GetPixelFormat();
+	codecContext->pix_fmt = output->getPixelFormat();
 
 	av_opt_set(codecContext->priv_data, "preset", "slow", 0);
 	//video.VideoCodecContext->framerate = { 25, 1 };
@@ -69,7 +69,7 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 	int ret = avcodec_open2(codecContext, codec, NULL);
 	if (ret < 0) {
 		//fprintf(stderr, "Could not open video codec: %s\n", av_err2str(ret));
-		MultiMediaHelper::FFMPEG_ERROR(ret);
+		MultiMediaHelper::ffmpegError(ret);
 		exit(1);
 	}
 
@@ -78,9 +78,9 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 		exit(1);
 	}
 
-	frame->format = output->GetPixelFormat();
-	frame->width = output->GetWidth();
-	frame->height = output->GetHeight();
+	frame->format = output->getPixelFormat();
+	frame->width = output->getWidth();
+	frame->height = output->getHeight();
 
 	//TODO: What is the second argument?
 	av_frame_get_buffer(frame, 0);
@@ -94,17 +94,17 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 		exit(1);
 	}
 
-	tempFrame->format = input->GetPixelFormat();
-	tempFrame->width = input->GetWidth();
-	tempFrame->height = input->GetHeight();
+	tempFrame->format = input->getPixelFormat();
+	tempFrame->width = input->getWidth();
+	tempFrame->height = input->getHeight();
 
 	//TODO: What is the second argument?
 	av_frame_get_buffer(tempFrame, 0);
 
-	buffer = new unsigned char[input->GetWidth() * input->GetHeight() * 3];
-	av_image_fill_arrays(tempFrame->data, tempFrame->linesize, buffer, input->GetPixelFormat(), input->GetWidth(), input->GetHeight(), 1);
+	buffer = new unsigned char[input->getWidth() * input->getHeight() * 3];
+	av_image_fill_arrays(tempFrame->data, tempFrame->linesize, buffer, input->getPixelFormat(), input->getWidth(), input->getHeight(), 1);
 
-	sws_ctx = sws_getContext(input->GetWidth(), input->GetHeight(), input->GetPixelFormat(), output->GetWidth(), output->GetHeight(), output->GetPixelFormat(), SWS_BICUBIC, NULL, NULL, NULL);
+	sws_ctx = sws_getContext(input->getWidth(), input->getHeight(), input->getPixelFormat(), output->getWidth(), output->getHeight(), output->getPixelFormat(), SWS_BICUBIC, NULL, NULL, NULL);
 
 	ret = avcodec_parameters_from_context(stream->codecpar, codecContext);
 	if (ret < 0) {
@@ -116,7 +116,7 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 
 	//video.videoStream->codecpar->codec_tag = (uint32_t )av_malloc(32);
 	//video.videoStream->codecpar->format = 0;
-	stream->avg_frame_rate = { output->GetStreamFrameRate(), 1 };
+	stream->avg_frame_rate = { output->getStreamFrameRate(), 1 };
 
 	//stream extradata
 	stream->codecpar->extradata_size = 40;
@@ -136,15 +136,15 @@ VideoStream::VideoStream(VideoParameters* inputIn, VideoParameters* outputIn, AV
 	av_init_packet(packet);
 }
 
-void VideoStream::EncodeFrame() {
+void VideoStream::encodeFrame() {
 	glReadPixels(*viewPortX, *viewPortY, *viewPortWidth, *viewPortHeight, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
 	av_frame_make_writable(frame);
 	av_frame_make_writable(tempFrame);
 
-	av_image_fill_arrays(tempFrame->data, tempFrame->linesize, buffer, input->GetPixelFormat(), input->GetWidth(), input->GetHeight(), 1);
-	MultiMediaHelper::MirrorFrameHorizontallyJ420(tempFrame);
-	sws_scale(sws_ctx, tempFrame->data, tempFrame->linesize, 0, input->GetHeight(), frame->data, frame->linesize);
+	av_image_fill_arrays(tempFrame->data, tempFrame->linesize, buffer, input->getPixelFormat(), input->getWidth(), input->getHeight(), 1);
+	MultiMediaHelper::mirrorFrameHorizontallyJ420(tempFrame);
+	sws_scale(sws_ctx, tempFrame->data, tempFrame->linesize, 0, input->getHeight(), frame->data, frame->linesize);
 
 	//video.Frame->pts = video.video_next_pts++;
 	//video.Frame->pts = av_rescale_q(video.Frame->pts, video.VideoCodecContext->time_base, video.videoStream->time_base);

@@ -12,7 +12,7 @@ protected:
 
 public:
 	static void initialize(GamePlay*);
-	void SetGamePlay(GamePlay*);
+	void setGamePlay(GamePlay*);
 	virtual void start() = 0;
 	virtual void update(float) = 0;
 	virtual void end() = 0;

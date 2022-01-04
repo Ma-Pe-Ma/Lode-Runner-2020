@@ -1,7 +1,7 @@
 #ifndef AUDIOSTATUS_H
 #define AUDIOSTATUS_H
 
-enum AudioStatus {
+enum class AudioStatus {
 	stopped,
 	paused,
 	playing

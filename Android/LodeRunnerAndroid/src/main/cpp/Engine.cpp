@@ -74,7 +74,7 @@ int Engine::InitDisplay(android_app *app) {
     // Note that screen size might have been changed
     glViewport(0, 0, gl_context_->GetScreenWidth(), gl_context_->GetScreenHeight());
     //renderer_.UpdateViewport();
-    GLHelper::UpdateViewPort();
+    GLHelper::updateViewPort();
 
     tap_camera_.SetFlip(1.f, -1.f, -1.f);
     tap_camera_.SetPinchTransformFactor(10.f, 10.f, 8.f);

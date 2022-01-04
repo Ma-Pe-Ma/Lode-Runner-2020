@@ -20,8 +20,8 @@ public:
 	void update(float) override;
 	void end() override;
 
-	void TransitionTo(GameState*, bool start = true, bool end = true);
-	void TransitionToAtEndOfFrame(GameState*, bool start = true, bool end = true);
+	void transitionTo(GameState*, bool start = true, bool end = true);
+	void transitionToAtEndOfFrame(GameState*, bool start = true, bool end = true);
 
 	Begin* begin;
 	Play* play;
@@ -29,7 +29,7 @@ public:
 	Death* death;
 
 	float startingTimer = currentFrame;	
-	void WriteGameTime();
+	void writeGameTime();
 };
 
 #endif

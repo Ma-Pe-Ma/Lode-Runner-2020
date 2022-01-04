@@ -10,7 +10,7 @@
 
 void Intro::start() {
 	timer = GameTime::getCurrentFrame();
-	Audio::SFX[8].PlayPause();
+	Audio::sfx[8].playPause();
 
 	if (stateContext->level[stateContext->playerNr] < 1) {
 		stateContext->level[stateContext->playerNr] = 1;
@@ -66,30 +66,30 @@ void Intro::start() {
 }
 
 void Intro::update(float currentFrame) {
-	TextWriting(levelName, 8, 12);
+	Drawing::textWriting(levelName, 8, 12);
 	if (!championship) {
-		TextWriting(playerName, 12, 6);
+		Drawing::textWriting(playerName, 12, 6);
 	}
 
-	TextWriting(lifeLeft, 19, 12);
-	TextWriting(scoret, 8, 18);
-	TextWriting(hiscore, 8, 20);
+	Drawing::textWriting(lifeLeft, 19, 12);
+	Drawing::textWriting(scoret, 8, 18);
+	Drawing::textWriting(hiscore, 8, 20);
 
-	if (GameTime::getCurrentFrame() - timer < Audio::SFX[8].LengthInSec()) {
+	if (GameTime::getCurrentFrame() - timer < Audio::sfx[8].lengthInSec()) {
 		if (space.simple()) {
-			stateContext->TransitionTo(stateContext->select);
+			stateContext->transitionTo(stateContext->select);
 		}
 
 		if (enter.simple()) {
-			stateContext->TransitionTo(stateContext->gamePlay);
+			stateContext->transitionTo(stateContext->gamePlay);
 		}
 	}
 	else {
-		stateContext->TransitionTo(stateContext->gamePlay);
+		stateContext->transitionTo(stateContext->gamePlay);
 	}
 }
 
 void Intro::end() {
-	Audio::SFX[8].StopAndRewind();
-	Audio::SFX[7].StopAndRewind();
+	Audio::sfx[8].stopAndRewind();
+	Audio::sfx[7].stopAndRewind();
 }

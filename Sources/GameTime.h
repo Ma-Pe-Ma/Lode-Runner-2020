@@ -5,7 +5,7 @@ class GameTime {
 	static float curSessionStartTime;
 	static float prevSessionSum;
 	static float gameTime;
-	static int FPS;
+	static int fps;
 	static float currentFrame;
 	static float deltaTime;	// time between current frame and last frame
 	static float lastFrame;

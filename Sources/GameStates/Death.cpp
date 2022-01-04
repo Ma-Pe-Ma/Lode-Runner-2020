@@ -6,36 +6,36 @@
 #include "Gold.h"
 
 void Death::start() {	
-	Audio::SFX[7].StopAndRewind();
-	Audio::SFX[17].StopAndRewind();
-	Audio::SFX[3].StopAndRewind();
-	Audio::SFX[3].PlayPause();
+	Audio::sfx[7].stopAndRewind();
+	Audio::sfx[17].stopAndRewind();
+	Audio::sfx[3].stopAndRewind();
+	Audio::sfx[3].playPause();
 	timer = GameTime::getCurrentFrame();
 }
 
 void Death::update(float) {
-	Enemy::DrawPlayerDeath();
+	Enemy::drawPlayerDeath();
 	gamePlay->play->drawLevel();
-	Gold::DrawGolds();
-	gamePlay->WriteGameTime();
+	Gold::drawGolds();
+	gamePlay->writeGameTime();
 	
-	float deathLength = Audio::SFX[3].LengthInSec();
+	float deathLength = Audio::sfx[3].lengthInSec();
 
 	if (GameTime::getCurrentFrame() - timer < deathLength) {
-		Enemy::HandlePlayerDying();
+		Enemy::handlePlayerDying();
 	}
 	else {
 		if (gamePlay->stateContext->menuCursor < 2) {
 			if (--gamePlay->stateContext->playerLife[gamePlay->stateContext->playerNr] != 0) {
-				gamePlay->stateContext->TransitionTo(gamePlay->stateContext->intro);
+				gamePlay->stateContext->transitionTo(gamePlay->stateContext->intro);
 				gamePlay->stateContext->playerNr = gamePlay->stateContext->menuCursor == 1 ? 1 - gamePlay->stateContext->playerNr : gamePlay->stateContext->playerNr;
 			}
 			else {
-				gamePlay->stateContext->TransitionTo(gamePlay->stateContext->gameOver);
+				gamePlay->stateContext->transitionTo(gamePlay->stateContext->gameOver);
 			}
 		}
 		else {
-			gamePlay->stateContext->TransitionTo(gamePlay->stateContext->generator);
+			gamePlay->stateContext->transitionTo(gamePlay->stateContext->generator);
 		}
 	}
 }

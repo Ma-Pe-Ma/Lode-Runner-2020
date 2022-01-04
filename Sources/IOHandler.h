@@ -43,8 +43,8 @@ void loadConfig();
 extern unsigned int scr;
 extern unsigned int vid;
 
-unsigned int FindScreenShotCount();
-unsigned int FindVideoCount();
+unsigned int findScreenShotCount();
+unsigned int findVideoCount();
 std::string generateNewVideoName();
 
 extern Vector2D debugPos[2];

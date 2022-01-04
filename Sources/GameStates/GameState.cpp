@@ -6,6 +6,6 @@ void GameState::initialize(GamePlay* gamePlay) {
 	GameState::gamePlay = gamePlay;
 }
 
-void GameState::SetGamePlay(GamePlay* gamePlay) {
+void GameState::setGamePlay(GamePlay* gamePlay) {
 	this->gamePlay = gamePlay;
 }

@@ -17,8 +17,8 @@ extern "C" {
 class MultiMediaHelper {
 public:
 	static void determineOutput(unsigned int, unsigned int, unsigned int&, unsigned int&, unsigned int);
-	static void FFMPEG_ERROR(int);
-	static void MirrorFrameHorizontallyJ420(AVFrame* pFrame);
+	static void ffmpegError(int);
+	static void mirrorFrameHorizontallyJ420(AVFrame* pFrame);
 	static float fromShortToFloat(short input);
 };
 

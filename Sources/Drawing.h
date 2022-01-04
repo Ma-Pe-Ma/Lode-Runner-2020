@@ -16,11 +16,17 @@
 
 #include "GLHelper.h"
 
-void playerTextureMapping(int);
-void levelTextureMapping(int);
-void abcTextureMapping(char);
-void TextWriting(std::string, float, float);
-void DrawLevel(float, float, int);
-void DrawEnemy(float, float, int, Direction, bool);
+namespace Drawing{
+	extern float block[16];
+	extern float main_menu[16];
+	extern const unsigned int indices[6];
+
+	void playerTextureMapping(int);
+	void levelTextureMapping(int);
+	void abcTextureMapping(char);
+	void textWriting(std::string, float, float);
+	void drawLevel(float, float, int);
+	void drawEnemy(float, float, int, Direction, bool);
+}
 
 #endif // !FUNCTIONS_H

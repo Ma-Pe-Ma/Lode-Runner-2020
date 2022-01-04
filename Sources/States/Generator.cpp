@@ -44,22 +44,22 @@ Generator::Generator() {
 	textureMap.insert(std::pair<short, short>(8, 42));
 	textureMap.insert(std::pair<short, short>(9, 48));
 
-	layoutMap.insert(std::pair<short, LayoutBlock> (0, empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (1, brick));
-	layoutMap.insert(std::pair<short, LayoutBlock> (2, concrete));
-	layoutMap.insert(std::pair<short, LayoutBlock> (3, ladder));
-	layoutMap.insert(std::pair<short, LayoutBlock> (4, pole));
-	layoutMap.insert(std::pair<short, LayoutBlock> (5, trapDoor));
-	layoutMap.insert(std::pair<short, LayoutBlock> (6, empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (7, empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (8, empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (9, empty));
+	layoutMap.insert(std::pair<short, LayoutBlock> (0, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock> (1, LayoutBlock::brick));
+	layoutMap.insert(std::pair<short, LayoutBlock> (2, LayoutBlock::concrete));
+	layoutMap.insert(std::pair<short, LayoutBlock> (3, LayoutBlock::ladder));
+	layoutMap.insert(std::pair<short, LayoutBlock> (4, LayoutBlock::pole));
+	layoutMap.insert(std::pair<short, LayoutBlock> (5, LayoutBlock::trapDoor));
+	layoutMap.insert(std::pair<short, LayoutBlock> (6, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock> (7, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock> (8, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock> (9, LayoutBlock::empty));
 }
 
 void Generator::start() {
 	geX = 1;
 	geY = 16;
-	play->ClearContainers();
+	play->clearContainers();
 }
 
 void Generator::update(float currentFrame) {
@@ -68,8 +68,8 @@ void Generator::update(float currentFrame) {
 			geX = 28;
 		}
 		else {
-			Audio::SFX[9].StopAndRewind();
-			Audio::SFX[9].PlayPause();
+			Audio::sfx[9].stopAndRewind();
+			Audio::sfx[9].playPause();
 		}
 	}
 
@@ -78,8 +78,8 @@ void Generator::update(float currentFrame) {
 			geX = 1;
 		}
 		else {
-			Audio::SFX[9].StopAndRewind();
-			Audio::SFX[9].PlayPause();
+			Audio::sfx[9].stopAndRewind();
+			Audio::sfx[9].playPause();
 		}
 	}
 
@@ -88,8 +88,8 @@ void Generator::update(float currentFrame) {
 			geY = 16;
 		}
 		else {
-			Audio::SFX[9].StopAndRewind();
-			Audio::SFX[9].PlayPause();
+			Audio::sfx[9].stopAndRewind();
+			Audio::sfx[9].playPause();
 		}
 	}
 
@@ -98,8 +98,8 @@ void Generator::update(float currentFrame) {
 			geY = 1;
 		}
 		else {
-			Audio::SFX[9].StopAndRewind();
-			Audio::SFX[9].PlayPause();
+			Audio::sfx[9].stopAndRewind();
+			Audio::sfx[9].playPause();
 		}
 	}
 
@@ -109,8 +109,8 @@ void Generator::update(float currentFrame) {
 			gen[geX][geY] = 0;
 		}
 
-		Audio::SFX[10].StopAndRewind();
-		Audio::SFX[10].PlayPause();
+		Audio::sfx[10].stopAndRewind();
+		Audio::sfx[10].playPause();
 	}
 
 	//chaning element downwards
@@ -119,20 +119,20 @@ void Generator::update(float currentFrame) {
 			gen[geX][geY] = 9;
 		}
 
-		Audio::SFX[10].StopAndRewind();
-		Audio::SFX[10].PlayPause();
+		Audio::sfx[10].stopAndRewind();
+		Audio::sfx[10].playPause();
 	}
 
 	//yellow cursor block
 	if (int(3 * currentFrame) % 2) {
-		DrawLevel(geX, geY, 54);
+		Drawing::drawLevel(geX, geY, 54);
 	}
 
 	//drawing generator elements
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 17; j++) {
 			int ref = textureMap[gen[i][j]];
-			DrawLevel(i, j, ref);
+			Drawing::drawLevel(i, j, ref);
 		}
 	}
 	
@@ -161,11 +161,11 @@ void Generator::update(float currentFrame) {
 					Gold::addGoldToUncollected(std::move(gold));
 				}
 				else if (gen[i][j] == 8) {
-					Enemy::AddEnemy(Pos);
+					Enemy::addEnemy(Pos);
 				}
 				else if (gen[i][j] == 9) {
 					if (!playerPresent) {
-						Player::AddPlayer(Pos);
+						Player::addPlayer(Pos);
 						playerPresent = true;
 					}
 				}
@@ -182,9 +182,9 @@ void Generator::update(float currentFrame) {
 				}
 
 				for (int i = 1; i < 30; i++) {
-					if (layout[i][j] == empty && gen[i][j] != 7 && gen[i][j] != 8) {
+					if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
 						Vector2DInt Pos = { i,j };
-						Player::AddPlayer(Pos);
+						Player::addPlayer(Pos);
 						playerPresent = true;
 						break; 
 					}
@@ -195,8 +195,8 @@ void Generator::update(float currentFrame) {
 		if (playerPresent) {
 			highestLadder = highestLadder < 15 ? 15 : highestLadder;
 
-			play->SetLadders(highestLadder, finisihingLadders);
-			stateContext->TransitionTo(stateContext->gamePlay);
+			play->setLadders(highestLadder, finisihingLadders);
+			stateContext->transitionTo(stateContext->gamePlay);
 		}		
 	}
 }

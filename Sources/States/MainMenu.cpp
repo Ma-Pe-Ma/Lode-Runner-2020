@@ -21,8 +21,8 @@ void MainMenu::start() {
 
 void MainMenu::update(float currentFrame) {
 	//main menu music cyclically playing!
-	if (Audio::SFX[5].GetPlayStatus() == stopped) {
-		Audio::SFX[5].PlayPause();
+	if (Audio::sfx[5].getPlayStatus() == AudioStatus::stopped) {
+		Audio::sfx[5].playPause();
 	}
 
 	//Drawing main menu
@@ -74,23 +74,23 @@ void MainMenu::update(float currentFrame) {
 
 	//choosing selected gamemode
 	if (enter.simple()) {
-		Audio::SFX[5].StopAndRewind();
+		Audio::sfx[5].stopAndRewind();
 
 		switch (stateContext->menuCursor) {
 			//single player
 			case 0:
 			//multiplayer
 			case 1:
-				stateContext->TransitionTo(stateContext->intro);
+				stateContext->transitionTo(stateContext->intro);
 				break;
 			//level generator
 			case 2:
-				stateContext->TransitionTo(stateContext->generator);
+				stateContext->transitionTo(stateContext->generator);
 				break;
 		}
 	}
 }
 
 void MainMenu::end() {
-	Audio::SFX[5].StopAndRewind();
+	Audio::sfx[5].stopAndRewind();
 }

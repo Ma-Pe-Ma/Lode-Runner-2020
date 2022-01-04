@@ -285,8 +285,8 @@ void loadConfig() {
 	GLHelper::SCR_WIDTH = GLHelper::SCR_WIDTH > 4096 ? 4096 : GLHelper::SCR_WIDTH;
 	GLHelper::SCR_HEIGHT = GLHelper::SCR_HEIGHT > 2160 ? 2160 : GLHelper::SCR_HEIGHT;
 
-	Enemy::SetPlayerSpeed(getFloatByKey("playerSpeed", 0.9f));
-	Enemy::SetEnemySpeed(getFloatByKey("enemySpeed", 0.415f));
+	Enemy::setPlayerSpeed(getFloatByKey("playerSpeed", 0.9f));
+	Enemy::setEnemySpeed(getFloatByKey("enemySpeed", 0.415f));
 
 	GameTime::setFPS(getIntByKey("FPS", 60));
 	int levelSet = getIntByKey("levelset", 0);
@@ -309,8 +309,8 @@ void loadConfig() {
 	rightDigButton.setImpulseTime(0.25);
 
 	GLHelper::updateViewPortValues(GLHelper::SCR_WIDTH, GLHelper::SCR_HEIGHT);
-	FindScreenShotCount();
-	FindVideoCount();
+	findScreenShotCount();
+	findVideoCount();
 	config.close();
 }
 #endif // !ANDROID_VERSION
@@ -318,7 +318,7 @@ void loadConfig() {
 unsigned int scr = 0;
 unsigned int vid = 0;
 
-unsigned int FindScreenShotCount() {
+unsigned int findScreenShotCount() {
 #ifdef ANDROID_VERSION
 	return 0;
 #else
@@ -343,7 +343,7 @@ unsigned int FindScreenShotCount() {
 #endif
 }
 
-unsigned int FindVideoCount() {
+unsigned int findVideoCount() {
 #ifdef ANDROID_VERSION
 	return 0;
 #else
@@ -367,6 +367,6 @@ unsigned int FindVideoCount() {
 }
 
 std::string generateNewVideoName() {
-	unsigned int vid = FindVideoCount();
+	unsigned int vid = findVideoCount();
 	return "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
 }

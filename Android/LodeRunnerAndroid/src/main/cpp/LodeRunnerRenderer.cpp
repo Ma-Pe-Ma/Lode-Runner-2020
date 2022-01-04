@@ -17,11 +17,11 @@ void LodeRunnerRenderer::Initialize() {
         mainMenuTextureName = "Texture/MainMenuU.png";
     }
 
-    GLHelper::Initialize(mainMenuTextureName);
+    GLHelper::initialize(mainMenuTextureName);
 
     android_fopen_set_asset_manager(ndk_helper::JNIHelper::GetInstance()->GetAssetManager());
-    Audio::OpenAudioFiles(Audio::soundNames);
-    Audio::InitializeAudioStream(new AudioCallback());
+    Audio::openAudioFiles(Audio::soundNames);
+    Audio::initializeAudioStream(new AudioCallback());
 
 #ifdef VIDEO_RECORDING
     AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
@@ -50,19 +50,19 @@ void LodeRunnerRenderer::Initialize() {
 }
 
 void LodeRunnerRenderer::ResumeWindow() {
-    Audio::OnWindowResume();
+    Audio::onWindowResume();
 }
 
 void LodeRunnerRenderer::CloseWindow() {
     std::chrono::duration<double, std::milli> sessionTime = (std::chrono::system_clock::now() - start);
     offset += sessionTime.count() / 1000;
 
-    Audio::OnWindowClose();
+    Audio::onWindowClose();
 }
 
 void LodeRunnerRenderer::Terminate() {
-    GLHelper::Terminate();
-    Audio::CloseAudioFiles();
+    GLHelper::terminate();
+    Audio::closeAudioFiles();
 }
 
 void LodeRunnerRenderer::PauseGame() {

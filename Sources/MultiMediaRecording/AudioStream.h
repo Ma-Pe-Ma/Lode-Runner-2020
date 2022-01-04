@@ -27,7 +27,7 @@ private:
 
 public:
 	AudioStream(AudioParameters*, AudioParameters*, AVFormatContext*);
-	void EncodeFrame(float);
+	void encodeFrame(float);
 };
 
 #endif // !AUDIOSTREAM_H
