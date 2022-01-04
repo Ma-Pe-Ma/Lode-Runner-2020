@@ -26,9 +26,9 @@ public:
 	GameOver* gameOver;
 	Generator* generator;
 
-	//void TransitionTo(State*);
-	void TransitionTo(State*, bool start = true, bool end = true);
-	void TransitionToAtEndOfFrame(State*, bool start = true, bool end = true);
+	//void transitionTo(State*);
+	void transitionTo(State*, bool start = true, bool end = true);
+	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
 	StateContext();
 	
 	void update(float);

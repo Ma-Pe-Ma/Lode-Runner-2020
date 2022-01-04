@@ -20,7 +20,7 @@ public:
 	void update(float) override;
 	void end() override;
 
-	void SetScoreParameters(short, short, short);
+	void setScoreParameters(short, short, short);
 };
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef LAYOUTBLOCK_H
 #define LAYOUTBLOCK_H
 
-enum LayoutBlock {
+enum class LayoutBlock {
 	empty,
 	brick,
 	concrete,

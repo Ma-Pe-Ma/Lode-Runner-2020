@@ -4,14 +4,14 @@
 #include "Drawing.h"
 #include "States/StateContext.h"
 
-void Outro::SetScoreParameters(short killCounter, short goldCounter, short fruitID) {
+void Outro::setScoreParameters(short killCounter, short goldCounter, short fruitID) {
 	enemyScore = killCounter * 200;
 	goldScore = goldCounter * 200;
 	this->fruitID = fruitID;
 }
 
 void Outro::start() {
-	Audio::SFX[13].PlayPause();
+	Audio::sfx[13].playPause();
 
 	if (stateContext->playerLife[stateContext->playerNr] < 9) {
 		stateContext->playerLife[stateContext->playerNr]++;
@@ -36,27 +36,27 @@ void Outro::start() {
 }
 
 void Outro::update(float currentFrame) {
-	TextWriting(gold_points, 20, 6);
-	TextWriting(enemy_points, 20, 12);
-	TextWriting(total, 14.5, 23.25);
+	Drawing::textWriting(gold_points, 20, 6);
+	Drawing::textWriting(enemy_points, 20, 12);
+	Drawing::textWriting(total, 14.5, 23.25);
 
 	//draw enemy for score indicator
-	DrawEnemy(11, 9.5, 12, left, false);
+	Drawing::drawEnemy(11, 9.5, 12, Direction::left, false);
 
 	//draw Gold for score indicator
 	int timeFactor = int(2 * currentFrame) % 4;
 	timeFactor = timeFactor == 3 ? 1 : timeFactor;
-	DrawLevel(11, 13.25, 36 + timeFactor);
+	Drawing::drawLevel(11, 13.25, 36 + timeFactor);
 
 	for (int i = 7; i < 13; i++) {
 		for (int k = 0; k < 3; k++) {
 			//drawing ladder
 			if (i == 9) {
-				DrawLevel(i, k, 12 + timeFactor);
+				Drawing::drawLevel(i, k, 12 + timeFactor);
 			}
 			//drawing bricks
 			else if (k == 2) {
-				DrawLevel(i, k, 0);
+				Drawing::drawLevel(i, k, 0);
 			}
 		}
 	}
@@ -68,25 +68,25 @@ void Outro::update(float currentFrame) {
 		int timeFactor = ((currentFrame - timer) * 4);
 		int TextureRef = 36 + timeFactor % 4;
 
-		DrawEnemy(9, runnerY, TextureRef, left, false);
+		Drawing::drawEnemy(9, runnerY, TextureRef, Direction::left, false);
 	}
 	//nail bitting after reaching top of ladder
 	else {
 		int timeFactor = int((currentFrame - timer) * 3) % 4;
-		DrawEnemy(9, 3, 44 + timeFactor, left, false);
+		Drawing::drawEnemy(9, 3, 44 + timeFactor, Direction::left, false);
 	}
 
-	if (GameTime::getCurrentFrame() - timer > Audio::SFX[13].LengthInSec() || enter.simple()) {
+	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || enter.simple()) {
 		if (stateContext->menuCursor < 2) {
-			stateContext->TransitionTo(stateContext->intro);
+			stateContext->transitionTo(stateContext->intro);
 		}
 		else {
-			stateContext->TransitionTo(stateContext->generator);
+			stateContext->transitionTo(stateContext->generator);
 		}	
 	}	
 }
 
 void Outro::end() {
-	Audio::SFX[7].StopAndRewind();
-	Audio::SFX[13].StopAndRewind();
+	Audio::sfx[7].stopAndRewind();
+	Audio::sfx[13].stopAndRewind();
 }

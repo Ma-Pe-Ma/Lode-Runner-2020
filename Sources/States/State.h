@@ -15,7 +15,7 @@ public:
 	virtual void update(float) = 0;
 	virtual void end() = 0;
 
-	void SetStateContext(StateContext*);
+	void setStateContext(StateContext*);
 };
 
 #endif

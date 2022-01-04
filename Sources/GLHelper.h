@@ -58,7 +58,7 @@ public:
 	static void window_pos_callback(GLFWwindow* window, int xpos, int ypos);
 
 	static unsigned char* getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type);
-	static void FullscreenSwitch();
+	static void fullscreenSwitch();
 	static void saveImage(unsigned char*);
 	#endif
 
@@ -67,12 +67,8 @@ public:
 	static void screenCapture();
 	static unsigned int loadTexture(char const* path);
 
-	static void Initialize(std::string);
-	static void Terminate();
-	static const unsigned int indices[];
-
-	static float blokk[16];
-	static float main_menu[16];
+	static void initialize(std::string);
+	static void terminate();
 
 	static unsigned int menuScreen;
 	static unsigned int characterSet;

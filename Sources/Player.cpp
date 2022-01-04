@@ -6,17 +6,17 @@
 Player::Player() : Enemy() {
 	textureMap = {28, 52, 48,36,40, 26};
 	charSpeed = playerSpeed;
-	TextureRef = textureMap.going;
+	textureRef = textureMap.going;
 }
 
-void Player::AddPlayer(Vector2DInt position) {
+void Player::addPlayer(Vector2DInt position) {
 	Player* newPlayer = new Player();
-	newPlayer->Pos = { (float) position.x, (float) position.y };
-	newPlayer->prevPos = newPlayer->Pos;
+	newPlayer->pos = { (float) position.x, (float) position.y };
+	newPlayer->prevPos = newPlayer->pos;
 	Enemy::player.reset(newPlayer);
 }
 
-void Player::FindPath() {
+void Player::findPath() {
 	actualSpeed = charSpeed * GameTime::getSpeed();
 
 	if (rightButton.continuous() && leftButton.continuous()) {
@@ -41,79 +41,78 @@ void Player::FindPath() {
 
 	//check if runner dies by enemy
 	for (auto& enemy : enemies) {
-		if (abs(enemy->Pos.x - Pos.x) < 0.5f && abs(enemy->Pos.y - Pos.y) < 0.5f) {
-			Die();
+		if (abs(enemy->pos.x - pos.x) < 0.5f && abs(enemy->pos.y - pos.y) < 0.5f) {
+			die();
 		}
 	}
 }
 
-void Player::FreeRun() {
+void Player::freeRun() {
 	//Check digging input
 	if (leftDigButton.impulse()) {
-		if (brickO[curX - 1][curY - 1] && brickO[curX - 1][curY -1]->InitiateDig()) {
+		if (brickO[curX - 1][curY - 1] && brickO[curX - 1][curY -1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
-
-			state = digging;
-			direction = left;
-			TextureRef = 24;
+			state = EnemyState::digging;
+			direction = Direction::left;
+			textureRef = 24;
 			return;
 		}
 	}
 	
 	if (rightDigButton.impulse()) {
-		if (brickO[curX + 1][curY - 1] && brickO[curX + 1][curY - 1]->InitiateDig()) {
+		if (brickO[curX + 1][curY - 1] && brickO[curX + 1][curY - 1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
-			state = digging;
-			direction = right;
-			TextureRef = 25;
+			state = EnemyState::digging;
+			direction = Direction::right;
+			textureRef = 25;
 			return;
 		}
 	}
 
-	Enemy::FreeRun();
+	Enemy::freeRun();
 }
 
-void Player::InitiateFallingStart() {
-	Enemy::InitiateFallingStart();
-	Audio::SFX[17].PlayPause();
+void Player::initiateFallingStart() {
+	Enemy::initiateFallingStart();
+	Audio::sfx[17].playPause();
 }
 
-void Player::InitiateFallingStop() {
-	Enemy::InitiateFallingStop();
-	Audio::SFX[17].StopAndRewind();
+void Player::initiateFallingStop() {
+	Enemy::initiateFallingStop();
+	Audio::sfx[17].stopAndRewind();
 }
 
-void Player::Falling() {
-	if (layout[curX][curY] == trapDoor) {
+void Player::falling() {
+	if (layout[curX][curY] == LayoutBlock::trapDoor) {
 		trapdoors[curX][curY]->setRevealed();
 	}
 
-	Enemy::Falling();
+	Enemy::falling();
 
-	if (state != falling) {
+	if (state != EnemyState::falling) {
 		idleTimeStart = GameTime::getGameTime();
 	}
 }
 
-bool Player::CheckHole() {
+bool Player::checkHole() {
 	return false;
 }
 
-void Player::Digging() {
+void Player::digging() {
 	//Position runner to middle and hold him in place
-	if (Pos.x > curX) {
-		if (Pos.x - actualSpeed < curX) {
-			dPos.x = curX - Pos.x;
+	if (pos.x > curX) {
+		if (pos.x - actualSpeed < curX) {
+			dPos.x = curX - pos.x;
 		}
 		else {
 			dPos.x = -actualSpeed;
 		}
 	}
-	else if (Pos.x < curX) {
-		if (Pos.x + actualSpeed > curX) {
-			dPos.x = curX - Pos.x;
+	else if (pos.x < curX) {
+		if (pos.x + actualSpeed > curX) {
+			dPos.x = curX - pos.x;
 		}
 		else {
 			dPos.x = actualSpeed;
@@ -123,17 +122,17 @@ void Player::Digging() {
 		dPos.x = 0;
 	}
 
-	if (Pos.y > curY) {
-		if (Pos.y - actualSpeed < curY) {
-			dPos.y = curY - Pos.y;
+	if (pos.y > curY) {
+		if (pos.y - actualSpeed < curY) {
+			dPos.y = curY - pos.y;
 		}
 		else {
 			dPos.y = -actualSpeed;
 		}
 	}
-	else if (Pos.y < curY) {
-		if (Pos.y + actualSpeed > curY) {
-			dPos.y = curY - Pos.y;
+	else if (pos.y < curY) {
+		if (pos.y + actualSpeed > curY) {
+			dPos.y = curY - pos.y;
 		}
 		else {
 			dPos.y = actualSpeed;
@@ -144,107 +143,107 @@ void Player::Digging() {
 	}
 }
 
-void Player::ReleaseFromDigging() {
-	state = freeRun;
+void Player::releaseFromDigging() {
+	state = EnemyState::freeRun;
 	idleTimeStart = gameTime;
 }
 
-void Player::AnimateFreeRun() {
+void Player::animateFreeRun() {
 	//last time of moving == start of idle time
-	if (prevPos.x - Pos.x != 0) {
+	if (prevPos.x - pos.x != 0) {
 		idleTimeStart = gameTime;
 	}
 
 	//runner idle animation
-	if (Pos.x - prevPos.x == 0 && Pos.y - prevPos.y == 0 && gameTime - idleTimeStart > 1 && (middle != pole) && Pos.y == curY) {
-		TextureRef = textureMap.idle + (int (gameTime)) % 2;
+	if (pos.x - prevPos.x == 0 && pos.y - prevPos.y == 0 && gameTime - idleTimeStart > 1 && (middle != LayoutBlock::pole) && pos.y == curY) {
+		textureRef = textureMap.idle + (int (gameTime)) % 2;
 	}
 
-	Enemy::AnimateFreeRun();
+	Enemy::animateFreeRun();
 }
 
-void Player::AnimateDigging() {
-	if (middle == pole) {
-		TextureRef = textureMap.pole;
+void Player::animateDigging() {
+	if (middle == LayoutBlock::pole) {
+		textureRef = textureMap.pole;
 	}
-	else if (middle == ladder) {
-		TextureRef = textureMap.ladder;
+	else if (middle == LayoutBlock::ladder) {
+		textureRef = textureMap.ladder;
 	}
 }
 
-void Player::AnimateDying() {
+void Player::animateDying() {
 	
 }
 
-void Player::AnimateFalling() {
-	Enemy::AnimateFalling();
+void Player::animateFalling() {
+	Enemy::animateFalling();
 }
 
-void Player::AnimateGoing() {
-	Enemy::AnimateGoing();
+void Player::animateGoing() {
+	Enemy::animateGoing();
 
-	if (Audio::SFX[9 + going[0]].GetPlayStatus() == stopped) {
-		Audio::SFX[10 - going[0]].PlayPause();
+	if (Audio::sfx[9 + going[0]].getPlayStatus() == AudioStatus::stopped) {
+		Audio::sfx[10 - going[0]].playPause();
 		going[0] = 1 - going[0];
 	}
 }
 
-void Player::AnimateOnLadder() {
-	Enemy::AnimateOnLadder();
+void Player::animateOnLadder() {
+	Enemy::animateOnLadder();
 
-	if (Audio::SFX[11 + going[1]].GetPlayStatus() == stopped) {
-		Audio::SFX[12 - going[1]].PlayPause();
+	if (Audio::sfx[11 + going[1]].getPlayStatus() == AudioStatus::stopped) {
+		Audio::sfx[12 - going[1]].playPause();
 		going[1] = 1 - going[1];
 	}
 }
 
-void Player::AnimateOnPole() {
-	Enemy::AnimateOnPole();
+void Player::animateOnPole() {
+	Enemy::animateOnPole();
 
-	if (Audio::SFX[15 + going[2]].GetPlayStatus() == stopped) {
-		Audio::SFX[16 - going[2]].PlayPause();
+	if (Audio::sfx[15 + going[2]].getPlayStatus() == AudioStatus::stopped) {
+		Audio::sfx[16 - going[2]].playPause();
 		going[2] = 1 - going[2];
 	}	
 }
 
 //player does not check gold rather top of level,
-void Player::CheckGoldCollect() {
-	if ((carriedGold = Gold::GoldCollectChecker(Pos.x, Pos.y))) {
-		if (Audio::SFX[0].GetPlayStatus() == playing) {
-			Audio::SFX[0].StopAndRewind();
+void Player::checkGoldCollect() {
+	if ((carriedGold = Gold::goldCollectChecker(pos.x, pos.y))) {
+		if (Audio::sfx[0].getPlayStatus() == AudioStatus::playing) {
+			Audio::sfx[0].stopAndRewind();
 		}
 
-		Audio::SFX[0].PlayPause();
+		Audio::sfx[0].playPause();
 		Gold::addGoldToCollected(std::move(carriedGold));
 
 		//if every gold is collected draw the ladders which are needed to finish the level
-		if (!Enemy::HasGold() && Gold::GetUncollectedSize() == 0) {
-			Audio::SFX[4].PlayPause();
+		if (!Enemy::hasGold() && Gold::getUncollectedSize() == 0) {
+			Audio::sfx[4].playPause();
 			play->generateFinishingLadders();
 		}
 	}
 	
 	//if every gold collected!
-	if (Gold::GetUncollectedSize() == 0 && !Enemy::HasGold()) {
+	if (Gold::getUncollectedSize() == 0 && !Enemy::hasGold()) {
 		//top of level reached
 		if (curY >= play->getHighestLadder() + 1) {
-			play->TransitionToOutro(killCounter, Gold::GetCollectedSize(), 0);
+			play->transitionToOutro(killCounter, Gold::getCollectedSize(), 0);
 			
 			//score_gold = collectedsize * 200;
 		}
 	}
 }
 
-void Player::Die() {
+void Player::die() {
 	dieTimer = GameTime::getCurrentFrame();
-	play->TransitionToDeath();
+	play->transitionToDeath();
 }
 
-void Player::Dying() {
-	float deathLength = Audio::SFX[3].LengthInSec();
+void Player::dying() {
+	float deathLength = Audio::sfx[3].lengthInSec();
 	int timeFactor = ((int) (9 * (GameTime::getCurrentFrame() - dieTimer) / deathLength)) % 9;
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
 
-	TextureRef = textureMap.death + timeFactor;
-	DrawEnemy(Pos.x, Pos.y, TextureRef, direction, false);
+	textureRef = textureMap.death + timeFactor;
+	Drawing::drawEnemy(pos.x, pos.y, textureRef, direction, false);
 }

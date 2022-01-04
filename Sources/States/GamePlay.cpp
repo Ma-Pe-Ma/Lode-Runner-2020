@@ -16,7 +16,7 @@ GamePlay::GamePlay() {
 	currentGameState = begin;
 }
 
-void GamePlay::TransitionTo(GameState* newState, bool start, bool end) {
+void GamePlay::transitionTo(GameState* newState, bool start, bool end) {
 	if (end) {
 		currentGameState->end();
 	}
@@ -29,12 +29,12 @@ void GamePlay::TransitionTo(GameState* newState, bool start, bool end) {
 	}
 }
 
-void GamePlay::TransitionToAtEndOfFrame(GameState* newState, bool start, bool end) {
+void GamePlay::transitionToAtEndOfFrame(GameState* newState, bool start, bool end) {
 
 }
 
 void GamePlay::start() {
-	TransitionTo(begin);
+	transitionTo(begin);
 }
 
 void GamePlay::update(float currentFrame) {
@@ -42,12 +42,12 @@ void GamePlay::update(float currentFrame) {
 }
 
 void GamePlay::end() {
-	Audio::SFX[4].StopAndRewind();
-	Audio::SFX[7].StopAndRewind();
+	Audio::sfx[4].stopAndRewind();
+	Audio::sfx[7].stopAndRewind();
 }
 
-void GamePlay::WriteGameTime() {
+void GamePlay::writeGameTime() {
 	std::string timeValue = std::to_string(GameTime::getGameTime());
 	timeValue = timeValue.substr(0, timeValue.length() - 5);
-	TextWriting("GAMETIME: " + timeValue + " SEC", -5, 0);
+	Drawing::textWriting("GAMETIME: " + timeValue + " SEC", -5, 0);
 }

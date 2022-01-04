@@ -20,7 +20,7 @@ void MultiMediaHelper::determineOutput(unsigned int inputX, unsigned int inputY,
 	}
 }
 
-void MultiMediaHelper::FFMPEG_ERROR(int ret) {
+void MultiMediaHelper::ffmpegError(int ret) {
 	if (ret < 0) {
 		char buffer[50];
 		size_t bufsize = 50;
@@ -34,7 +34,7 @@ void MultiMediaHelper::FFMPEG_ERROR(int ret) {
 }
 
 //mirror image horizontally https://emvlo.wordpress.com/2016/03/10/sws_scale/
-void MultiMediaHelper::MirrorFrameHorizontallyJ420(AVFrame* pFrame) {
+void MultiMediaHelper::mirrorFrameHorizontallyJ420(AVFrame* pFrame) {
 	for (int i = 0; i < 4; i++) {
 		if (i) {
 			pFrame->data[i] += pFrame->linesize[i] * ((pFrame->height >> 1) - 1);

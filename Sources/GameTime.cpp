@@ -4,7 +4,7 @@ float GameTime::curSessionStartTime = 0;
 float GameTime::prevSessionSum = 0;
 float GameTime::gameTime = 0;
 
-int GameTime::FPS = 35;
+int GameTime::fps = 35;
 float GameTime::currentFrame = 0;
 float GameTime::deltaTime = 0.0f;	// time between current frame and last frame
 float GameTime::lastFrame = 0.0f;
@@ -37,11 +37,11 @@ float GameTime::getSpeed() {
 }
 
 int GameTime::getFPS() {
-	return GameTime::FPS;
+	return GameTime::fps;
 }
 
-void GameTime::setFPS(unsigned int FPS) {
-	GameTime::FPS = FPS;
+void GameTime::setFPS(unsigned int fps) {
+	GameTime::fps = fps;
 }
 
 void GameTime::calculateTimeValues(float currentFrame) {

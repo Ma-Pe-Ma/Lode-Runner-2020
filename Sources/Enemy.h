@@ -37,18 +37,18 @@ private:
 	float holeHorizontalTime = 0.25;
 
 	//PathFinding
-	void ScanFloor();
-	void ScanDown(int, int);
-	void ScanUp(int, int);
+	void scanFloor();
+	void scanDown(int, int);
+	void scanUp(int, int);
 
-	bool EnemyChecker(float, float);
+	bool enemyChecker(float, float);
 	void handle();
 
-	virtual void CheckCollisionWithOthers();
+	virtual void checkCollisionWithOthers();
 
-	void FallingToPit();
-	void MovingInPit();
-	void Climbing();
+	void fallingToPit();
+	void movingInPit();
+	void climbing();
 
 	Brick* holeBrick = nullptr;
 	
@@ -65,8 +65,8 @@ protected:
 	
 	static std::unique_ptr<Enemy> player;
 
-	inline void DetermineDirection();
-	void DetermineNearbyObjects();
+	inline void determineDirection();
+	void determineNearbyObjects();
 	LayoutBlock middle;
 	LayoutBlock downBlock;
 	int curX;
@@ -74,44 +74,44 @@ protected:
 	short directionX;
 	short directionY;
 
-	virtual void InitiateFallingStart();
-	virtual void InitiateFallingStop();
+	virtual void initiateFallingStart();
+	virtual void initiateFallingStop();
 		
-	void CheckCollisionsWithEnvironment();
+	void checkCollisionsWithEnvironment();
 
-	void LadderTransformation();
+	void ladderTransformation();
 
 	TextureMap textureMap = { 8,16,12,0,4,-1};
 
-	virtual void FindPath();
-	void Move();
-	virtual void Dying();
+	virtual void findPath();
+	void move();
+	virtual void dying();
 
 	//Moving 
-	virtual void FreeRun();
-	virtual void Digging();
-	virtual void Falling();
-	void Pitting();
-	void StartingToFall();
+	virtual void freeRun();
+	virtual void digging();
+	virtual void falling();
+	void pitting();
+	void startingToFall();
 
 	//Animating
-	void Animate();
-	virtual void AnimateFreeRun();
-	virtual void AnimateGoing();
-	virtual void AnimateOnLadder();
-	virtual void AnimateOnPole();
+	void animate();
+	virtual void animateFreeRun();
+	virtual void animateGoing();
+	virtual void animateOnLadder();
+	virtual void animateOnPole();
 
-	virtual void AnimateDigging();
-	virtual void AnimateDying();
-	virtual void AnimateFalling();
-	virtual void AnimatePitting();
+	virtual void animateDigging();
+	virtual void animateDying();
+	virtual void animateFalling();
+	virtual void animatePitting();
 	
-	virtual void CheckGoldCollect();
-	virtual void CheckGoldDrop();
+	virtual void checkGoldCollect();
+	virtual void checkGoldDrop();
 	
-	virtual void ReleaseFromDigging() {};
+	virtual void releaseFromDigging() {};
 
-	virtual bool CheckHole();
+	virtual bool checkHole();
 
 	EnemyState state;
 	float holeTimer;
@@ -120,43 +120,43 @@ protected:
 	float charSpeed;
 
 	Direction direction;
-	int TextureRef;
+	int textureRef;
 
 	PitState pitState;
 public:
 	virtual ~Enemy() {}
 	static std::vector<std::unique_ptr<Enemy>> enemies;
 	static void clearEnemyVector();
-	static void AddEnemy(Vector2DInt);
+	static void addEnemy(Vector2DInt);
 
-	static bool EnemyCheckerGlobal(float, float);
+	static bool enemyCheckerGlobal(float, float);
 	static void handleCharacters();
 
-	static bool CheckDigPrevention(int, int);
-	static void CheckDeaths(int, int);
-	void CheckDeath(int, int);
+	static bool checkDigPrevention(int, int);
+	static void checkDeaths(int, int);
+	void checkDeath(int, int);
 
-	virtual void Die();
+	virtual void die();
 
 	Enemy();
 
 	std::unique_ptr<Gold> carriedGold;
 
-	Vector2D Pos;
+	Vector2D pos;
 	Vector2D dPos;
 	Vector2D prevPos;
 	Vector2D dPrevPos;
 
 	static void setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>**, std::unique_ptr<Trapdoor>**, Play*);
-	static void NotifyPlayerAboutDigEnd();
-	static bool HasGold();
+	static void notifyPlayerAboutDigEnd();
+	static bool hasGold();
 
-	static void SetPlayerSpeed(float);
-	static void SetEnemySpeed(float);
-	static unsigned int GetKillCounter();
-	static void DrawPaused();
-	static void DrawPlayerDeath();
-	static void HandlePlayerDying();
+	static void setPlayerSpeed(float);
+	static void setEnemySpeed(float);
+	static unsigned int getKillCounter();
+	static void drawPaused();
+	static void drawPlayerDeath();
+	static void handlePlayerDying();
 };
 
 #endif // !ENEMY_H

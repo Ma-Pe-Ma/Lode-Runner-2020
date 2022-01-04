@@ -16,11 +16,11 @@ private:
 public:
 	AudioParameters(int, AVCodecID, int, uint64_t, AVSampleFormat);
 
-	int GetSampleRate() { return sampleRate; }
-	AVCodecID GetCodecID() { return codecID; }
-	int GetBitrate() { return bitrate; }
-	uint64_t GetChannelLayout() { return channelLayout; }
-	AVSampleFormat GetAVSampleFormat() { return aVSampleFormat; }
+	int getSampleRate() { return sampleRate; }
+	AVCodecID getCodecID() { return codecID; }
+	int getBitrate() { return bitrate; }
+	uint64_t getChannelLayout() { return channelLayout; }
+	AVSampleFormat getAVSampleFormat() { return aVSampleFormat; }
 };
 
 #endif // !AUDIOPARAMETERS_H

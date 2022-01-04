@@ -7,6 +7,6 @@ void State::initialize(StateContext* stateContext) {
 	State::stateContext = stateContext;
 }
 
-void State::SetStateContext(StateContext* stateContext) {
+void State::setStateContext(StateContext* stateContext) {
 	this->stateContext = stateContext;
 }

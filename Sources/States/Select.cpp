@@ -12,26 +12,26 @@ void Select::start() {
 void Select::update(float currentFrame) {
 	if (leftButton.simple()) {
 		stateContext->level[stateContext->playerNr]--;
-		Audio::SFX[16].StopAndRewind();
-		Audio::SFX[16].PlayPause();
+		Audio::sfx[16].stopAndRewind();
+		Audio::sfx[16].playPause();
 	}
 
 	if (rightButton.simple()) {
 		stateContext->level[stateContext->playerNr]++;
-		Audio::SFX[16].StopAndRewind();
-		Audio::SFX[16].PlayPause();
+		Audio::sfx[16].stopAndRewind();
+		Audio::sfx[16].playPause();
 	}
 
 	if (up.simple()) {
 		stateContext->level[stateContext->playerNr] += 10;
-		Audio::SFX[16].StopAndRewind();
-		Audio::SFX[16].PlayPause();
+		Audio::sfx[16].stopAndRewind();
+		Audio::sfx[16].playPause();
 	}
 
 	if (down.simple()) {
 		stateContext->level[stateContext->playerNr] -= 10;
-		Audio::SFX[16].StopAndRewind();
-		Audio::SFX[16].PlayPause();
+		Audio::sfx[16].stopAndRewind();
+		Audio::sfx[16].playPause();
 	}
 
 
@@ -59,9 +59,9 @@ void Select::update(float currentFrame) {
 	}
 
 	if (enter.simple()) {
-		stateContext->TransitionTo(stateContext->intro);
-		Audio::SFX[8].StopAndRewind();
-		Audio::SFX[8].PlayPause();
+		stateContext->transitionTo(stateContext->intro);
+		Audio::sfx[8].stopAndRewind();
+		Audio::sfx[8].playPause();
 	}
 
 	std::string levelNumber;
@@ -79,7 +79,7 @@ void Select::update(float currentFrame) {
 	}
 
 	std::string levelName = "STAGE " + levelNumber;
-	TextWriting(levelName, 8, 12);
+	Drawing::textWriting(levelName, 8, 12);
 }
 
 void Select::end() {

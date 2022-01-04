@@ -31,16 +31,16 @@ void Play::start() {
 	//player->SetIdleTime();
 	GameTime::setSessionStartTime();
 
-	if (Audio::SFX[4].GetPlayStatus() == playing) {
-		Audio::SFX[4].PlayPause();
+	if (Audio::sfx[4].getPlayStatus() == AudioStatus::playing) {
+		Audio::sfx[4].playPause();
 	}
 
-	if (Audio::SFX[1].GetPlayStatus() == playing) {
-		Audio::SFX[1].PlayPause();
+	if (Audio::sfx[1].getPlayStatus() == AudioStatus::playing) {
+		Audio::sfx[1].playPause();
 	}
 
-	if (Audio::SFX[17].GetPlayStatus() == playing) {
-		Audio::SFX[17].PlayPause();
+	if (Audio::sfx[17].getPlayStatus() == AudioStatus::playing) {
+		Audio::sfx[17].playPause();
 	}
 }
 
@@ -48,14 +48,14 @@ void Play::update(float currentFrame) {
 	GameTime::update(currentFrame);
 
 	//play gamplay music cyclically
-	if (Audio::SFX[7].GetPlayStatus() != playing) {
-		Audio::SFX[7].PlayPause();
+	if (Audio::sfx[7].getPlayStatus() != AudioStatus::playing) {
+		Audio::sfx[7].playPause();
 	}
 	
 	drawLevel();
 	Enemy::handleCharacters();
-	Gold::DrawGolds();
-	gamePlay->WriteGameTime();
+	Gold::drawGolds();
+	gamePlay->writeGameTime();
 
 	//handle select and pause
 	handleNonControlButtons();
@@ -67,49 +67,49 @@ void Play::end() {
 
 void Play::handleNonControlButtons() {
 	if (enter.simple()) {
-		Audio::SFX[7].PlayPause();
+		Audio::sfx[7].playPause();
 
-		if (Audio::SFX[4].GetPlayStatus() == playing) {
-			Audio::SFX[4].PlayPause();
+		if (Audio::sfx[4].getPlayStatus() == AudioStatus::playing) {
+			Audio::sfx[4].playPause();
 		}
 
-		if (Audio::SFX[1].GetPlayStatus() == playing) {
-			Audio::SFX[1].PlayPause();
+		if (Audio::sfx[1].getPlayStatus() == AudioStatus::playing) {
+			Audio::sfx[1].playPause();
 		}
 
-		if (Audio::SFX[17].GetPlayStatus() == playing) {
-			Audio::SFX[17].PlayPause();
+		if (Audio::sfx[17].getPlayStatus() == AudioStatus::playing) {
+			Audio::sfx[17].playPause();
 		}
 
-		Audio::SFX[14].PlayPause();
+		Audio::sfx[14].playPause();
 
-		gamePlay->TransitionTo(gamePlay->pause);
+		gamePlay->transitionTo(gamePlay->pause);
 	}
 
 	//levelselect with space
 	if (space.simple()) {
-		Audio::SFX[17].StopAndRewind();
-		Audio::SFX[4].StopAndRewind();
-		Audio::SFX[7].StopAndRewind();
+		Audio::sfx[17].stopAndRewind();
+		Audio::sfx[4].stopAndRewind();
+		Audio::sfx[7].stopAndRewind();
 
 		if (gamePlay->stateContext->menuCursor < 2) {
-			gamePlay->stateContext->TransitionTo(gamePlay->stateContext->select);
+			gamePlay->stateContext->transitionTo(gamePlay->stateContext->select);
 		}
 		else {
-			gamePlay->stateContext->TransitionTo(gamePlay->stateContext->generator);
+			gamePlay->stateContext->transitionTo(gamePlay->stateContext->generator);
 		}
 	}
 }
 
-void Play::ClearContainers() {
+void Play::clearContainers() {
 	highestLadder = 0;
 
 	Enemy::clearEnemyVector();
-	Gold::ClearGoldHolders();
+	Gold::clearGoldHolders();
 	finishingLadders.clear();
 }
 
-void Play::SetLadders(int highestLadder, std::vector<Vector2DInt> finishingLadders) {
+void Play::setLadders(int highestLadder, std::vector<Vector2DInt> finishingLadders) {
 	this->highestLadder = highestLadder;
 	this->finishingLadders = finishingLadders;
 }
@@ -122,33 +122,33 @@ void Play::drawLevel() {
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 18; j++) {
 			if (brickO[i][j]) {
-				brickO[i][j]->Handle(gameTime);
+				brickO[i][j]->handle(gameTime);
 			}
 			//if layout is empty do nothing
-			else if (layout[i][j] == empty);
+			else if (layout[i][j] == LayoutBlock::empty);
 			//animating flashing ladder
-			else if (layout[i][j] == ladder) {
-				DrawLevel(i, j, 12 + ladderFactor);
+			else if (layout[i][j] == LayoutBlock::ladder) {
+				Drawing::drawLevel(i, j, 12 + ladderFactor);
 			}
 			//draw every other item simply
-			else if (layout[i][j] == brick) {
-				DrawLevel(i, j, 0);
+			else if (layout[i][j] == LayoutBlock::brick) {
+				Drawing::drawLevel(i, j, 0);
 			}
-			else if (layout[i][j] == trapDoor) {
+			else if (layout[i][j] == LayoutBlock::trapDoor) {
 				trapdoors[i][j]->handle();
 			}
-			else if (layout[i][j] == concrete) {
-				DrawLevel(i, j, 6);
+			else if (layout[i][j] == LayoutBlock::concrete) {
+				Drawing::drawLevel(i, j, 6);
 			}
-			else if (layout[i][j] == pole) {
-				DrawLevel(i, j, 18);
+			else if (layout[i][j] == LayoutBlock::pole) {
+				Drawing::drawLevel(i, j, 18);
 			}
 		}
 	}
 }
 
 void Play::loadLevel(unsigned int levelNumber) {
-	ClearContainers();
+	clearContainers();
 
 	levelNumber = levelNumber < 1 ? 1 : levelNumber;
 	levelNumber = levelNumber > 150 ? 150 : levelNumber;
@@ -201,12 +201,12 @@ void Play::loadLevel(unsigned int levelNumber) {
 			//filling last row with empty blocks
 			if (rowCounter == 0) {
 				for (int i = 1; i < 29; i++) {
-					layout[i][17] = empty;
+					layout[i][17] = LayoutBlock::empty;
 				}
 
 				//but the sides are closed
-				layout[0][17] = concrete;
-				layout[29][17] = concrete;
+				layout[0][17] = LayoutBlock::concrete;
+				layout[29][17] = LayoutBlock::concrete;
 				rowCounter++;
 			}
 			else {
@@ -215,18 +215,18 @@ void Play::loadLevel(unsigned int levelNumber) {
 					trapdoors[i][17 - rowCounter].reset();
 					//level elements
 					if (row[i] == '#') {
-						Vector2DInt Pos;
-						Pos.x = i;
-						Pos.y = 17 - rowCounter;
+						Vector2DInt pos;
+						pos.x = i;
+						pos.y = 17 - rowCounter;
 
-						layout[i][17 - rowCounter] = brick;
-						brickO[i][17 - rowCounter].reset(new Brick(Pos));
+						layout[i][17 - rowCounter] = LayoutBlock::brick;
+						brickO[i][17 - rowCounter].reset(new Brick(pos));
 					}
 					else if (row[i] == '@' || row[i] == '"') {
-						layout[i][17 - rowCounter] = concrete;
+						layout[i][17 - rowCounter] = LayoutBlock::concrete;
 					}
 					else if (row[i] == 'H') {
-						layout[i][17 - rowCounter] = ladder;
+						layout[i][17 - rowCounter] = LayoutBlock::ladder;
 
 						if (!highestLadder) {
 							highestLadder = 17 - rowCounter;
@@ -234,42 +234,42 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 					}
 					else if (row[i] == '-') {
-						layout[i][17 - rowCounter] = pole;
+						layout[i][17 - rowCounter] = LayoutBlock::pole;
 					}
 					else if (row[i] == 'X') {
-						layout[i][17 - rowCounter] = trapDoor;
+						layout[i][17 - rowCounter] = LayoutBlock::trapDoor;
 						trapdoors[i][17 - rowCounter].reset(new Trapdoor({ i,17-rowCounter}));
 					}
 					else if (row[i] == 'S') {
-						layout[i][17 - rowCounter] = empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;
 						finishingLadders.push_back({ i, 17 - rowCounter });
 						if (!highestLadder) {
 							highestLadder = 17 - rowCounter;
 						}
 					}
 					else if (row[i] == '&') {							//runner
-						layout[i][17 - rowCounter] = empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;
 
 						Vector2DInt Pos = { i, 17 - rowCounter };
-						Player::AddPlayer(Pos);
+						Player::addPlayer(Pos);
 					}
 
 					else if (row[i] == '0') {							//guards
-						layout[i][17 - rowCounter] = empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;
 
 						Vector2DInt Pos = { i, 17 - rowCounter };
-						Enemy::AddEnemy(Pos);
+						Enemy::addEnemy(Pos);
 					}
 
 					else if (row[i] == '$') {							//gold
-						layout[i][17 - rowCounter] = empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;
 						Vector2DInt Pos = { i, 17 - rowCounter };
 
 						std::unique_ptr<Gold> gold(new Gold(Pos));
 						Gold::addGoldToUncollected(std::move(gold));
 					}
 					else {
-						layout[i][17 - rowCounter] = empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;
 					}
 				}
 
@@ -278,7 +278,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 				//filling first row with concrete, then quit initializing level
 				if (rowCounter == 17) {
 					for (int i = 0; i < 30; i++) {
-						layout[i][0] = concrete;
+						layout[i][0] = LayoutBlock::concrete;
 					}
 
 					foundLevel = false;
@@ -306,7 +306,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 void Play::generateFinishingLadders() {
 	for (auto finishLadder : finishingLadders) {
-		layout[finishLadder.x][finishLadder.y] = ladder;
+		layout[finishLadder.x][finishLadder.y] = LayoutBlock::ladder;
 	}
 }
 
@@ -314,11 +314,11 @@ short Play::getHighestLadder() {
 	return highestLadder;
 }
 
-void Play::TransitionToDeath() {
-	gamePlay->TransitionTo(gamePlay->death);
+void Play::transitionToDeath() {
+	gamePlay->transitionTo(gamePlay->death);
 }
 
-void Play::TransitionToOutro(short killCounter, short goldNr, short fruitID) {
-	gamePlay->stateContext->outro->SetScoreParameters(killCounter, goldNr, fruitID);
-	gamePlay->stateContext->TransitionTo(gamePlay->stateContext->outro);
+void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
+	gamePlay->stateContext->outro->setScoreParameters(killCounter, goldNr, fruitID);
+	gamePlay->stateContext->transitionTo(gamePlay->stateContext->outro);
 }

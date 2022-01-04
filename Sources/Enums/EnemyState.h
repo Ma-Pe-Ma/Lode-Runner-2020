@@ -1,7 +1,7 @@
 #ifndef ENEMYSTATE_H
 #define ENEMYSTATE_H
 
-enum EnemyState {
+enum class EnemyState {
 	freeRun,
 	startingToFall,
 	falling,

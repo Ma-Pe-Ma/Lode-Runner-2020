@@ -5,40 +5,40 @@
 
 class Player final : public Enemy {
 private:
-	void FindPath() override;
+	void findPath() override;
 
 	//variable for changing moving sound, going-0, laddering-1, poling-2
 	int going[3] = {};
 	int idleTimeStart;
 
 	//Moving
-	void FreeRun() override;
-	void Digging() override;
-	void InitiateFallingStart() override;
-	void InitiateFallingStop() override;
+	void freeRun() override;
+	void digging() override;
+	void initiateFallingStart() override;
+	void initiateFallingStop() override;
 
-	void Falling() override;
-	virtual bool CheckHole() override;
+	void falling() override;
+	virtual bool checkHole() override;
 
 	//Animating
-	inline void AnimateFreeRun() override;
-	inline void AnimateDigging() override;
-	inline void AnimateDying() override;
-	inline void AnimateFalling() override;
-	inline void AnimateGoing() override;
-	inline void AnimateOnLadder() override;
-	inline void AnimateOnPole() override;
+	inline void animateFreeRun() override;
+	inline void animateDigging() override;
+	inline void animateDying() override;
+	inline void animateFalling() override;
+	inline void animateGoing() override;
+	inline void animateOnLadder() override;
+	inline void animateOnPole() override;
 	
-	inline void CheckGoldCollect() override;
-	inline void CheckGoldDrop() override {};
-	void ReleaseFromDigging() override;
+	inline void checkGoldCollect() override;
+	inline void checkGoldDrop() override {};
+	void releaseFromDigging() override;
 
-	virtual void CheckCollisionWithOthers() override {}
+	virtual void checkCollisionWithOthers() override {}
 public:
-	static void AddPlayer(Vector2DInt);
+	static void addPlayer(Vector2DInt);
 	Player();
-	void Die() override;
-	void Dying() override;
+	void die() override;
+	void dying() override;
 };
 
 #endif

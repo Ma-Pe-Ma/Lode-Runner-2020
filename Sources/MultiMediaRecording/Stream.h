@@ -15,7 +15,7 @@ protected:
 	AVFrame* tempFrame = nullptr;
 
 public:
-	void FreeFrames();
+	void freeFrames();
 	bool have = false;
 	AVPacket* packet = nullptr;
 	int64_t nextPts = 0;

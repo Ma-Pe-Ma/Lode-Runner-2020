@@ -1,7 +1,7 @@
 #ifndef PITSTATE_H
 #define PITSTATE_H
 
-enum PitState {
+enum class PitState {
 	fallingToPit,
 	moving,
 	climbing

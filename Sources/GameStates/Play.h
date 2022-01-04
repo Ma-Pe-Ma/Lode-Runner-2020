@@ -28,10 +28,10 @@ public:
 	short getHighestLadder();
 
 	void loadLevel(unsigned int);
-	void TransitionToDeath();
-	void TransitionToOutro(short, short, short);
-	void ClearContainers();
-	void SetLadders(int, std::vector<Vector2DInt>);
+	void transitionToDeath();
+	void transitionToOutro(short, short, short);
+	void clearContainers();
+	void setLadders(int, std::vector<Vector2DInt>);
 };
 
 #endif

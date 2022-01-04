@@ -50,7 +50,7 @@ int main(int argc, char**argv) {
 		}
 	}	
 
-	Audio::OpenAudioFiles(Audio::soundNames);
+	Audio::openAudioFiles(Audio::soundNames);
 	RtAudio dac = RtAudio(RtAudio::WINDOWS_WASAPI);
 
 	if (dac.getDeviceCount() < 1) {
@@ -65,7 +65,7 @@ int main(int argc, char**argv) {
 	
 	unsigned int bufferFrames = FRAMES_PER_BUFFER;
 	try {
-		dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames, &Audio::RtAudioVorbis, (void *)Audio::SFX);
+		dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames, &Audio::rtAudioVorbis, (void *)Audio::sfx);
 		dac.startStream();
 	}
 	catch (RtAudioError& e) {
@@ -115,7 +115,7 @@ int main(int argc, char**argv) {
 		mainMenuTextureName = "Texture/MainMenuU.png";
 	}		
 
-	GLHelper::Initialize(mainMenuTextureName);
+	GLHelper::initialize(mainMenuTextureName);
 	
 #ifdef VIDEO_RECORDING
 	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
@@ -158,7 +158,7 @@ int main(int argc, char**argv) {
 		processInput(GLHelper::window);
 
 		if (lAlt.continuous() && enter.simple()) {
-			GLHelper::FullscreenSwitch();
+			GLHelper::fullscreenSwitch();
 		}			
 
 		State::stateContext->update(GameTime::getCurrentFrame());
@@ -177,7 +177,7 @@ int main(int argc, char**argv) {
 		glfwPollEvents();
 	}
 
-	GLHelper::Terminate();
+	GLHelper::terminate();
 
 	glfwTerminate();
 	return 0;

@@ -29,33 +29,33 @@ private:
 	int index;
 
 public:
-	static Audio SFX[];
+	static Audio sfx[];
 
-	static void OpenAudioFiles(const char soundNames[SOUND_FILE_NR][25]);
-    static void CloseAudioFiles();
+	static void openAudioFiles(const char soundNames[SOUND_FILE_NR][25]);
+    static void closeAudioFiles();
 	OggVorbis_File* sound;
-	double LengthInSec();
-	void PlayPause();
-	void StopAndRewind();
+	double lengthInSec();
+	void playPause();
+	void stopAndRewind();
 	char* PCM;
-	void OpenSoundFile(const char*);
-    void CloseSoundFile();
-	AudioStatus GetPlayStatus();
+	void openSoundFile(const char*);
+    void closeSoundFile();
+	AudioStatus getPlayStatus();
 
-	long ReadNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]);
+	long readNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]);
 
 	Audio(int, const char*);
 	Audio(const char*);
 	Audio() {}
 
 #ifdef ANDROID_VERSION
-	static void InitializeAudioStream(AudioCallback*);
+	static void initializeAudioStream(AudioCallback*);
 	static oboe::ManagedStream managedStream;
 	static AudioCallback* audioCallback;
-    static void OnWindowClose();
-    static void OnWindowResume();
+    static void onWindowClose();
+    static void onWindowResume();
 #else
-	static int RtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData);
+	static int rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData);
 #endif
 
 #ifdef VIDEO_RECORDING

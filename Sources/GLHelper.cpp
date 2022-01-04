@@ -12,25 +12,6 @@
 
 #include <thread>
 
-const unsigned int GLHelper::indices[6] = {
-		 0,1,2,
-		 2,3,0
-};
-
-float GLHelper::blokk[16] = {
-	-0.5,	-0.5,
-	 0.5,	-0.5,
-	 0.5, 	 0.5,
-	-0.5,	 0.5,
-};
-
-float GLHelper::main_menu[16] = {
-	-1,	-1,		0.0, 0.0,
-	 1, -1,		1.0, 0.0,
-	 1,	 1,		1.0, 1.0,
-	-1,	 1,		0.0, 1.0,
-};
-
 #ifdef VIDEO_RECORDING
 MultiMedia* GLHelper::multiMedia;
 #endif // VIDEO_RECORDING
@@ -163,7 +144,7 @@ unsigned char* GLHelper::getRawCharArrayWithSTBI(char const* path, int* width, i
 	return stbi_load(path, width, height, nrComponents, type);
 }
 
-void GLHelper::FullscreenSwitch() {
+void GLHelper::fullscreenSwitch() {
 
 	if (!fullScreen) {
 
@@ -191,7 +172,7 @@ void GLHelper::FullscreenSwitch() {
 void GLHelper::saveImage(unsigned char* buffer) {
 	std::cout << "\n trying to save image!";
 	//find next non-existing screenshot identifier
-	unsigned int scr = FindScreenShotCount();
+	unsigned int scr = findScreenShotCount();
 
 	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
 
@@ -265,7 +246,7 @@ unsigned int GLHelper::loadTexture(char const* path) {
 #endif
 }
 
-void GLHelper::Initialize(std::string mainMenuTextureName) {
+void GLHelper::initialize(std::string mainMenuTextureName) {
 	glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
 
 #ifndef ANDROID_VERSION
@@ -294,7 +275,7 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glBindBuffer(GL_ARRAY_BUFFER, levelVBO);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, levelEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Drawing::indices), Drawing::indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
@@ -311,7 +292,7 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glBindBuffer(GL_ARRAY_BUFFER, playerVBO);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, playerEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Drawing::indices), Drawing::indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
@@ -325,10 +306,10 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 
 	glBindVertexArray(mainVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mainVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(main_menu), main_menu, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Drawing::main_menu), Drawing::main_menu, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, playerEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Drawing::indices), Drawing::indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -345,7 +326,7 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, selectEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Drawing::indices), Drawing::indices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -364,7 +345,7 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cursorEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Drawing::indices), Drawing::indices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -402,7 +383,7 @@ void GLHelper::Initialize(std::string mainMenuTextureName) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void GLHelper::Terminate() {
+void GLHelper::terminate() {
 	glDeleteVertexArrays(1, &levelVAO);
 	glDeleteBuffers(1, &levelVBO);
 	glDeleteBuffers(1, &levelEBO);

@@ -9,19 +9,19 @@ StateContext::StateContext() {
     this->gameOver = new GameOver();
     this->generator = new Generator();
     currentState = mainMenu;
-    TransitionTo(mainMenu);
+    transitionTo(mainMenu);
 
     level[0] = startingLevel;
     level[1] = startingLevel;
 }
 
-void StateContext::TransitionTo(State* newState, bool start, bool end) {
+void StateContext::transitionTo(State* newState, bool start, bool end) {
     if (end) {
         currentState->end();
     }
 
     currentState = newState;
-    currentState->SetStateContext(this);
+    currentState->setStateContext(this);
 
     if (start) {
         currentState->start();
@@ -32,6 +32,6 @@ void StateContext::update(float currentFrame) {
     currentState->update(currentFrame);
 }
 
-void StateContext::TransitionToAtEndOfFrame(State* newState, bool start, bool end) {
+void StateContext::transitionToAtEndOfFrame(State* newState, bool start, bool end) {
 
 }

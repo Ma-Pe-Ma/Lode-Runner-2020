@@ -6,12 +6,12 @@
 
 class Trapdoor {
 	int textureRef = 0;
-	Vector2DInt Pos;
+	Vector2DInt pos;
 public:
-	Trapdoor(Vector2DInt Pos) { this->Pos = Pos; }
+	Trapdoor(Vector2DInt pos) { this->pos = pos; }
 	void setRevealed() { this->textureRef = 24;}
 	void handle() {
-		DrawLevel(Pos.x, Pos.y, textureRef);		
+		Drawing::drawLevel(pos.x, pos.y, textureRef);		
 	}
 };
 

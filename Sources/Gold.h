@@ -14,26 +14,26 @@ class Gold {
 	static std::vector<std::unique_ptr<Gold>> collectedGold;
 
 	//Enemy* carrier;
-	void Draw();
+	void draw();
 	short releaseCounter = 0;
-	Vector2D Pos;
+	Vector2D pos;
 
 public:
-	Gold(Vector2DInt Pos) { this->Pos = { (float)Pos.x, (float) Pos.y}; }
-	void Initialize(int, Vector2D);
-	static void DrawGolds();
-	static bool GoldChecker(int, int);
-	static std::unique_ptr<Gold> GoldCollectChecker(float, float);
-	static void ClearGoldHolders();
+	Gold(Vector2DInt pos) { this->pos = { (float) pos.x, (float) pos.y}; }
+	void initialize(int, Vector2D);
+	static void drawGolds();
+	static bool goldChecker(int, int);
+	static std::unique_ptr<Gold> goldCollectChecker(float, float);
+	static void clearGoldHolders();
 	static void addGoldToUncollected(std::unique_ptr<Gold>);
 	static void addGoldToCollected(std::unique_ptr<Gold>);
 
-	static short GetCollectedSize();
-	static short GetUncollectedSize();
+	static short getCollectedSize();
+	static short getUncollectedSize();
 
-	void SetReleaseCounter(short releaseCounter) { this->releaseCounter = releaseCounter; }
+	void setReleaseCounter(short releaseCounter) { this->releaseCounter = releaseCounter; }
 	bool shouldBeReleased();
-	void SetPos(Vector2D Pos) { this->Pos = Pos; }
+	void setPos(Vector2D pos) { this->pos = pos; }
 };
 
 #endif // !GOLD_H

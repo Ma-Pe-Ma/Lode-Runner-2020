@@ -1,9 +1,9 @@
 #include "MultiMediaRecording/AudioStream.h"
 
 AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters* outputAudioParameters, AVFormatContext* aVFormatContext) {
-	aVFormatContext->oformat->audio_codec = outputAudioParameters->GetCodecID();
+	aVFormatContext->oformat->audio_codec = outputAudioParameters->getCodecID();
 
-	codec = avcodec_find_encoder(outputAudioParameters->GetCodecID());
+	codec = avcodec_find_encoder(outputAudioParameters->getCodecID());
 
 	if (!(codec)) {
 		//fprintf(stderr, "Could not find encoder for '%s'\n", avcodec_get_name(codec_id));
@@ -31,8 +31,8 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	//video.audioStream->codecpar->format = AV_SAMPLE_FMT_FLTP;
 
 	codecContext->sample_fmt = codec->sample_fmts ? codec->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
-	codecContext->bit_rate = outputAudioParameters->GetBitrate();
-	stream->codecpar->sample_rate = outputAudioParameters->GetBitrate();
+	codecContext->bit_rate = outputAudioParameters->getBitrate();
+	stream->codecpar->sample_rate = outputAudioParameters->getBitrate();
 
 	//is this really needed?
 	if (codec->supported_samplerates) {
@@ -47,10 +47,10 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	std::cout << "\n samplerate: " << codecContext->sample_rate;
 
 	//saját gányolás
-	codecContext->sample_rate = outputAudioParameters->GetSampleRate();
+	codecContext->sample_rate = outputAudioParameters->getSampleRate();
 
 	codecContext->channels = av_get_channel_layout_nb_channels(codecContext->channel_layout);
-	codecContext->channel_layout = outputAudioParameters->GetChannelLayout();
+	codecContext->channel_layout = outputAudioParameters->getChannelLayout();
 
 	//is this really needed?
 	if (codec->channel_layouts) {
@@ -63,7 +63,7 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	codecContext->channels = av_get_channel_layout_nb_channels(codecContext->channel_layout);
 
 	//saját gányolás
-	codecContext->time_base = { 1, outputAudioParameters->GetSampleRate() };
+	codecContext->time_base = { 1, outputAudioParameters->getSampleRate() };
 
 	stream->time_base = { 1, codecContext->sample_rate };
 
@@ -121,13 +121,13 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 
 	// set options
 	av_opt_set_int(swr_ctx, "in_channel_count", codecContext->channels, 0);
-	av_opt_set_int(swr_ctx, "in_sample_rate", inputAudioParameters->GetSampleRate(), 0);
-	av_opt_set_int(swr_ctx, "in_channel_layout", inputAudioParameters->GetChannelLayout(), 0);
-	av_opt_set_sample_fmt(swr_ctx, "in_sample_fmt", inputAudioParameters->GetAVSampleFormat(), 0);
+	av_opt_set_int(swr_ctx, "in_sample_rate", inputAudioParameters->getSampleRate(), 0);
+	av_opt_set_int(swr_ctx, "in_channel_layout", inputAudioParameters->getChannelLayout(), 0);
+	av_opt_set_sample_fmt(swr_ctx, "in_sample_fmt", inputAudioParameters->getAVSampleFormat(), 0);
 	av_opt_set_int(swr_ctx, "out_channel_count", codecContext->channels, 0);
-	av_opt_set_int(swr_ctx, "out_sample_rate", outputAudioParameters->GetSampleRate(), 0);
-	av_opt_set_int(swr_ctx, "out_channel_layout", outputAudioParameters->GetChannelLayout(), 0);
-	av_opt_set_sample_fmt(swr_ctx, "out_sample_fmt", outputAudioParameters->GetAVSampleFormat(), 0);
+	av_opt_set_int(swr_ctx, "out_sample_rate", outputAudioParameters->getSampleRate(), 0);
+	av_opt_set_int(swr_ctx, "out_channel_layout", outputAudioParameters->getChannelLayout(), 0);
+	av_opt_set_sample_fmt(swr_ctx, "out_sample_fmt", outputAudioParameters->getAVSampleFormat(), 0);
 
 	// initialize the resampling context 
 	if ((ret = swr_init(swr_ctx)) < 0) {
@@ -139,7 +139,7 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	av_init_packet(packet);
 }
 
-void AudioStream::EncodeFrame(float out) {
+void AudioStream::encodeFrame(float out) {
 	if (audioSampleCounter == 0) {
 		l = (float*) frame->extended_data[0];
 		r = (float*) frame->extended_data[1];
