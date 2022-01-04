@@ -210,7 +210,7 @@ public class StartupActivity extends AppCompatActivity {
         TextView textView = view.findViewById(R.id.headerText);
 
         textView.setText(R.string.inputType);
-        radioButton1.setText(R.string.jostick);
+        radioButton1.setText(R.string.joystick);
         radioButton2.setText(R.string.dpad);
 
         final SharedPreferences sharedPref = getSharedPreferences(getString(R.string.configPreferences), Context.MODE_PRIVATE);

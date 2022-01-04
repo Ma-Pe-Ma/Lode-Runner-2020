@@ -6,7 +6,7 @@ The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/D
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
-In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md)!
+In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/ReadMe.md)!
 
 ## Features of the game
 ### Differences from the original (NES) version:
@@ -55,8 +55,10 @@ Headers needed to be included:
 Source file needed to be linked:
 - [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL
 
-A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.<br>
-At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.<br>
+A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.
+
+At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
+
 Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.<br>
 And of course, the libraries' proper dll-s are needed to put in the built executable's folder.
 
@@ -82,7 +84,7 @@ Check out the release section you can find simple and video recording versions (
 
 Just simply unpack the 7z archive and launch the Lode Runner.exe. 
 
-For the Android notes please check the [aforementioned readme](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/README.md).
+For the Android notes please check the [aforementioned readme](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/blob/master/Android/ReadMe.md).
 
 Note: Linux port currently is not available.
 
@@ -112,10 +114,10 @@ I know that there are parts that are still badly implemented those parts will be
 
 ## Screenshots
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Lode Runner &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Championship  Lode Runner
-- | - 
-![](./Screenshots/Original.png) |![](./Screenshots/Championship.png)
-![](./Screenshots/Orignal-Gameplay.png) |![](./Screenshots/Championship-Gameplay.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lode Runner&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Championship Lode Runner
+--- | ---
+![](./Screenshots/Original.png) | ![](./Screenshots/Championship.png)
+![](./Screenshots/Original-Gameplay.png) | ![](./Screenshots/Championship-Gameplay.png)
 
 
 ## Future tasks for this project:

@@ -9,7 +9,7 @@
     <string name="originalLevels">Original</string>
 
     <string name="inputType">Input</string>
-    <string name="jostick">Joystick</string>
+    <string name="joystick">Virtual joystick</string>
     <string name="dpad">D-Pad</string>
 
     <string name="cover">Cover</string>
