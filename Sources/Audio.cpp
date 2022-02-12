@@ -5,12 +5,12 @@ Audio Audio::sfx[SOUND_FILE_NR];
 char Audio::pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
 
 
-const char Audio::soundNames[SOUND_FILE_NR][25] = { "SFX/gold.ogg", "SFX/dig.ogg","SFX/dig_prev.ogg",
-										"SFX/death.ogg", "SFX/everygold.ogg","SFX/mainmenu.ogg",
-										"SFX/gameover.ogg", "SFX/gameplay.ogg","SFX/intro.ogg",
-										"SFX/step1.ogg","SFX/step2.ogg","SFX/ladder1.ogg",
-										"SFX/ladder2.ogg", "SFX/outro.ogg","SFX/pause.ogg",
-										"SFX/pole1.ogg","SFX/pole2.ogg", "SFX/fall.ogg"
+const char Audio::soundNames[SOUND_FILE_NR][25] = { "Assets/SFX/gold.ogg", "Assets/SFX/dig.ogg","Assets/SFX/dig_prev.ogg",
+										"Assets/SFX/death.ogg", "Assets/SFX/everygold.ogg","Assets/SFX/mainmenu.ogg",
+										"Assets/SFX/gameover.ogg", "Assets/SFX/gameplay.ogg","Assets/SFX/intro.ogg",
+										"Assets/SFX/step1.ogg","Assets/SFX/step2.ogg","Assets/SFX/ladder1.ogg",
+										"Assets/SFX/ladder2.ogg", "Assets/SFX/outro.ogg","Assets/SFX/pause.ogg",
+										"Assets/SFX/pole1.ogg","Assets/SFX/pole2.ogg", "Assets/SFX/fall.ogg"
 };
 
 #ifdef VIDEO_RECORDING

@@ -44,7 +44,7 @@ int main(int argc, char**argv) {
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
-			levelFileName = "level/ChampionshipLevels.txt";
+			levelFileName = "Assets/level/ChampionshipLevels.txt";
 			championship = true;
 			break;
 		}
@@ -107,12 +107,12 @@ int main(int argc, char**argv) {
 		return -1;
 	}
 
-	std::string mainMenuTextureName = "Texture/MainMenu.png";
+	std::string mainMenuTextureName = "Assets/Texture/MainMenu.png";
 	if (championship) {
-		mainMenuTextureName = "Texture/Championship.png";
+		mainMenuTextureName = "Assets/Texture/Championship.png";
 	}		
 	else if (usCover) {
-		mainMenuTextureName = "Texture/MainMenuU.png";
+		mainMenuTextureName = "Assets/Texture/MainMenuU.png";
 	}		
 
 	GLHelper::initialize(mainMenuTextureName);

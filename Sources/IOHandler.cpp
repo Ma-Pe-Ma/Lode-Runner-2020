@@ -2,7 +2,7 @@
 #include <map>
 
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
-std::string levelFileName = "Level/OriginalLevels.txt";
+std::string levelFileName = "Assets/Level/OriginalLevels.txt";
 Vector2D debugPos[2];
 
 bool championship = false;
@@ -293,11 +293,11 @@ void loadConfig() {
 
 	switch (levelSet) {
 	case 1:
-		levelFileName = "level/ChampionshipLevels.txt";
+		levelFileName = "Assets/level/ChampionshipLevels.txt";
 		championship = true;
 		break;
 	default:
-		levelFileName = "level/OriginalLevels.txt";
+		levelFileName = "Assets/level/OriginalLevels.txt";
 		break;
 	}
 
