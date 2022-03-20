@@ -12,10 +12,10 @@ This version was based on the more teapots native activity example, many tools a
 
         git clone --recurse-submodules https://github.com/Ma-Pe-Ma/Lode-Runner-2020.git
 
-2. At the [Android/common](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/tree/master/Android/common) folder you can find a *vorbis_working_cmakelists* directory. Copy and paste the content to the vorbis folder (confirm overwriting).<br>
+2. At the [Android/common](./common) folder you can find a *vorbis_working_cmakelists* directory. Copy and paste the content to the vorbis folder (confirm overwriting).<br>
 (These files are needed to build the libvorbis and libvorbisfile libraries properly into the app.)
 
-3. From the [assets folder](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/tree/master/Assets), copy the Level, SFX, Texture (but NOT the Shaders!) folders to /Android/LodeRunnerAndroid/src/main/assets directory.
+3. From the [assets folder](../Assets), copy the Level, SFX, Texture (but NOT the Shaders!) folders to /Android/LodeRunnerAndroid/src/main/assets directory.
 
 4. Open the Android folder/project with Android Studio. NDK needs to be installed to build the project.<br>Now you should be able to build the project successfully.
 

@@ -28,6 +28,8 @@ oboe::DataCallbackResult AudioCallback::onAudioReady(oboe::AudioStream *audioStr
             for (int k = 0; k < s; k++) {
                 outputData[2 * i + j] += (((short(Audio::pcmout[k][2 * 2 * i + 2 * j] << 8)) + Audio::pcmout[k][2 * 2 * i + 2 * j + 1])) / s;
             }
+			
+			outputData[2 * i + j] /= 8;
 
 #ifdef VIDEO_RECORDING
             if (multiMedia != nullptr) {

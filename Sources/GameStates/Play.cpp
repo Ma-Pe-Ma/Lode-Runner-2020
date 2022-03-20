@@ -171,7 +171,12 @@ void Play::loadLevel(unsigned int levelNumber) {
 	//reading level into the layout matrix
 	int rowCounter = 0;
 
-#ifdef ANDROID_VERSION
+
+#ifndef ANDROID_VERSION
+	std::fstream levelFile;
+	levelFile.open(levelFileName);
+	while (getline(levelFile, row)) {
+#else
 	std::vector<uint8_t> data;
 	if (!ndk_helper::JNIHelper::GetInstance()->ReadFile(levelFileName.c_str(), &data)) {
 		Helper::log("Can't read file!"+levelFileName);
@@ -192,10 +197,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 	}
 
 	for (auto row : rows) {
-#else
-	std::fstream levelFile;
-	levelFile.open(levelFileName);
-	while (getline(levelFile, row)) {
 #endif
         if (foundLevel) {
 			//filling last row with empty blocks

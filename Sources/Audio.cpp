@@ -145,6 +145,8 @@ int Audio::rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBu
 				dataOut += (((short(pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8)) + pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1])) / s;
 			}
 
+			dataOut /= 8;
+
 #ifdef VIDEO_RECORDING
 			if (multiMedia != nullptr) {
 				multiMedia->writeAudioFrame(dataOut);
