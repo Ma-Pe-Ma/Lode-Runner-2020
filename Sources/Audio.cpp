@@ -4,13 +4,18 @@ Audio Audio::sfx[SOUND_FILE_NR];
 
 char Audio::pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
 
+#ifndef ANDROID_VERSION
+std::string assetFolder = "Assets/";
+#else
+std::string assetFolder = "";
+#endif
 
-const char Audio::soundNames[SOUND_FILE_NR][25] = { "Assets/SFX/gold.ogg", "Assets/SFX/dig.ogg","Assets/SFX/dig_prev.ogg",
-										"Assets/SFX/death.ogg", "Assets/SFX/everygold.ogg","Assets/SFX/mainmenu.ogg",
-										"Assets/SFX/gameover.ogg", "Assets/SFX/gameplay.ogg","Assets/SFX/intro.ogg",
-										"Assets/SFX/step1.ogg","Assets/SFX/step2.ogg","Assets/SFX/ladder1.ogg",
-										"Assets/SFX/ladder2.ogg", "Assets/SFX/outro.ogg","Assets/SFX/pause.ogg",
-										"Assets/SFX/pole1.ogg","Assets/SFX/pole2.ogg", "Assets/SFX/fall.ogg"
+const std::string Audio::soundNames[SOUND_FILE_NR] = { assetFolder + "SFX/gold.ogg",  assetFolder + "SFX/dig.ogg", assetFolder + "SFX/dig_prev.ogg",
+													   assetFolder + "SFX/death.ogg", assetFolder + "SFX/everygold.ogg", assetFolder + "SFX/mainmenu.ogg",
+													   assetFolder + "SFX/gameover.ogg", assetFolder + "SFX/gameplay.ogg", assetFolder + "SFX/intro.ogg",
+													   assetFolder + "SFX/step1.ogg", assetFolder + "SFX/step2.ogg", assetFolder + "SFX/ladder1.ogg",
+													   assetFolder + "SFX/ladder2.ogg", assetFolder + "SFX/outro.ogg", assetFolder + "SFX/pause.ogg",
+													   assetFolder + "SFX/pole1.ogg", assetFolder + "SFX/pole2.ogg", assetFolder + "SFX/fall.ogg"
 };
 
 #ifdef VIDEO_RECORDING
@@ -63,9 +68,9 @@ void Audio::closeSoundFile() {
 	ov_clear(sound);
 }
 
-void Audio::openAudioFiles(const char soundNames[SOUND_FILE_NR][25]) {
+void Audio::openAudioFiles(const std::string soundNames[SOUND_FILE_NR]) {
 	for (int i = 0; i < SOUND_FILE_NR; i++) {
-		sfx[i] = Audio(i, soundNames[i]);
+		sfx[i] = Audio(i, soundNames[i].c_str());
 	}		
 }
 

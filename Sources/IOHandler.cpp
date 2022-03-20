@@ -2,7 +2,7 @@
 #include <map>
 
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
-std::string levelFileName = "Assets/Level/OriginalLevels.txt";
+;
 Vector2D debugPos[2];
 
 bool championship = false;
@@ -11,6 +11,9 @@ unsigned int startingLevel = 1;
 unsigned int recordingHeight;
 
 #ifdef ANDROID_VERSION
+
+std::string levelFileName = "Level/OriginalLevels.txt";
+
 JNIEXPORT void JNICALL
 Java_com_mpm_lodeRunner_GameActivity_processInput(JNIEnv* env, jobject thiz, jint buttonID, jboolean pushed) {
     switch ((int) buttonID) {
@@ -52,8 +55,8 @@ Java_com_mpm_lodeRunner_GameActivity_initializeGame( JNIEnv* env, jobject thiz, 
 	usCover = (bool) ntscCover;
     startingLevel = (unsigned int) levelIn;
 
-	Enemy::SetPlayerSpeed((float) player);
-	Enemy::SetEnemySpeed((float) enemy);
+	Enemy::setPlayerSpeed((float) player);
+	Enemy::setEnemySpeed((float) enemy);
 }
 
 JNIEXPORT void JNICALL
@@ -78,6 +81,8 @@ Java_com_mpm_lodeRunner_GameActivity_processJoystick( JNIEnv* env, jobject thiz,
     }
 }
 #else
+std::string levelFileName = "Assets/Level/OriginalLevels.txt"
+
 void processInput(GLFWwindow* window) {
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);

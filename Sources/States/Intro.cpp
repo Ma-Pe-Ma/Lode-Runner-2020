@@ -108,7 +108,7 @@ void Intro::start() {
 
 	remove("config.txt");
 	rename("config_temp.txt", "config.txt");
-#elif
+#else
 	ndk_helper::JNIHelper* jniHelper = ndk_helper::JNIHelper::GetInstance();
 	jniHelper->setLastLevel(stateContext->level[stateContext->playerNr]);
 #endif

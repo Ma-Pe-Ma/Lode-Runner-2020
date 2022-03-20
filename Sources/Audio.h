@@ -31,7 +31,7 @@ private:
 public:
 	static Audio sfx[];
 
-	static void openAudioFiles(const char soundNames[SOUND_FILE_NR][25]);
+	static void openAudioFiles(const std::string soundNames[SOUND_FILE_NR]);
     static void closeAudioFiles();
 	OggVorbis_File* sound;
 	double lengthInSec();
@@ -63,6 +63,6 @@ public:
 #endif
 
 	static char pcmout[SOUND_FILE_NR][FRAMES_PER_BUFFER * CHANNEL_COUNT * 2];
-	static const char soundNames[SOUND_FILE_NR][25];
+	static const std::string soundNames[SOUND_FILE_NR];
 };
 #endif // !AUDIO_H
