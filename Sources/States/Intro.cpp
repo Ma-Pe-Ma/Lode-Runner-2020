@@ -8,6 +8,10 @@
 #include "Audio.h"
 #include "GameTime.h"
 
+#ifdef ANDROID_VERSION
+#include <JNIHelper.h>
+#endif
+
 void Intro::start() {
 	timer = GameTime::getCurrentFrame();
 	Audio::sfx[8].playPause();
@@ -63,6 +67,51 @@ void Intro::start() {
 		zeros = zeros + '0';
 	}
 	hiscore = "HISCORE  " + zeros + record;
+
+	//save starting level
+	std::string line;
+
+#ifndef ANDROID_VERSION
+	std::ifstream configFileOld;
+	std::ofstream configFileNew;
+	configFileOld.open("config.txt");
+	configFileNew.open("config_temp.txt");
+	bool levelConfigFound = false;
+
+	while (getline(configFileOld, line)) {
+		if (line.length() == 0 || line[0] == '#') {
+			configFileNew << line + "\n";
+			continue;
+		}
+
+		std::string key = line.substr(0, line.find(' '));
+		std::string value = line.substr(line.find(' ') + 1);
+
+		if (key == "levelNr") {
+			levelConfigFound = true;
+
+			std::string newLine = "levelNr " + std::to_string(stateContext->level[stateContext->playerNr]);
+			configFileNew << newLine + "\n";
+		}
+		else {
+			configFileNew << line + "\n";
+		}
+	}
+
+	if (!levelConfigFound) {
+		std::string newLine = "levelNr " + std::to_string(stateContext->level[stateContext->playerNr]);
+		configFileNew << newLine + "\n";
+	}
+
+	configFileNew.close();
+	configFileOld.close();
+
+	remove("config.txt");
+	rename("config_temp.txt", "config.txt");
+#elif
+	ndk_helper::JNIHelper* jniHelper = ndk_helper::JNIHelper::GetInstance();
+	jniHelper->setLastLevel(stateContext->level[stateContext->playerNr]);
+#endif
 }
 
 void Intro::update(float currentFrame) {
