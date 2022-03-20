@@ -258,7 +258,9 @@ void GLHelper::initialize(std::string mainMenuTextureName) {
     mainShader = new Shader("Assets/Shaders/main_VS.txt", "Assets/Shaders/main_FS.txt");
     levelShader = new Shader("Assets/Shaders/level_VS.txt", "Assets/Shaders/level_FS.txt");
     playerShader = new Shader("Assets/Shaders/player_VS.txt", "Assets/Shaders/player_FS.txt");
+    std::string assetFolder = "Assets/";
 #else
+    std::string assetFolder = "";
     std::map<std::string, std::string> param;
 	selectShader = new Shader("Shaders/select_VS.txt", "Shaders/select_FS.txt", param);
 	mainShader = new Shader("Shaders/main_VS.txt", "Shaders/main_FS.txt", param);
@@ -353,13 +355,13 @@ void GLHelper::initialize(std::string mainMenuTextureName) {
 
 	GLHelper::playerShader->use();
 	glActiveTexture(GL_TEXTURE0);
-	characterSet = GLHelper::loadTexture("Assets/Texture/NES - Lode Runner - Characters.png");
+	characterSet = GLHelper::loadTexture((assetFolder + "Texture/NES - Lode Runner - Characters.png").c_str());
 	glBindTexture(GL_TEXTURE_2D, characterSet);
 	GLHelper::playerShader->setInt("textureA", 0);
 
 	GLHelper::levelShader->use();
 	glActiveTexture(GL_TEXTURE1);
-	tileSet = GLHelper::loadTexture("Assets/Texture/NES - Lode Runner - Tileset.png");
+	tileSet = GLHelper::loadTexture((assetFolder + "Texture/NES - Lode Runner - Tileset.png").c_str());
 	glBindTexture(GL_TEXTURE_2D, tileSet);
 	GLHelper::levelShader->setInt("textureA", 1);
 
@@ -373,7 +375,7 @@ void GLHelper::initialize(std::string mainMenuTextureName) {
 
 	GLHelper::selectShader->use();
 	glActiveTexture(GL_TEXTURE3);
-	selectScreenT = GLHelper::loadTexture("Assets/Texture/ABC.png");
+	selectScreenT = GLHelper::loadTexture((assetFolder +"Texture/ABC.png").c_str());
 	glBindTexture(GL_TEXTURE_2D, selectScreenT);
 	GLHelper::selectShader->setInt("textureA", 3);
 
