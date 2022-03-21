@@ -81,7 +81,7 @@ Java_com_mpm_lodeRunner_GameActivity_processJoystick( JNIEnv* env, jobject thiz,
     }
 }
 #else
-std::string levelFileName = "Assets/Level/OriginalLevels.txt"
+std::string levelFileName = "Assets/Level/OriginalLevels.txt";
 
 void processInput(GLFWwindow* window) {
 	GLFWgamepadstate state;

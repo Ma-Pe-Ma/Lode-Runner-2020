@@ -24,6 +24,7 @@ The levels are ripped from the original Apple II version. The NES port has only 
 A conspicious difference about the collision detection: in the original when there are 3 guards circling around a ladder, they do not stop, while in this version they do, but this does not effect the gameplay much, I think...)
 
 ### Extra features:
+- Continuing at last played level after startup (ie. auto-saving progress)
 - Taking screenshot
 - Recording gameplay video
 
@@ -60,7 +61,7 @@ A fully configured Visual Studio project is included in the repository. You have
 At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
 
 Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.<br>
-And of course, the libraries' proper dll-s are needed to put in the built executable's folder.
+And of course, the libraries' proper dll-s are needed to be put in the built executable's folder.
 
 ## Controls:
 The game uses XInput API for controller handling.
@@ -82,20 +83,24 @@ The game uses XInput API for controller handling.
 
 Check out the release section you can find simple and video recording versions (with/without a launcher). Choose the one that you want!
 
-Just simply unpack the 7z archive and launch the Lode Runner.exe. 
+Just simply unpack the 7z archive and launch the "Lode Runner.exe". 
 
-For the Android notes please check the [aforementioned readme](./Android/ReadMe.md).
+For the Android notes please check the [aforementioned ReadMe](./Android/ReadMe.md).
 
-Note: Linux port currently is not available.
+Note: Linux port currently is not available however it is planned.
 
-### Configurating the game
+### Configuring the game
 In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
 
-Moreover you can use the provided launcher (LR-Launcher.exe) to configure and launch the game in a GUI window. (It just simply recreates the config txt acording to the GUI input).
+Moreover you can use the provided launcher ("LR-Launcher.exe") to configure and launch the game in a GUI window. (It just simply recreates the config txt acording to the GUI input).
 
 In the release section the name of file tells you which version contains the launcher.
 
 For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
+
+<p align="center">
+  <img src="./Screenshots/Launcher.png" width = "500" height="350" />
+</p>
 
 ### Championship Lode Runner ###
 To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.
@@ -114,13 +119,21 @@ I know that there are parts that are still badly implemented those parts will be
 
 ## Screenshots
 
+### Desktop version
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lode Runner&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Championship Lode Runner
 --- | ---
 ![](./Screenshots/Original.png) | ![](./Screenshots/Championship.png)
 ![](./Screenshots/Original-Gameplay.png) | ![](./Screenshots/Championship-Gameplay.png)
 
+### Android version
+
+<p align="center">
+  <img src="./Screenshots/Android-Gameplay.jpg" width = "541" height="250" />
+</p>
 
 ## Future tasks for this project:
+- Upload gameplay video
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, saving level, completion time etc.
