@@ -18,6 +18,8 @@ android {
                           '-DANDROID_STL=c++_static'
             }
         }
+		versionCode 101
+		versionName 'v1.1'
     }
     buildTypes {
         release {
