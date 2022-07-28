@@ -8,91 +8,24 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow) {
+    , ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
-	
-    setWindowTitle("Lode Runner Launcher");
-    setWindowIcon(QIcon(":/app/Icon"));
 
-    setFixedSize(640, 420);
-    setWindowFlags(/*Qt::Dialog |*/ Qt::MSWindowsFixedSizeDialogHint);
-    statusBar()->setSizeGripEnabled(false);
+    setFixedSize(654, 440);
+    //setWindowFlags(/*Qt::Dialog |*/ Qt::MSWindowsFixedSizeDialogHint);    
 
-    QWidget* centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-
-	verticalLayout = new QVBoxLayout;
-
-    imageLabel = new QLabel;
-    QPixmap image(":/app/Title");
-    int imageWidth = imageLabel->width();
-    int imageHeight= imageLabel->height();
-
-    //imageLabel->setPixmap(image.scaled(imageWidth, imageHeight, Qt::KeepAspectRatio));
-    imageLabel->setPixmap(image.scaledToWidth(640));
-    imageLabel->setMargin(0);
-    //imageLabel->setPixmap(image);
-    verticalLayout->addWidget(imageLabel);
-    verticalLayout->setAlignment(imageLabel, Qt::AlignHCenter);
-
-    //QHBoxLayout* gameModeLayout = new QHBoxLayout;
-
-    gameModeWidget = new GameModeWidget;
-    //gameModeLayout->addWidget(gameModeWidget);
-
-    //verticalLayout->addLayout(gameModeLayout);
-    verticalLayout->addWidget(gameModeWidget);
-
-    resolutionWidget = new ResolutionWidget;
-    connect(resolutionWidget, &ResolutionWidget::showError, this, &MainWindow::showError);
-    verticalLayout->addWidget(resolutionWidget);
-
-    otherSettings = new OtherSettings;
-    connect(otherSettings, &OtherSettings::showError, this, &MainWindow::showError);
-    verticalLayout->addWidget(otherSettings);
-
-
-    QHBoxLayout* buttons = new QHBoxLayout;
-    buttons->addSpacing(15);
-
-    resetButton = new QPushButton("Reset Settings");
-    connect(resetButton, &QPushButton::pressed, this, &MainWindow::resetSettings);
-    buttons->addWidget(resetButton);
-    buttons->setAlignment(resetButton, Qt::AlignLeft);
-
-    launchButton = new QPushButton("Launch");
-    connect(launchButton, &QPushButton::pressed, this, &MainWindow::launchGame);
-    buttons->addWidget(launchButton);
-    buttons->setAlignment(launchButton, Qt::AlignRight);
-    buttons->addSpacing(15);
-
-    verticalLayout->addLayout(buttons);
-    centralWidget->setLayout(verticalLayout);
+    connect(ui->resolutionWidget, &ResolutionWidget::showError, this, &MainWindow::showError);
+    connect(ui->otherSettings, &OtherSettings::showError, this, &MainWindow::showError);
 }
 
-void MainWindow::launchGame() {
-    gameModeWidget->setSettings();
-
-    if (resolutionWidget->valuesValid() && otherSettings->valuesValid()) {
-        if (ConfigReader::write()) {
-            QString path = QCoreApplication::applicationDirPath()+"/Lode Runner.exe";
-            startup(path.toUtf8().constData());
-            QCoreApplication::quit();
-        }
-    }
-}
-
-void MainWindow::resetSettings() {
-    gameModeWidget->resetSettings();
-    resolutionWidget->resetSettings();
-    otherSettings->resetSettings();
-}
-
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::showError(QString text) {
+void MainWindow::showError(QString text)
+{
     QMessageBox* qMessageBox = new QMessageBox;
     qMessageBox->setWindowTitle("Invalid value!");
     qMessageBox->setWindowIcon(QIcon(":/app/Icon"));
@@ -100,7 +33,30 @@ void MainWindow::showError(QString text) {
     qMessageBox->show();
 }
 
-void MainWindow::startup(LPCSTR lpApplicationName) {
+void MainWindow::on_launchButton_clicked()
+{
+    ui->gameModeWidget->setSettings();
+
+    if (ui->resolutionWidget->valuesValid() && ui->otherSettings->valuesValid())
+    {
+        if (ConfigReader::write())
+        {
+            QString path = QCoreApplication::applicationDirPath()+"/Lode Runner.exe";
+            startup(path.toUtf8().constData());
+            QCoreApplication::quit();
+        }
+    }
+}
+
+void MainWindow::on_resetButton_clicked()
+{
+    ui->gameModeWidget->resetSettings();
+    ui->resolutionWidget->resetSettings();
+    ui->otherSettings->resetSettings();
+}
+
+void MainWindow::startup(LPCSTR lpApplicationName)
+{
     // additional information
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;

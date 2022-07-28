@@ -25,22 +25,15 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QVBoxLayout* verticalLayout;
-    QLabel* imageLabel;
-    GameModeWidget* gameModeWidget;
-    ResolutionWidget* resolutionWidget;
-    OtherSettings* otherSettings;
-
-    QPushButton* resetButton;
-    QPushButton* launchButton;
 
     void startup(LPCSTR lpApplicationName);
 
-
 private slots:
-    void launchGame();
-    void resetSettings();
     void showError(QString);
+
+    void on_launchButton_clicked();
+
+    void on_resetButton_clicked();
 
 signals:
 

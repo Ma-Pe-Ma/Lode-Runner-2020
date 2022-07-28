@@ -6,11 +6,12 @@
 #include <QDebug>
 #include "configreader.h"
 
-ResolutionWidget::ResolutionWidget(QWidget *parent) : QWidget(parent) {
+ResolutionWidget::ResolutionWidget(QWidget *parent) : QWidget(parent)
+{
     QHBoxLayout* upper = new QHBoxLayout;
 
     resolutionGroup = new QGroupBox;
-    resolutionGroup->setTitle("Resolution:");
+    resolutionGroup->setTitle(tr("Resolution:"));
 
     QHBoxLayout *hbox = new QHBoxLayout;
     resolutionGroup->setLayout(hbox);
@@ -55,7 +56,8 @@ ResolutionWidget::ResolutionWidget(QWidget *parent) : QWidget(parent) {
 
     customToggled(false);
 
-    switch (ConfigReader::resolutionMode) {
+    switch (ConfigReader::resolutionMode)
+    {
         case 0:
         radio1->setChecked(true);
         break;
@@ -80,46 +82,57 @@ ResolutionWidget::ResolutionWidget(QWidget *parent) : QWidget(parent) {
 }
 
 
-void ResolutionWidget::customToggled(bool toggled) {
+void ResolutionWidget::customToggled(bool toggled)
+{
     heightEdit->setEnabled(toggled);
     widthEdit->setEnabled(toggled);
 }
 
-bool ResolutionWidget::valuesValid() {
-    if(radio1->isChecked()){
+bool ResolutionWidget::valuesValid()
+{
+    if(radio1->isChecked())
+    {
         ConfigReader::resolutionMode = 0;
     }
-    else if(radio2->isChecked()){
+    else if(radio2->isChecked())
+    {
         ConfigReader::resolutionMode = 1;
     }
-    else if(radio3->isChecked()){
+    else if(radio3->isChecked())
+    {
         ConfigReader::resolutionMode = 2;
     }
-    else if(radio4->isChecked()){
+    else if(radio4->isChecked())
+    {
         ConfigReader::resolutionMode = 3;
     }
-    else if (radio5->isChecked()) {
+    else if (radio5->isChecked())
+    {
         ConfigReader::resolutionMode = 4;
 
         bool ok = true;
         int widthValue = QLocale::system().toInt(widthEdit->getValue(), &ok);
 
-        if (!ok) {
-            emit showError("Width value is not correct!");
+        if (!ok)
+        {
+            emit showError(tr("Width value is not correct!"));
             return false;
         }
-        else {
+        else
+        {
             ConfigReader::width = widthValue;
         }
 
         ok = true;
         int heightValue = QLocale::system().toInt(heightEdit->getValue(), &ok);
 
-        if (!ok) {
-            emit showError("Height value is not correct!");
+        if (!ok)
+        {
+            emit showError(tr("Height value is not correct!"));
             return false;
         }
-        else {
+        else
+        {
             ConfigReader::height = heightValue;
         }
     }
@@ -127,7 +140,8 @@ bool ResolutionWidget::valuesValid() {
     return true;
 }
 
-void ResolutionWidget::resetSettings() {
+void ResolutionWidget::resetSettings()
+{
     radio4->setChecked(true);
     widthEdit->setValueText(QLocale::system().toString(1280));
     heightEdit->setValueText(QLocale::system().toString(720));

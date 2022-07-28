@@ -6,7 +6,8 @@
 #include "labeledlineedit.h"
 #include <QRadioButton>
 
-class ResolutionWidget : public QWidget {
+class ResolutionWidget : public QWidget
+{
     Q_OBJECT
 public:
     explicit ResolutionWidget(QWidget *parent = nullptr);

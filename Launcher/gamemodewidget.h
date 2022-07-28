@@ -6,7 +6,8 @@
 #include <QGroupBox>
 #include <QRadioButton>
 
-class GameModeWidget : public QWidget {
+class GameModeWidget : public QWidget
+{
     Q_OBJECT
 public:
     explicit GameModeWidget(QWidget *parent = nullptr);
@@ -21,7 +22,7 @@ private:
     QGroupBox* createGameGroup();
     QGroupBox* createCoverGroup();
 
-    QRadioButton* orignalButton;
+    QRadioButton* originalButton;
     QRadioButton* championshipButton;
 
     QRadioButton *classicButton ;
