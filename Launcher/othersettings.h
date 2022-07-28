@@ -5,7 +5,8 @@
 #include <QLineEdit>
 #include "labeledlineedit.h"
 
-class OtherSettings : public QWidget {
+class OtherSettings : public QWidget
+{
     Q_OBJECT
 public:
     explicit OtherSettings(QWidget *parent = nullptr);

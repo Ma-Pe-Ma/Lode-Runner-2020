@@ -6,7 +6,8 @@
 #include <QLineEdit>
 #include <QValidator>
 
-class LabeledLineEdit : public QWidget {
+class LabeledLineEdit : public QWidget
+{
     Q_OBJECT
 public:
     explicit LabeledLineEdit(QWidget *parent = nullptr);

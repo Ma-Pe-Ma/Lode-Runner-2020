@@ -6,7 +6,8 @@
 #include <QDebug>
 #include <QApplication>
 
-namespace ConfigReader {
+namespace ConfigReader
+{
     int resolutionMode = 0;
     bool levelset = false;
     bool usCover = false;
@@ -23,14 +24,18 @@ namespace ConfigReader {
 
     std::map<std::string, std::string> configMap;
 
-    int getIntByKey(std::string key, int defaultValue) {
+    int getIntByKey(std::string key, int defaultValue)
+    {
         std::string value = configMap[key];
 
-        if (value != "") {
-            try {
+        if (value != "")
+        {
+            try
+            {
                 return std::stoi(value);
             }
-            catch (std::invalid_argument e) {
+            catch (std::invalid_argument e)
+            {
                 return defaultValue;
             }
         }
@@ -38,14 +43,18 @@ namespace ConfigReader {
         return defaultValue;
     }
 
-    float getFloatByKey(std::string key, float defaultValue) {
+    float getFloatByKey(std::string key, float defaultValue)
+    {
         std::string value = configMap[key];
 
-        if (value != "") {
-            try {
+        if (value != "")
+        {
+            try
+            {
                 return std::stof(value);
             }
-            catch (std::invalid_argument e) {
+            catch (std::invalid_argument e)
+            {
                 return defaultValue;
             }
         }
@@ -53,14 +62,18 @@ namespace ConfigReader {
         return defaultValue;
     }
 
-    void read() {
+    void read()
+    {
         QString path = QCoreApplication::applicationDirPath()+"/config.txt";
         std::ifstream config(path.toUtf8().constData(), std::fstream::in);
         std::string line;
 
-        if (config.is_open()) {
-            while (getline(config, line)) {
-                if (line.length() == 0 || line[0] == '#') {
+        if (config.is_open())
+        {
+            while (getline(config, line))
+            {
+                if (line.length() == 0 || line[0] == '#')
+                {
                     continue;
                 }
 
@@ -70,8 +83,9 @@ namespace ConfigReader {
                 configMap[key] = value;
             }
          }
-        else {
-           qInfo()<<"File not open";
+        else
+        {
+           //qInfo()<<"File not open";
         }
 
         config.close();
@@ -90,7 +104,8 @@ namespace ConfigReader {
 
     std::ofstream configOut;
 
-    void writeEntry(std::string explanation, std::string value) {
+    void writeEntry(std::string explanation, std::string value)
+    {
         explanation += "\n";
         value += "\n";
 
@@ -99,7 +114,8 @@ namespace ConfigReader {
         configOut.write("\n", 1);
     }
 
-    bool write() {
+    bool write()
+    {
         QString path = QCoreApplication::applicationDirPath()+"/config.txt";
         configOut = std::ofstream(path.toUtf8().constData(), std::fstream::out);
 

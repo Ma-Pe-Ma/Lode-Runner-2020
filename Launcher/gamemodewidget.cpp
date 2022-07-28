@@ -3,7 +3,8 @@
 #include <QVBoxLayout>
 #include "configreader.h"
 
-GameModeWidget::GameModeWidget(QWidget *parent) : QWidget(parent) {
+GameModeWidget::GameModeWidget(QWidget *parent) : QWidget(parent)
+{
     this->coverGroup = createCoverGroup();
     this->gameGroup = createGameGroup();
 
@@ -14,24 +15,27 @@ GameModeWidget::GameModeWidget(QWidget *parent) : QWidget(parent) {
     setLayout(hLayout);
 }
 
-QGroupBox* GameModeWidget::createGameGroup() {
+QGroupBox* GameModeWidget::createGameGroup()
+{
     QGroupBox* gameGroup = new QGroupBox;
-    gameGroup->setTitle("Levelset:");
+    gameGroup->setTitle(tr("Levelset:"));
 
-    orignalButton = new QRadioButton(tr("Original"));
+    originalButton = new QRadioButton(tr("Original"));
     championshipButton = new QRadioButton(tr("Championship"));
-    connect(orignalButton, &QRadioButton::toggled, this, &GameModeWidget::originalChecked);
+    connect(originalButton, &QRadioButton::toggled, this, &GameModeWidget::originalChecked);
     this->coverGroup->setEnabled(false);
 
-    if (ConfigReader::levelset) {
+    if (ConfigReader::levelset)
+    {
         championshipButton->setChecked(true);
     }
-    else {
-        orignalButton->setChecked(true);
+    else
+    {
+        originalButton->setChecked(true);
     }
 
     QHBoxLayout *vbox = new QHBoxLayout;
-    vbox->addWidget(orignalButton);
+    vbox->addWidget(originalButton);
     vbox->addWidget(championshipButton);
     vbox->addStretch(1);
     gameGroup->setLayout(vbox);
@@ -39,17 +43,20 @@ QGroupBox* GameModeWidget::createGameGroup() {
     return gameGroup;
 }
 
-QGroupBox* GameModeWidget::createCoverGroup() {
+QGroupBox* GameModeWidget::createCoverGroup()
+{
     QGroupBox* coverGroup = new QGroupBox;
-    coverGroup->setTitle("Cover:");
+    coverGroup->setTitle(tr("Cover:"));
 
     classicButton = new QRadioButton(tr("Classic"));
     usButton = new QRadioButton(tr("US"));
 
-    if (ConfigReader::usCover) {
+    if (ConfigReader::usCover)
+    {
         usButton->setChecked(true);
     }
-    else {
+    else
+    {
         classicButton->setChecked(true);
     }
 
@@ -62,34 +69,43 @@ QGroupBox* GameModeWidget::createCoverGroup() {
     return coverGroup;
 }
 
-void GameModeWidget::originalChecked(bool checked) {
+void GameModeWidget::originalChecked(bool checked)
+{
     this->coverGroup->setEnabled(checked);
 
-    if (checked) {
+    if (checked)
+    {
         //this->coverGroup->show();
     }
-    else {
+    else
+    {
         //this->coverGroup->hide();
     }
 }
 
-void GameModeWidget::resetSettings() {
-    orignalButton->setChecked(true);
+void GameModeWidget::resetSettings()
+{
+    originalButton->setChecked(true);
     classicButton->setChecked(true);
 }
 
-void GameModeWidget::setSettings() {
-    if(orignalButton->isChecked()) {
+void GameModeWidget::setSettings()
+{
+    if(originalButton->isChecked())
+    {
         ConfigReader::levelset = false;
     }
-    else {
+    else
+    {
         ConfigReader::levelset = true;
     }
 
-    if(classicButton->isChecked()) {
+    if(classicButton->isChecked())
+    {
         ConfigReader::usCover = false;
     }
-    else {
+    else
+    {
         ConfigReader::usCover = true;
     }
 }

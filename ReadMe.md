@@ -1,6 +1,10 @@
 # Lode Runner 2020
 ![](./Launcher/LRTITLE.png)
 
+![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
+
+![Desktop](https://badgen.net/badge/desktop/working/green) ![Desktop](https://badgen.net/badge/Android/working/green) ![Desktop](https://badgen.net/badge/launcher/working/green)
+
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
 
@@ -21,7 +25,7 @@ In this ReadMe you can find info about general aspects of the project and about 
 
 The levels are ripped from the original Apple II version. The NES port has only 50 levels and this remake includes the missing 100 levels too. Note: The levels ported to the NES are not 100% identical to the original ones, as some rows or columns are missing in the ported levels. If you have the proper NES levelset I will happily include it.
 
-A conspicious difference about the collision detection: in the original when there are 3 guards circling around a ladder, they do not stop, while in this version they do, but this does not effect the gameplay much, I think...)
+A conspicious difference about the collision detection: in the original when there are 3 guards circling around a ladder, they do not stop, while in this version they do, but this does not effect the gameplay much, I think...
 
 ### Extra features:
 - Continuing at last played level after startup (ie. auto-saving progress)
@@ -37,7 +41,7 @@ A conspicious difference about the collision detection: in the original when the
 - The soundeffects/music (some of them are form online sources but the rest were recorded by me with the help of an emulator)
 - Guard AI (the AI is the same as the original it was published in a book which I couldn't get but I found it in an other [remake](https://github.com/SimonHung/LodeRunner) and I translated it back to C++)
 - Level design - same as original but copied from the aforementioned remake
-- The game logic (naturally...)
+- The game logic (obviously...)
 
 Every other feature was developed by me (using existing libraries).
 
@@ -137,7 +141,7 @@ I know that there are parts that are still badly implemented those parts will be
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, saving level, completion time etc.
-- Linux port (probably CMAKE support?)
+- Linux port (probably Cmake support?)
 - [Dear Imgui](https://github.com/ocornut/imgui) in-game configurer
 
 
