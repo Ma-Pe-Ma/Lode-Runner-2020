@@ -12,6 +12,10 @@ Before playing check out the manual of the [original](https://www.gamesdatabase.
 
 In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](./Android/ReadMe.md)!
 
+## Gameplay video
+
+[![Gameplay Video](https://img.youtube.com/vi/i1yjls2AzKk/0.jpg)](https://www.youtube.com/watch?v=i1yjls2AzKk)
+
 ## Features of the game
 ### Differences from the original (NES) version:
 - Controller input is supported but the mappings differ from the original 
@@ -137,10 +141,9 @@ I know that there are parts that are still badly implemented those parts will be
 </p>
 
 ## Future tasks for this project:
-- Upload gameplay video
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
-- Adding some useful extras, eg. score counter, leaderboard, saving level, completion time etc.
+- Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Linux port (probably Cmake support?)
 - [Dear Imgui](https://github.com/ocornut/imgui) in-game configurer
 
