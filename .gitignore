@@ -6,6 +6,11 @@
 /GameplayVideos
 /Release
 /build*/
+/out/
+
+ffmpeg
+
+*dll
 
 __TemplateIcon.ico
 vc141.pdb

@@ -9,9 +9,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <SHADER/shader.h>
+#include <Shader.h>
 
-#include <RtAudio/RtAudio.h>
+#include <RtAudio.h>
 
 #ifdef VIDEO_RECORDING
 #include "MultiMediaRecording/MultiMediaHelper.h"
@@ -32,12 +32,6 @@
 #include "IOHandler.h"
 
 int main(int argc, char**argv) {
-#ifndef RELEASE_VERSION
-	HWND hWnd = GetConsoleWindow();
-	//ShowWindow(hWnd, SW_HIDE);
-	ShowWindow(hWnd, SW_SHOW);
-#endif
-
 	//loading configuration file
 	loadConfig();
 

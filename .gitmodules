@@ -10,3 +10,18 @@
 [submodule "Android/common/oboe"]
 	path = Android/common/oboe
 	url = https://github.com/google/oboe.git
+[submodule "Sources/external/glfw"]
+	path = src/submodules/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Sources/external/ogg"]
+	path = src/submodules/ogg
+	url = https://github.com/xiph/ogg.git
+[submodule "Sources/external/vorbis"]
+	path = src/submodules/vorbis
+	url = https://github.com/xiph/vorbis.git
+[submodule "Sources/external/rtaudio"]
+	path = src/submodules/rtaudio
+	url = https://github.com/thestk/rtaudio.git
+[submodule "Sources/external/stbi"]
+	path = src/submodules/stb
+	url = https://github.com/nothings/stb.git

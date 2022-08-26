@@ -4,7 +4,7 @@
 #ifdef ANDROID_VERSION
 #include "../shader_a.h"
 #else
-#include <SHADER/shader.h>
+#include <shader.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #endif // ANDROID_VERSION
