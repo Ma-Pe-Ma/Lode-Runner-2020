@@ -17,7 +17,9 @@ This version was based on the more teapots native activity example, many tools a
 
 3. From the [assets folder](../Assets), copy the Level, SFX, Texture (but NOT the Shaders!) folders to /Android/LodeRunnerAndroid/src/main/assets directory.
 
-4. Open the Android folder/project with Android Studio. NDK needs to be installed to build the project.<br>Now you should be able to build the project successfully.
+4. Copy the [src/loderunner](../src/loderunner/) folder to /Android/LodeRunnerAndroid/src/main/cpp/
+
+5. Open the Android folder/project with Android Studio. NDK needs to be installed to build the project.<br>Now you should be able to build the project successfully.
 
 ## Downloading built version
 
@@ -51,7 +53,5 @@ Config-screen | Gameplay
 
 1. Implement controlling by motion sensors.
 2. Fix mentioned bugs.
-3. Implementing saving last played level (only chosen level number is saved)
-
 
 **Have fun playing with it!**

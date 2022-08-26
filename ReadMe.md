@@ -51,25 +51,23 @@ Every other feature was developed by me (using existing libraries).
 
 ## Compilation help
 
-Libraries needed to be linked to compile:
+Clone the project with its submodules:
+
+	git clone --recurse-submodules -j8 https://github.com/Ma-Pe-Ma/Lode-Runner-2020.git
+
+A CMake project is added to the repository which should configure and then build without problems.
+
+These dependencies are autoconfigured:
 - [GLFW](https://www.glfw.org/) - utility used to create OpenGL contexts
 - [RTAUDIO](https://www.music.mcgill.ca/~gary/rtaudio/) - used to play sound effects
 - [libogg / libvorbis / libvorbisfile](https://xiph.org/downloads/) - used to decode vorbis sound files
-- [FFMPEG](https://ffmpeg.org/) (avformat, avutil, avcodec, swscale, swresample) - needed for video recording
+- [STBI Image + Write](https://github.com/nothings/stb) - header files used to read textures and write screnshots
 
-Headers needed to be included:
-- [STBI Image + Write](https://github.com/nothings/stb) - used to read textures and write screnshots
-- [this shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) - used to handle shaders easily
+These files have to be added manually:
+- [this shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) - used to handle shaders easily, download it and place it in the [src/loderunner](./src/loderunner), and remove functions which use the glm library
+- [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL, [generate](https://glad.dav1d.de/) source and headers and place them in the [src/loderunner](./src/loderunner) folder
 
-Source file needed to be linked:
-- [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL
-
-A fully configured Visual Studio project is included in the repository. You have to specify only two paths in the LR_Path.props property sheet to compile it successfully.
-
-At line 5 you have to add the LR_INCLUDE_DIR macro which is the path to the location where the aforementioned libraries' headers + the glad.c source file are located.
-
-Similarly, at line 6 you have specify the LR_LIB_DIR macro which is the path to the location where the libraries' static lib files are located.<br>
-And of course, the libraries' proper dll-s are needed to be put in the built executable's folder.
+To use video recording capabilites [FFMPEG](https://ffmpeg.org/) (avformat, avutil, avcodec, swscale, swresample) has to be linked. The process is explained in the CMakeLists (only dowloading and unpacking to the right place are required).
 
 ## Controls:
 The game uses XInput API for controller handling.
@@ -144,8 +142,6 @@ I know that there are parts that are still badly implemented those parts will be
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
-- Linux port (probably Cmake support?)
 - [Dear Imgui](https://github.com/ocornut/imgui) in-game configurer
-
 
 **Have fun playing with it!**

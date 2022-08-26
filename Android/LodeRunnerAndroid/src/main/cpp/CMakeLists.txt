@@ -50,60 +50,61 @@ include_directories (${commonDir})
 #include_directories (${oboeSrc}/include)
 
 # include the game's headers
-include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Sources)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/loderunner)
 
 # now build app's shared lib
-add_library(${PROJECT_NAME}
-        SHARED
-        Sources/GameStates/Begin.cpp
-        Sources/GameStates/Death.cpp
-        Sources/GameStates/GameState.cpp
-        Sources/GameStates/Pause.cpp
-        Sources/GameStates/Play.cpp
-        Sources/States/GameOver.cpp
-        Sources/States/GamePlay.cpp
-        Sources/States/Generator.cpp
-        Sources/States/Intro.cpp
-        Sources/States/MainMenu.cpp
-        Sources/States/Outro.cpp
-        Sources/States/Select.cpp
-        Sources/States/State.cpp
-        Sources/States/StateContext.cpp
-        Sources/Audio.cpp
-        Sources/Brick.cpp
-        Sources/Button.cpp
-        Sources/Drawing.cpp
-        Sources/Enemy.cpp
-        Sources/GameTime.cpp
-        Sources/GLHelper.cpp
-        Sources/Gold.cpp
-        Sources/IOHandler.cpp
-        Sources/Player.cpp
-        AudioCallback.cpp
-        GameActivity.cpp
-        Engine.cpp
-        Helper.cpp
-        LodeRunnerRenderer.cpp
-        )
+add_library(${PROJECT_NAME} SHARED
+    loderunner/GameStates/Begin.cpp
+    loderunner/GameStates/Death.cpp
+    loderunner/GameStates/GameState.cpp
+    loderunner/GameStates/Pause.cpp
+    loderunner/GameStates/Play.cpp
+    loderunner/States/GameOver.cpp
+    loderunner/States/GamePlay.cpp
+    loderunner/States/Generator.cpp
+    loderunner/States/Intro.cpp
+    loderunner/States/MainMenu.cpp
+    loderunner/States/Outro.cpp
+    loderunner/States/Select.cpp
+    loderunner/States/State.cpp
+    loderunner/States/StateContext.cpp
+    loderunner/Audio.cpp
+    loderunner/Brick.cpp
+    loderunner/Button.cpp
+    loderunner/Drawing.cpp
+    loderunner/Enemy.cpp
+    loderunner/GameTime.cpp
+    loderunner/GLHelper.cpp
+    loderunner/Gold.cpp
+    loderunner/IOHandler.cpp
+    loderunner/Player.cpp
+    AudioCallback.cpp
+    GameActivity.cpp
+    Engine.cpp
+    Helper.cpp
+    LodeRunnerRenderer.cpp
+)
+
 set_target_properties(${PROJECT_NAME}
-        PROPERTIES
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS NO
-        )
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)
 
 # Export ANativeActivity_onCreate(),
 # Refer to: https://github.com/android-ndk/ndk/issues/381.
 set_target_properties(${PROJECT_NAME}
-        PROPERTIES  LINK_FLAGS "-u ANativeActivity_onCreate")
+    PROPERTIES  LINK_FLAGS "-u ANativeActivity_onCreate"
+)
 
 # add lib dependencies
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        NdkHelper
-        ogg
-        vorbis
-        vorbisenc
-        vorbisfile
-        oboe
-        )
+    PRIVATE
+    NdkHelper
+    ogg
+    vorbis
+    vorbisenc
+    vorbisfile
+    oboe
+)

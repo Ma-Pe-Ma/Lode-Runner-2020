@@ -29,7 +29,7 @@ display-p3/third_party
 
 /common/bin
 
-/LodeRunnerAndroid/src/main/cpp/Sources
+/LodeRunnerAndroid/src/main/cpp/loderunner
 /LodeRunnerAndroid/src/main/assets/Level
 /LodeRunnerAndroid/src/main/assets/SFX
 /LodeRunnerAndroid/src/main/assets/Texture
