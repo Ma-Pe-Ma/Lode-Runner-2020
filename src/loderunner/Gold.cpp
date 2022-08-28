@@ -47,7 +47,7 @@ bool Gold::goldChecker(int x, int y) {
 
 std::unique_ptr<Gold> Gold::goldCollectChecker(float x, float y) {
 	for (auto it = uncollectedGold.begin(); it != uncollectedGold.end(); it++) {
-		if (abs(it->get()->pos.x - x) < 0.15f && abs(it->get()->pos.y - y) < 0.15f) {
+		if (std::abs(it->get()->pos.x - x) < 0.15f && std::abs(it->get()->pos.y - y) < 0.15f) {
 			std::unique_ptr<Gold> foundGold = std::move(*it);
 			uncollectedGold.erase(it);
 
@@ -70,8 +70,6 @@ void Gold::draw() {
 }
 
 bool Gold::shouldBeReleased() {
-	//std::cout << "\n relasecounter: " << releaseCounter;
-
 	if (releaseCounter-- <= 0) {
 		return true;
 	}

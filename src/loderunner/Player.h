@@ -36,7 +36,7 @@ private:
 	virtual void checkCollisionWithOthers() override {}
 public:
 	static void addPlayer(Vector2DInt);
-	Player();
+	Player(float, float);
 	void die() override;
 	void dying() override;
 };

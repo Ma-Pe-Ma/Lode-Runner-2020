@@ -3,14 +3,14 @@
 
 ![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
-![Desktop](https://badgen.net/badge/desktop/working/green) ![Desktop](https://badgen.net/badge/Android/working/green) ![Desktop](https://badgen.net/badge/launcher/working/green)
+![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Desktop](https://badgen.net/badge/Android/working/green) ![Desktop](https://badgen.net/badge/launcher/working/green)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
-In this ReadMe you can find info about general aspects of the project and about the Windows version. For the details of the Android port please [click here](./Android/ReadMe.md)!
+In this ReadMe you can find info about general aspects of the project and about the desktop (Windows/Linux) version. For the details of the Android port please [click here](./Android/ReadMe.md)!
 
 ## Gameplay video
 
@@ -57,15 +57,13 @@ Clone the project with its submodules:
 
 A CMake project is added to the repository which should configure and then build without problems.
 
-These dependencies are autoconfigured:
+The dependencies are autoconfigured:
 - [GLFW](https://www.glfw.org/) - utility used to create OpenGL contexts
 - [RTAUDIO](https://www.music.mcgill.ca/~gary/rtaudio/) - used to play sound effects
 - [libogg / libvorbis / libvorbisfile](https://xiph.org/downloads/) - used to decode vorbis sound files
 - [STBI Image + Write](https://github.com/nothings/stb) - header files used to read textures and write screnshots
-
-These files have to be added manually:
-- [this shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) - used to handle shaders easily, download it and place it in the [src/loderunner](./src/loderunner), and remove functions which use the glm library
-- [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL, [generate](https://glad.dav1d.de/) source and headers and place them in the [src/loderunner](./src/loderunner) folder
+- [GLAD](https://glad.dav1d.de/) - an OpenGL Loading Library is a library that loads pointers to OpenGL functions at runtime, this is required to access functions from OpenGL, the source and headers were [generated here](https://glad.dav1d.de/) 
+- [this handy shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) from [Learn OpenGl](https://learnopengl.com) by Joey De Vries - simple header which handles shaders easily
 
 To use video recording capabilites [FFMPEG](https://ffmpeg.org/) (avformat, avutil, avcodec, swscale, swresample) has to be linked. The process is explained in the CMakeLists (only dowloading and unpacking to the right place are required).
 

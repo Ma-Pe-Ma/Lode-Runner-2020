@@ -298,11 +298,11 @@ void loadConfig() {
 
 	switch (levelSet) {
 	case 1:
-		levelFileName = "Assets/level/ChampionshipLevels.txt";
+		levelFileName = "Assets/Level/ChampionshipLevels.txt";
 		championship = true;
 		break;
 	default:
-		levelFileName = "Assets/level/OriginalLevels.txt";
+		levelFileName = "Assets/Level/OriginalLevels.txt";
 		break;
 	}
 
