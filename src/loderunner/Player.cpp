@@ -3,17 +3,14 @@
 #include "GameTime.h"
 #include "IOHandler.h"
 
-Player::Player() : Enemy() {
+Player::Player(float x, float y) : Enemy(x, y) {
 	textureMap = {28, 52, 48,36,40, 26};
 	charSpeed = playerSpeed;
 	textureRef = textureMap.going;
 }
 
 void Player::addPlayer(Vector2DInt position) {
-	Player* newPlayer = new Player();
-	newPlayer->pos = { (float) position.x, (float) position.y };
-	newPlayer->prevPos = newPlayer->pos;
-	Enemy::player.reset(newPlayer);
+	Enemy::player = std::make_unique<Player>((float)position.x, (float)position.y);
 }
 
 void Player::findPath() {
@@ -41,7 +38,7 @@ void Player::findPath() {
 
 	//check if runner dies by enemy
 	for (auto& enemy : enemies) {
-		if (abs(enemy->pos.x - pos.x) < 0.5f && abs(enemy->pos.y - pos.y) < 0.5f) {
+		if (std::abs(enemy->pos.x - pos.x) < 0.5f && std::abs(enemy->pos.y - pos.y) < 0.5f) {
 			die();
 		}
 	}

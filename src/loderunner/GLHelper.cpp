@@ -120,8 +120,7 @@ void GLHelper::errorCallback(int error, const char* description) {
 }
 
 void GLHelper::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	std::cout << "\n updating viewport: " << width << ", " << height;
-
+	//std::cout << "\n updating viewport: " << width << ", " << height;
 	updateViewPortValues(width, height);
 
 #ifdef VIDEO_RECORDING
@@ -170,7 +169,7 @@ void GLHelper::fullscreenSwitch() {
 }
 
 void GLHelper::saveImage(unsigned char* buffer) {
-	std::cout << "\n trying to save image!";
+	std::cout << "\n Trying to save image...";
 	//find next non-existing screenshot identifier
 	unsigned int scr = findScreenShotCount();
 
@@ -183,7 +182,9 @@ void GLHelper::saveImage(unsigned char* buffer) {
 	if (!stbi_write_png(name, SCR_WIDTH, SCR_HEIGHT, 3, buffer, 0)) {
 		std::cout << "\nERROR: Could not write screenshot file: " << name;
 	}
-	else std::cout << "\nScreenshot taken as: " << name;
+	else {
+		std::cout << "\nScreenshot taken as: " << name;
+	}
 
 	delete[] buffer;
 }

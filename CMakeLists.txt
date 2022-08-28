@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 project("LodeRunner")
 
-# define executable and add src/loderunner
+# define executable and add src/loderunner source files
 add_executable(LodeRunner
 	"src/loderunner/Audio.cpp"
 	"src/loderunner/Brick.cpp"
@@ -20,7 +20,6 @@ add_executable(LodeRunner
 	"src/loderunner/IOHandler.cpp"
 	"src/loderunner/Main.cpp"
 	"src/loderunner/Player.cpp"
-	"src/loderunner/glad.c"
 
 	"src/loderunner/States/GameOver.cpp"
 	"src/loderunner/States/GamePlay.cpp"
@@ -37,9 +36,11 @@ add_executable(LodeRunner
 	"src/loderunner/GameStates/GameState.cpp"
 	"src/loderunner/GameStates/Pause.cpp"
 	"src/loderunner/GameStates/Play.cpp"
+
+	"src/submodules/glad.c"
 )
 
-# build glfw library
+# build external libraries
 add_subdirectory("src/submodules/glfw")
 add_subdirectory("src/submodules/ogg")
 add_subdirectory("src/submodules/vorbis")
@@ -118,12 +119,17 @@ if (VIDEO_RECORDING AND WIN32)
 	endforeach()
 endif()
 
+# Release mode
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_definitions(-DRELEASE_VERSION)
+endif()
+
 # windows specific settings
 if (WIN32)
+	add_definitions(-DSOUND_API=RtAudio::WINDOWS_WASAPI)
+
 	# Release mode
 	if (CMAKE_BUILD_TYPE STREQUAL "Release")
-		add_definitions(-DRELEASE_VERSION)
-
 		# Hide Console Window method 1 - not working as cmake appends /SUBSYSTEM:CONSOLE to CMAKE_EXE_LINKER_FLAGS after running current CMakeLists.txt
 #		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
@@ -150,4 +156,6 @@ if (WIN32)
 			PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
 		)
 	endif()
+elseif(UNIX)
+	add_definitions(-DSOUND_API=RtAudio::LINUX_ALSA)
 endif()

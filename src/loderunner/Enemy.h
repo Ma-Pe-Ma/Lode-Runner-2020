@@ -138,7 +138,7 @@ public:
 
 	virtual void die();
 
-	Enemy();
+	Enemy(float, float);
 
 	std::unique_ptr<Gold> carriedGold;
 

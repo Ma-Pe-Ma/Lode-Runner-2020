@@ -10,7 +10,7 @@
 #include "../AudioCallback.h"
 #include "../Helper.h"
 #else
-#include <RtAudio/RtAudio.h>
+#include <RtAudio.h>
 #endif
 
 #ifdef VIDEO_RECORDING

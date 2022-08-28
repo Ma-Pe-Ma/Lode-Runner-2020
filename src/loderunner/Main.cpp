@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <chrono>
 #include <thread>
+#include <string.h>
 
 #include "States/State.h"
 #include "States/StateContext.h"
@@ -38,14 +39,14 @@ int main(int argc, char**argv) {
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
-			levelFileName = "Assets/level/ChampionshipLevels.txt";
+			levelFileName = "Assets/Level/ChampionshipLevels.txt";
 			championship = true;
 			break;
 		}
 	}	
 
 	Audio::openAudioFiles(Audio::soundNames);
-	RtAudio dac = RtAudio(RtAudio::WINDOWS_WASAPI);
+	RtAudio dac = RtAudio(SOUND_API);
 
 	if (dac.getDeviceCount() < 1) {
 		std::cout << "\nNo audio devices found!\n";
