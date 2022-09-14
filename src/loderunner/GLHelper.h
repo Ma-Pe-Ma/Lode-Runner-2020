@@ -4,8 +4,16 @@
 #ifdef ANDROID_VERSION
 #include "../shader_a.h"
 #else
+
 #include <Shader.h>
+
+#if defined __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#include <emscripten/emscripten.h>
+#else 
 #include <glad/glad.h>
+#endif
+
 #include <GLFW/glfw3.h>
 #endif // ANDROID_VERSION
 
@@ -13,67 +21,65 @@
 #include "MultiMediaRecording/MultiMedia.h"
 #endif // VIDEO_RECORDING
 
-class GLHelper {
-private:
-
-public:
+namespace GLHelper {
 	
 #ifdef VIDEO_RECORDING
-	static MultiMedia* multiMedia;
+	extern MultiMedia* multiMedia;
 #endif
 
-	static Shader* selectShader;
-	static Shader* mainShader;
-	static Shader* levelShader;
-	static Shader* playerShader;
+	extern Shader* selectShader;
+	extern Shader* mainShader;
+	extern Shader* levelShader;
+	extern Shader* playerShader;
 
-	static unsigned int selectVBO, selectVAO, selectEBO;
-	static unsigned int levelVBO, levelVAO, levelEBO;
-	static unsigned int playerVBO, playerVAO, playerEBO;
-	static unsigned int mainVBO, mainVAO, mainEBO;
-	static unsigned int cursorVAO, cursorVBO, cursorEBO;
+	extern unsigned int selectVBO, selectVAO, selectEBO;
+	extern unsigned int levelVBO, levelVAO, levelEBO;
+	extern unsigned int playerVBO, playerVAO, playerEBO;
+	extern unsigned int mainVBO, mainVAO, mainEBO;
+	extern unsigned int cursorVAO, cursorVBO, cursorEBO;
 
-	static unsigned int viewPortX;
-	static unsigned int viewPortY;
-	static unsigned int viewPortWidth;
-	static unsigned int viewPortHeight;
+	extern unsigned int viewPortX;
+	extern unsigned int viewPortY;
+	extern unsigned int viewPortWidth;
+	extern unsigned int viewPortHeight;
 
-	static unsigned int SCR_WIDTH;
-	static unsigned int SCR_HEIGHT;
+	extern unsigned int SCR_WIDTH;
+	extern unsigned int SCR_HEIGHT;
 
-	static unsigned int former_SCR_WIDTH;
-	static unsigned int former_SCR_HEIGHT;
+	extern unsigned int former_SCR_WIDTH;
+	extern unsigned int former_SCR_HEIGHT;
 
-	static unsigned int windowPosX;
-	static unsigned int windowPosY;
+	extern unsigned int windowPosX;
+	extern unsigned int windowPosY;
 
-	#ifdef ANDROID_VERSION
-    static void updateViewPort();
+#ifdef ANDROID_VERSION
+    extern void updateViewPort();
     #else
-	static bool fullScreen;
-	static GLFWwindow* window;
+	extern bool fullScreen;
+	extern GLFWwindow* window;
 
-	static void errorCallback(int error, const char* description);
-	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-	static void window_pos_callback(GLFWwindow* window, int xpos, int ypos);
+	extern void errorCallback(int error, const char* description);
+	extern void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+	extern void window_pos_callback(GLFWwindow* window, int xpos, int ypos);
 
-	static unsigned char* getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type);
-	static void fullscreenSwitch();
-	static void saveImage(unsigned char*);
-	#endif
+	extern unsigned char* getRawCharArrayWithSTBI(char const* path, int* width, int* height, int* nrComponents, int type);
+	extern void fullscreenSwitch();
+	extern void saveImage(unsigned char*);
+#endif
 
-	static void updateViewPortValues(int, int);
+	extern void updateViewPortValues(int, int);
 
-	static void screenCapture();
-	static unsigned int loadTexture(char const* path);
+	extern void screenCapture();
+	extern unsigned int loadTexture(char const* path);
 
-	static void initialize(std::string);
-	static void terminate();
+	extern void initialize(std::string);
+	extern void terminate();
 
-	static unsigned int menuScreen;
-	static unsigned int characterSet;
-	static unsigned int tileSet;
-	static unsigned int selectScreenT;
+	extern unsigned int originalMenu;
+	extern unsigned int championshipMenu;
+	extern unsigned int characterSet;
+	extern unsigned int tileSet;
+	extern unsigned int selectScreenT;
 };
 
 #endif // !GLHELPER_H

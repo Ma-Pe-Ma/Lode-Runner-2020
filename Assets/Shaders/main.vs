@@ -1,4 +1,4 @@
-#version 450 core
+
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTexturePos;
 
@@ -9,7 +9,7 @@ out vec2 TexCoord;
 
 void main() {	
 	if(mode == 0) {
-		gl_Position = vec4( (24.0 / 35) * aPos.x, aPos.y, 0.0, 1.0);
+		gl_Position = vec4((24.0 / 35.0) * aPos.x, aPos.y, 0.0, 1.0);
 	}
 	else if(mode == 1)	{
 		gl_Position = vec4(aPos.x, aPos.y, -0.1, 1.0);

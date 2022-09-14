@@ -4,13 +4,17 @@
 #include "IOHandler.h"
 
 Player::Player(float x, float y) : Enemy(x, y) {
-	textureMap = {28, 52, 48,36,40, 26};
-	charSpeed = playerSpeed;
+	this->textureMap = {28, 52, 48, 36, 40, 26};
+	this->charSpeed = Enemy::playerSpeed;
 	textureRef = textureMap.going;
 }
 
 void Player::addPlayer(Vector2DInt position) {
 	Enemy::player = std::make_unique<Player>((float)position.x, (float)position.y);
+}
+
+void Player::updateCharSpeed() {
+	this->charSpeed = Enemy::playerSpeed;
 }
 
 void Player::findPath() {

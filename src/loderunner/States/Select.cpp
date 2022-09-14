@@ -35,7 +35,7 @@ void Select::update(float currentFrame) {
 	}
 
 
-	if (championship) {
+	if (gameVersion == 1) {
 		if (stateContext->level[stateContext->playerNr] < 1) {
 			stateContext->level[stateContext->playerNr] = 51 + stateContext->level[stateContext->playerNr];
 		}			

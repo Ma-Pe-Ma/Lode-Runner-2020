@@ -25,3 +25,6 @@
 [submodule "Sources/external/stbi"]
 	path = src/submodules/stb
 	url = https://github.com/nothings/stb.git
+[submodule "src/submodules/imgui"]
+	path = src/submodules/imgui
+	url = https://github.com/ocornut/imgui.git

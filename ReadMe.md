@@ -3,14 +3,18 @@
 
 ![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
-![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Desktop](https://badgen.net/badge/Android/working/green) ![Desktop](https://badgen.net/badge/launcher/working/green)
+![browser](https://badgen.net/badge/browser/working/green) ![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Android](https://badgen.net/badge/Android/working/green) ![launcher](https://badgen.net/badge/launcher/working/green)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
 
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
-In this ReadMe you can find info about general aspects of the project and about the desktop (Windows/Linux) version. For the details of the Android port please [click here](./Android/ReadMe.md)!
+In this ReadMe you can find info about general aspects of the project and about the desktop (Windows/Linux/browser) version. For the details of the Android port please [click here](./Android/ReadMe.md)!
+
+## Browser port
+
+**The game can be played in browser [here](https://mapema.hu/en/hobby/lode-runner/game/)!**
 
 ## Gameplay video
 
@@ -57,7 +61,7 @@ Clone the project with its submodules:
 
 A CMake project is added to the repository which should configure and then build without problems.
 
-The dependencies are autoconfigured:
+The game requires the following dependencies (which do not need further configuring):
 - [GLFW](https://www.glfw.org/) - utility used to create OpenGL contexts
 - [RTAUDIO](https://www.music.mcgill.ca/~gary/rtaudio/) - used to play sound effects
 - [libogg / libvorbis / libvorbisfile](https://xiph.org/downloads/) - used to decode vorbis sound files
@@ -66,6 +70,8 @@ The dependencies are autoconfigured:
 - [this handy shader class](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader.h) from [Learn OpenGl](https://learnopengl.com) by Joey De Vries - simple header which handles shaders easily
 
 To use video recording capabilites [FFMPEG](https://ffmpeg.org/) (avformat, avutil, avcodec, swscale, swresample) has to be linked. The process is explained in the CMakeLists (only dowloading and unpacking to the right place are required).
+
+The game should compile without problems to WebAssemby build with Emscripten.
 
 ## Controls:
 The game uses XInput API for controller handling.
@@ -80,6 +86,7 @@ The game uses XInput API for controller handling.
 	
 	p		-		    take screenshot
 	r		-		    start/end recording gameplay video
+	c		-		    show configurer dialog
 	
 	alt + enter  	-   		    change window mode (full or windowed)
 
@@ -140,6 +147,5 @@ I know that there are parts that are still badly implemented those parts will be
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
-- [Dear Imgui](https://github.com/ocornut/imgui) in-game configurer
 
 **Have fun playing with it!**

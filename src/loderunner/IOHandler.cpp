@@ -1,11 +1,10 @@
 #include "IOHandler.h"
 #include <map>
 
-Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
-;
+Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt, configButton;
 Vector2D debugPos[2];
 
-bool championship = false;
+int gameVersion = 0;
 bool usCover = false;
 unsigned int startingLevel = 1;
 unsigned int recordingHeight;
@@ -16,121 +15,112 @@ std::string levelFileName = "Level/OriginalLevels.txt";
 
 JNIEXPORT void JNICALL
 Java_com_mpm_lodeRunner_GameActivity_processInput(JNIEnv* env, jobject thiz, jint buttonID, jboolean pushed) {
-    switch ((int) buttonID) {
-        case 0:
-            up.detectAlter((bool) pushed);
-            break;
-        case 1:
-            rightButton.detectAlter((bool) pushed);
-            break;
-        case 2:
-            down.detectAlter((bool) pushed);
-            break;
-        case 3:
-            leftButton.detectAlter((bool) pushed);
-            break;
-        case 4:
-            leftDigButton.detectAlter((bool) pushed);
-            break;
-        case 5:
-            rightDigButton.detectAlter((bool) pushed);
-            break;
-        case 6:
-            space.detectAlter((bool) pushed);
-            break;
-        case 7:
-            enter.detectAlter((bool) pushed);
-            break;
-    }
+	switch ((int)buttonID) {
+	case 0:
+		up.detectAlter((bool)pushed);
+		break;
+	case 1:
+		rightButton.detectAlter((bool)pushed);
+		break;
+	case 2:
+		down.detectAlter((bool)pushed);
+		break;
+	case 3:
+		leftButton.detectAlter((bool)pushed);
+		break;
+	case 4:
+		leftDigButton.detectAlter((bool)pushed);
+		break;
+	case 5:
+		rightDigButton.detectAlter((bool)pushed);
+		break;
+	case 6:
+		space.detectAlter((bool)pushed);
+		break;
+	case 7:
+		enter.detectAlter((bool)pushed);
+		break;
+	}
 }
 
 JNIEXPORT void JNICALL
-Java_com_mpm_lodeRunner_GameActivity_initializeGame( JNIEnv* env, jobject thiz, jboolean champ, jboolean ntscCover, jboolean joystick, jint levelIn, jfloat player, jfloat enemy) {
-    championship = (bool) champ;
+Java_com_mpm_lodeRunner_GameActivity_initializeGame(JNIEnv* env, jobject thiz, jboolean champ, jboolean ntscCover, jboolean joystick, jint levelIn, jfloat player, jfloat enemy) {
+	championship = (bool)champ;
 
 	if (championship) {
 		levelFileName = "Level/ChampionshipLevels.txt";
 	}
 
-	usCover = (bool) ntscCover;
-    startingLevel = (unsigned int) levelIn;
+	usCover = (bool)ntscCover;
+	startingLevel = (unsigned int)levelIn;
 
-	Enemy::setPlayerSpeed((float) player);
-	Enemy::setEnemySpeed((float) enemy);
+	Enemy::setPlayerSpeed((float)player);
+	Enemy::setEnemySpeed((float)enemy);
 }
 
 JNIEXPORT void JNICALL
-Java_com_mpm_lodeRunner_GameActivity_processJoystick( JNIEnv* env, jobject thiz, jint jangle, jint jstrength) {
-    int angle = (int) jangle;
-    int strength = (int) jstrength;
+Java_com_mpm_lodeRunner_GameActivity_processJoystick(JNIEnv* env, jobject thiz, jint jangle, jint jstrength) {
+	int angle = (int)jangle;
+	int strength = (int)jstrength;
 
-    const int threshold = 30;
-    const int outerAngle = 20;
+	const int threshold = 30;
+	const int outerAngle = 20;
 
-    if (strength > threshold) {
-        rightButton.detectAlter(angle < 45 + outerAngle || angle > 315 - outerAngle);
-        up.detectAlter(45 - outerAngle < angle && angle < 135 + outerAngle);
-        leftButton.detectAlter(135 - outerAngle < angle && angle < 225 + outerAngle);
-        down.detectAlter(225 - outerAngle < angle && angle < 315 + outerAngle);
-    }
-    else {
-        rightButton.detectAlter(false);
-        up.detectAlter(false);
-        leftButton.detectAlter(false);
-        down.detectAlter(false);
-    }
+	if (strength > threshold) {
+		rightButton.detectAlter(angle < 45 + outerAngle || angle > 315 - outerAngle);
+		up.detectAlter(45 - outerAngle < angle&& angle < 135 + outerAngle);
+		leftButton.detectAlter(135 - outerAngle < angle&& angle < 225 + outerAngle);
+		down.detectAlter(225 - outerAngle < angle&& angle < 315 + outerAngle);
+	}
+	else {
+		rightButton.detectAlter(false);
+		up.detectAlter(false);
+		leftButton.detectAlter(false);
+		down.detectAlter(false);
+	}
 }
 #else
 std::string levelFileName = "Assets/Level/OriginalLevels.txt";
 
 void processInput(GLFWwindow* window) {
+	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+
+// currently only glfw 3.2 builds with emscripten which does not support controllers 
+#ifdef __EMSCRIPTEN__
+	leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+	rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+	up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
+	down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
+	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
+	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+	space.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);	
+#else 
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
-#ifndef RELEASE_VERSION
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}	
+	leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5);
+	rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5);
+	up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5);
+	down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5);
+	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
+	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
+	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
+	space.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
+
+	pButton.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+	lAlt.detect(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS);
+
+	REC.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
 #endif
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5) {
-		leftButton.detect(1);
-	}
-
-	else {
-		leftButton.detect(0);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5) {
-		rightButton.detect(1);
-	}
-	else {
-		rightButton.detect(0);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5) {
-		up.detect(1);
-	}
-	else {
-		up.detect(0);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5) {
-		down.detect(1);
-	}
-	else {
-		down.detect(0);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		REC.detect(1);
-	}
-	else {
-		REC.detect(0);
-	}
 #ifndef  RELEASE_VERSION
 	float enemySpeed = 0.415f;
 	float speed = GameTime::getSpeed();
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
 		debugPos[0].x = -enemySpeed * speed;
@@ -164,48 +154,6 @@ void processInput(GLFWwindow* window) {
 		debugPos[1].y = -enemySpeed * speed;
 	}
 #endif // ! RELEASE_VERSION
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0) {
-		rightDigButton.detect(1);
-	}		
-	else {
-		rightDigButton.detect(0);
-	}	
-
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0) {
-		leftDigButton.detect(1);
-	}		
-	else {
-		leftDigButton.detect(0);
-	}		
-
-	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS) {
-		enter.detect(1);
-	}		
-	else {
-		enter.detect(0);
-	}		
-
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS) {
-		space.detect(1);
-	}		
-	else {
-		space.detect(0);
-	}		
-
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-		pButton.detect(1);
-	}		
-	else {
-		pButton.detect(0);
-	}		
-
-	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
-		lAlt.detect(1);
-	}		
-	else {
-		lAlt.detect(0);
-	}	
 }
 
 std::map<std::string, std::string> configMap;
@@ -299,7 +247,7 @@ void loadConfig() {
 	switch (levelSet) {
 	case 1:
 		levelFileName = "Assets/Level/ChampionshipLevels.txt";
-		championship = true;
+		gameVersion = 1;
 		break;
 	default:
 		levelFileName = "Assets/Level/OriginalLevels.txt";

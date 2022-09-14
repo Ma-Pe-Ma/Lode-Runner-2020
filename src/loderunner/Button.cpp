@@ -1,4 +1,5 @@
 #include "Button.h"
+#include <iostream>
 
 void Button::setDebounceTime(float time) {
 	debounceTime = time;
@@ -12,26 +13,29 @@ void Button::detect(bool physPush) {
 	if (physPush) {
 		if (!pushed) {
 			pushed = true;
-			pushStartTime = ((float)clock() / CLOCKS_PER_SEC);
+			pushStartTime = ((float) clock() / CLOCKS_PER_SEC);
 		}
 	}
-
+	//handling debounce short time after starting pushing!s
 	else {
-		if (((float)clock() / CLOCKS_PER_SEC) <= pushStartTime + debounceTime)
+		if (((float) clock() / CLOCKS_PER_SEC) <= pushStartTime + debounceTime) {
 			pushed = true;
-		else
+		}			
+		else {
 			pushed = false;
+		}			
 	}
 
-	if (prevState && !pushed)
+	if (prevState && !pushed) {
 		release = true;
+	}		
 
 	prevState = pushed;
 }
 
 void Button::detectAlter(bool physPush) {
 	if (physPush) {
-		pushStartTime = ((float)clock() / CLOCKS_PER_SEC);
+		pushStartTime = ((float) clock() / CLOCKS_PER_SEC);
 	}
 
 	pushed = physPush;
@@ -48,24 +52,22 @@ bool Button::simple() {
 	if (change) {
 		simplePushed = true;
 		change = false;
-		return 0;
+		return false;
 	}
 
 	if (pushed && !simplePushed) {
 		simplePushed = true;
-		return 1;
-
+		return true;
 	}
 	else if (pushed && simplePushed) {
-		return 0;
-
+		return false;
 	}
 	else if (!pushed) {
 		simplePushed = false;
-		return 0;
+		return false;
 	}
 
-	return 0;
+	return false;
 }
 
 bool Button::impulse()
@@ -78,32 +80,35 @@ bool Button::impulse()
 	}
 
 	if (change) {
-		if (!pushed) change = false;
-		return 0;
+		if (!pushed) {
+			change = false;
+		}
+		return false;
 	}
 
 	if (pushed && !impulsePushed)
 	{
 		impulsePushed = true;
 		impulseChange = false;
-		return 1;
+		return true;
 	}
 	else if (pushed && impulsePushed) {
 		int time = int((((float)clock() / CLOCKS_PER_SEC) - pushStartTime) / impulseTime);
 
 		if (time % 2 != impulseChange) {
 			impulseChange = !impulseChange;
-			return 1;
+			return true;
 		}
-		else
-			return 0;
+		else {
+			return false;
+		}			
 	}
 	else if (!pushed) {
 		impulsePushed = false;
-		return 0;
+		return false;
 	}
 
-	return 0;
+	return false;
 }
 
 bool Button::continuous()
@@ -116,17 +121,19 @@ bool Button::continuous()
 	}
 
     if (change)	{
-		if (!pushed) change = false;
-		return 0;
+		if (!pushed) {
+			change = false;
+		}
+		return false;
 	}
 
 	if (pushed) {
 		continuousPushed = true;
-		return 1;
+		return true;
 	}
 	else {
 		continuousPushed = false;
-		return 0;
+		return false;
 	}
 	return false;
 }
@@ -140,51 +147,50 @@ bool Button::fastening() {
 	}
 
 	if (change) {
-		if (!pushed)
+		if (!pushed) {
 			change = false;
-		return 0;
+		}
+
+		return false;
 	}
 
 	if (pushed && !fasteningPushed) {
 		fasteningPushed = true;
 		fasteningTime = 2.0;			// TODO: This should be customized by user!
 		fasteningRef = pushStartTime;
-		return 1;
+		return true;
 	}
 	else if (pushed && fasteningPushed) {
 		int time = int((((float)clock() / CLOCKS_PER_SEC) - fasteningRef) / fasteningTime);
 
 		if (time % 2 == 1) {
-
 			fasteningRef += fasteningTime;
 
-			if (fasteningTime * 0.75 < 0.10)
+			if (fasteningTime * 0.75 < 0.10) {
 				fasteningTime = 0.05f;
-			else
+			}				
+			else {
 				fasteningTime *= 0.75;
-			return 1;
+			}
+				
+			return true;
 		}
-		else
-			return 0;
-
+		else {
+			return false;
+		}
 	}
 	else if (!pushed) {
 		fasteningPushed = false;
-		return 0;
+		return false;
 	}
 
-	return 0;
+	return false;
 }
 
 bool Button::released() {
-	if (release)
-		return true;
-	return false;
+	return release;
 }
 
 bool Button::isPushed() {
-	if (pushed)
-		return true;
-
-	return false;
+	return pushed;
 }

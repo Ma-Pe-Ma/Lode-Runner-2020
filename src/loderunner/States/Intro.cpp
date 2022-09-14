@@ -20,7 +20,7 @@ void Intro::start() {
 		stateContext->level[stateContext->playerNr] = 1;
 	}
 	else {
-		if (championship) {
+		if (gameVersion == 1) {
 			if(stateContext->level[stateContext->playerNr] > 51) {
 				stateContext->level[stateContext->playerNr] = 1;
 			}
@@ -71,7 +71,7 @@ void Intro::start() {
 	//save starting level
 	std::string line;
 
-#ifndef ANDROID_VERSION
+#if !defined ANDROID_VERSION && !defined __EMSCRIPTEN__
 	std::ifstream configFileOld;
 	std::ofstream configFileNew;
 	configFileOld.open("config.txt");
@@ -108,7 +108,7 @@ void Intro::start() {
 
 	remove("config.txt");
 	rename("config_temp.txt", "config.txt");
-#else
+#elif defined ANDROID_VERSION
 	ndk_helper::JNIHelper* jniHelper = ndk_helper::JNIHelper::GetInstance();
 	jniHelper->setLastLevel(stateContext->level[stateContext->playerNr]);
 #endif
@@ -116,7 +116,7 @@ void Intro::start() {
 
 void Intro::update(float currentFrame) {
 	Drawing::textWriting(levelName, 8, 12);
-	if (!championship) {
+	if (gameVersion == 0) {
 		Drawing::textWriting(playerName, 12, 6);
 	}
 

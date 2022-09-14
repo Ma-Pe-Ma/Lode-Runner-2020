@@ -71,6 +71,8 @@ void Enemy::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** bri
 Enemy::Enemy(float x, float y) {
 	this->pos = { x, y };
 	this->prevPos = this->pos;
+	this->dPos = { 0.0f, 0.0f };
+	this->dPrevPos = { 0.0f, 0.0f };
 
 	direction = Direction::right;
 	pitState = PitState::fallingToPit;
@@ -93,6 +95,10 @@ void Enemy::notifyPlayerAboutDigEnd() {
 void Enemy::clearEnemyVector() {
 	enemies.clear();
 	killCounter = 0;
+}
+
+void Enemy::updateCharSpeed() {
+	this->charSpeed = enemySpeed;
 }
 
 bool Enemy::checkDigPrevention(int x, int y) {

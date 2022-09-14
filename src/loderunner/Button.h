@@ -7,16 +7,16 @@
 class Button {
 	private:
 		std::atomic_bool pushed{false};
-		float pushStartTime;
+		float pushStartTime = ((float) clock() / CLOCKS_PER_SEC);
 		float debounceTime = 0.05f;
 		bool prevState = false;
 
-		bool simplePushed;
-		bool impulsePushed;
-		bool continuousPushed;
-		bool fasteningPushed;
+		bool simplePushed = false;
+		bool impulsePushed = false;
+		bool continuousPushed = false;
+		bool fasteningPushed = false;
 		
-		bool impulseChange;
+		bool impulseChange = false;
 		float impulseTime = 0.1f;
 		
 		float fasteningTime;
@@ -37,7 +37,7 @@ class Button {
 		void setImpulseTime(float);
 		
 		bool isPushed();
-		bool released();		
+		bool released();
 };
 
 #endif
