@@ -26,7 +26,7 @@ void MainMenu::update(float currentFrame) {
 	}
 
 	//Drawing main menu
-	if (championship) {
+	if (gameVersion == 1) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else {
@@ -54,12 +54,12 @@ void MainMenu::update(float currentFrame) {
 		}
 	}
 
-	if (championship) {
+	if (gameVersion == 1) {
 		stateContext->menuCursor = 0;
 	}
 
 	//drawing cursor
-	if (!championship) {
+	if (gameVersion == 0) {
 		glBindVertexArray(GLHelper::cursorVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, GLHelper::cursorVBO);
 		float cursorY = (1.0f - 2 * stateContext->menuCursor) / 14;

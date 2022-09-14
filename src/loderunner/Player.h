@@ -39,6 +39,7 @@ public:
 	Player(float, float);
 	void die() override;
 	void dying() override;
+	void updateCharSpeed() override;
 };
 
 #endif

@@ -4,7 +4,12 @@
 #ifdef ANDROID_VERSION
 
 #else
+#if defined __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#include <emscripten/emscripten.h>
+#else 
 #include <glad/glad.h>
+#endif
 #include <GLFW/glfw3.h>
 #include <string>
 #endif
@@ -15,10 +20,10 @@
 #include "Enemy.h"
 #include "GameTime.h"
 
-extern Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt;
+extern Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt, configButton;
 extern std::string levelFileName;
 
-extern bool championship;
+extern int gameVersion;
 extern bool usCover;
 extern unsigned int startingLevel;
 extern unsigned int recordingHeight;

@@ -13,6 +13,12 @@
 #include <RtAudio.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
+
+
 #ifdef VIDEO_RECORDING
 #include "MultiMediaRecording/MultiMedia.h"
 #endif
@@ -26,7 +32,6 @@ class Audio {
 
 private:
 	AudioStatus playStatus;
-	int index;
 
 public:
 	static Audio sfx[];
@@ -42,9 +47,22 @@ public:
     void closeSoundFile();
 	AudioStatus getPlayStatus();
 
+#ifdef __EMSCRIPTEN__
+
+	ALint state = AL_STOPPED;
+	ALuint aBuffer;
+	ALuint source = -1;	
+
+	static ALCdevice* device;
+	static ALCcontext* openALContext;
+
+	static void initializeOpenAL();
+
+	double lengthInSecs = 0;
+
+#endif
 	long readNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]);
 
-	Audio(int, const char*);
 	Audio(const char*);
 	Audio() {}
 
@@ -57,6 +75,7 @@ public:
 #else
 	static int rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData);
 #endif
+
 
 #ifdef VIDEO_RECORDING
 	static MultiMedia* multiMedia;

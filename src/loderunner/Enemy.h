@@ -53,17 +53,13 @@ private:
 	Brick* holeBrick = nullptr;
 	
 protected:
-	static unsigned int killCounter;
-	static float playerSpeed;
-	static float enemySpeed;
+	static unsigned int killCounter;	
 	
 	static LayoutBlock** layout;
 	static std::unique_ptr<Brick>** brickO;
 	static std::unique_ptr<Trapdoor>** trapdoors;
 	static Play* play;
 	static float gameTime;
-	
-	static std::unique_ptr<Enemy> player;
 
 	inline void determineDirection();
 	void determineNearbyObjects();
@@ -125,6 +121,8 @@ protected:
 	PitState pitState;
 public:
 	virtual ~Enemy() {}
+
+	static std::unique_ptr<Enemy> player;
 	static std::vector<std::unique_ptr<Enemy>> enemies;
 	static void clearEnemyVector();
 	static void addEnemy(Vector2DInt);
@@ -146,10 +144,15 @@ public:
 	Vector2D dPos;
 	Vector2D prevPos;
 	Vector2D dPrevPos;
+	
+	virtual void updateCharSpeed();
 
 	static void setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>**, std::unique_ptr<Trapdoor>**, Play*);
 	static void notifyPlayerAboutDigEnd();
 	static bool hasGold();
+
+	static float enemySpeed;
+	static float playerSpeed;
 
 	static void setPlayerSpeed(float);
 	static void setEnemySpeed(float);

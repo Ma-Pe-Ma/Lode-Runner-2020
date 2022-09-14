@@ -6,7 +6,12 @@
 #ifdef ANDROID_VERSION
 
 #else
-#include <glad/glad.h>
+#if defined __EMSCRIPTEN__
+	#include <GLES3/gl3.h>
+	#include <emscripten/emscripten.h>
+#else 
+	#include <glad/glad.h>
+#endif
 #include <GLFW/glfw3.h>
 #endif
 

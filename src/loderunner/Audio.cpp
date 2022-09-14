@@ -23,21 +23,57 @@ MultiMedia* Audio::multiMedia;
 #endif
 
 void Audio::playPause() {
+#ifdef __EMSCRIPTEN__
+	alGetSourcei(source, AL_SOURCE_STATE, &state);
+
+	if (state == AL_PLAYING) {
+		alSourcePause(source);
+	}
+	else {
+		alSourcePlay(source);
+	}
+
+#else 
 	if (playStatus == AudioStatus::playing) {
 		playStatus = AudioStatus::paused;
 	}
 	else {
 		playStatus = AudioStatus::playing;
-	}		
+	}
+#endif
 }
 
 void Audio::stopAndRewind() {
+	
+#ifdef __EMSCRIPTEN__
+	alSourceStop(source);
+#else
 	playStatus = AudioStatus::stopped;
 	ov_pcm_seek(sound, 0);
+#endif
 }
 
 AudioStatus Audio::getPlayStatus() {
+#ifdef __EMSCRIPTEN__
+	alGetSourcei(source, AL_SOURCE_STATE, &state);
+
+	if (state == AL_PLAYING) {
+		return AudioStatus::playing;
+	}
+
+	if (state == AL_PAUSED) {
+		return AudioStatus::paused;
+	}
+
+	if (state == AL_STOPPED || state == AL_INITIAL) {
+		return AudioStatus::stopped;
+	}
+
+	return AudioStatus::stopped;
+
+#else
 	return playStatus;
+#endif // __EMSCRIPTEN__
 }
 
 Audio::Audio(const char* fileName) {
@@ -45,14 +81,12 @@ Audio::Audio(const char* fileName) {
 	playStatus = AudioStatus::stopped;
 }
 
-Audio::Audio(int indexIn, const char* fileName) {
-	index = indexIn;
-	openSoundFile(fileName);
-	playStatus = AudioStatus::stopped;
-}
-
 double Audio::lengthInSec() {
+#ifdef __EMSCRIPTEN__
+	return lengthInSecs;
+#else
 	return ov_time_total(sound, -1);
+#endif
 }
 
 long Audio::readNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]) {
@@ -62,15 +96,51 @@ long Audio::readNextBuffer(char(&pcmChar)[FRAMES_PER_BUFFER * CHANNEL_COUNT * 2]
 void Audio::openSoundFile(const char* fileName) {
 	sound = new OggVorbis_File;
 	ov_fopen(fileName, sound);
+
+#ifdef __EMSCRIPTEN__
+	vorbis_info* soundInfo = ov_info(sound, -1);
+	ogg_int64_t total = ov_pcm_total(sound, -1) * soundInfo->channels * 2;
+
+	ALenum format = (soundInfo->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+	ALsizei freq = soundInfo->rate;
+
+	short* pcmout = new short[total];
+
+	for (size_t size = 0, offset = 0, sel = 0;
+			(size = ov_read(sound, (char*)pcmout + offset, 4096, 0, 2, 1, (int*)&sel)) != 0;
+			offset += size) {
+		if (size < 0) {
+			std::cout << "Corrupted file: " << fileName;
+		}
+	}
+
+	alGenBuffers(1, &aBuffer);
+	alBufferData(aBuffer, format, pcmout, total, freq);
+	delete[] pcmout;
+
+	alGenSources(1, &source);
+	alSourcei(source, AL_BUFFER, aBuffer);
+
+	alSourcef(source, AL_GAIN, 0.05f);
+
+	lengthInSecs = ov_time_total(sound, -1);
+
+	ov_clear(sound);
+#endif
 }
 
 void Audio::closeSoundFile() {
+#ifdef __EMSCRIPTEN__
+	alDeleteSources(1, &source);
+	alDeleteBuffers(1, &aBuffer);
+#else
 	ov_clear(sound);
+#endif
 }
 
 void Audio::openAudioFiles(const std::string soundNames[SOUND_FILE_NR]) {
 	for (int i = 0; i < SOUND_FILE_NR; i++) {
-		sfx[i] = Audio(i, soundNames[i].c_str());
+		sfx[i] = Audio(soundNames[i].c_str());
 	}		
 }
 
@@ -83,7 +153,40 @@ void Audio::closeAudioFiles() {
 	managedStream->close();
 	delete audioCallback;
 #endif
+
+#ifdef __EMSCRIPTEN__
+	ALCboolean contextMadeCurrent = false;
+	alcMakeContextCurrent(nullptr);
+
+	alcDestroyContext(openALContext);
+
+	ALCboolean closed;
+	alcCloseDevice(device);
+#endif 
 }
+
+#ifdef __EMSCRIPTEN__
+ALCdevice* Audio::device;
+ALCcontext* Audio::openALContext;
+
+void Audio::initializeOpenAL() {
+	device = alcOpenDevice(NULL);
+	if (!device) {
+		std::cout << "DEVICE NULL" << std::endl;
+		return;
+	}
+
+	openALContext = alcCreateContext(device, NULL);
+	if (!openALContext) {
+		std::cout << "CONTEXT NULL" << std::endl;
+	}
+
+	ALCboolean contextMadeCurrent = false;
+	if (!alcMakeContextCurrent(openALContext)) {
+		std::cout << "CONTEXT CURRENT FAIL" << std::endl;
+	}
+}
+#endif
 
 #ifdef ANDROID_VERSION
 oboe::ManagedStream Audio::managedStream;
@@ -118,6 +221,8 @@ void Audio::initializeAudioStream(AudioCallback* audioCallback1) {
 	managedStream->requestStart();
 }
 #else
+
+#ifndef __EMSCRIPTEN__
 
 int Audio::rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
 	short* out = (short*)outputBuffer;
@@ -163,5 +268,7 @@ int Audio::rtAudioVorbis(void* outputBuffer, void* inputBuffer, unsigned int nBu
 
 	return 0;
 }
+
+#endif
 
 #endif // ANDROID_VERSION

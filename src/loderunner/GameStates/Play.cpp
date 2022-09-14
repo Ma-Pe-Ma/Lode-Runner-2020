@@ -300,7 +300,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 #endif
 	//my level ending conditions are different than the original, in most levels it's OK apart from this:
 	//original conditions check if player is at the highest block or not
-	if (gamePlay->stateContext->level[gamePlay->stateContext->playerNr] == 115 && !championship) {
+	if (gamePlay->stateContext->level[gamePlay->stateContext->playerNr] == 115 && gameVersion == 0) {
 		highestLadder--;
 	}
 }

@@ -1,5 +1,7 @@
 # Note: in VS you have to set the "currentDir" : "${workspaceRoot}" key-value inside the executable's debug configuration 
-# Without this the dlls and the assets/resrc/loderunner are not found when running the app while developing
+# Without this the dlls and the assets/resources are not found when running the app while developing
+
+# to build emscripten version: emcmake cmake -B./out/build/wasm -G "Ninja"
 
 cmake_minimum_required (VERSION 3.20)
 
@@ -37,39 +39,75 @@ add_executable(LodeRunner
 	"src/loderunner/GameStates/Pause.cpp"
 	"src/loderunner/GameStates/Play.cpp"
 
-	"src/submodules/glad.c"
+	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
+	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"
+	"src/submodules/imgui/imgui.cpp"
+	"src/submodules/imgui/imgui_draw.cpp"
+	"src/submodules/imgui/imgui_tables.cpp"
+	"src/submodules/imgui/imgui_widgets.cpp"
 )
 
 # build external libraries
-add_subdirectory("src/submodules/glfw")
-add_subdirectory("src/submodules/ogg")
-add_subdirectory("src/submodules/vorbis")
-add_subdirectory("src/submodules/rtaudio")
+add_subdirectory("${CMAKE_SOURCE_DIR}/src/submodules/ogg")
+add_subdirectory("${CMAKE_SOURCE_DIR}/src/submodules/vorbis")
 
 # Add include search paths for the application
 target_include_directories(LodeRunner PRIVATE
-	"${CMAKE_SOURCE_DIR}/src/loderunner"
-	"${CMAKE_SOURCE_DIR}/src/submodules/"
-	"${CMAKE_SOURCE_DIR}/src/submodules/stb/"
-	"${CMAKE_SOURCE_DIR}/src/submodules/rtaudio/"
-	"${CMAKE_SOURCE_DIR}/src/submodules/ogg/include/"
-	"${CMAKE_SOURCE_DIR}/src/submodules/vorbis/include/"
+	"src/loderunner"
+	"src/submodules/"
+	"src/submodules/stb/"
+	"src/submodules/rtaudio/"
+	"src/submodules/ogg/include/"
+	"src/submodules/vorbis/include/"
+	"src/submodules/imgui/"
+	"src/submodules/glfw/include"
 )
 
 # link libraries with the app
 target_link_libraries(LodeRunner PRIVATE
-	glfw
 	ogg
 	vorbis
 	vorbisenc
 	vorbisfile
-	rtaudio
 )
+
+if(EMSCRIPTEN)
+	# generate html file
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	
+	# configure opengl context + pthreads
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sLLD_REPORT_UNDEFINED\
+		-s USE_GLFW=3 -sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2 \
+		-pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=4 -sALLOW_MEMORY_GROWTH
+		-lopenal
+		"
+	)
+
+	set_target_properties(LodeRunner
+		PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/Assets@/Assets/ "
+	)
+
+	target_compile_options(LodeRunner
+		PUBLIC "-pthread;-sUSE_PTHREADS=1;-sPTHREAD_POOL_SIZE=4;-sALLOW_MEMORY_GROWTH=1;"	
+	)	
+else()
+	add_subdirectory("src/submodules/glfw")
+	add_subdirectory("src/submodules/rtaudio")
+
+	target_sources(LodeRunner
+		PUBLIC "src/submodules/glad.c"
+	)
+
+	target_link_libraries(LodeRunner PRIVATE
+		glfw
+		rtaudio
+	)
+endif()
 
 # setting project for video recording
 # currently not working as ffmpeg update broke some functionalites (some members became const)
 # earlier only Windows build was tested
-set(VIDEO_RECORDING FALSE)
+option(VIDEO_RECORDING "Build with video recording capabilites" OFF)
 
 # download libraries from https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z and unpack it to ./src/submodules/ffmpeg
 if (VIDEO_RECORDING AND WIN32)
@@ -110,11 +148,11 @@ if (VIDEO_RECORDING AND WIN32)
 
 	# copy the dlls to working directory
 	foreach(copyable_dll IN LISTS copyable_dlls)
-		if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${copyable_dll}.${extension}")
-			message("Copying ${copyable_dll} ...")
+		if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${copyable_dll}.${dll_extension}")
+			message(STATUS "Copying ${copyable_dll} ...")
 			file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/submodules/ffmpeg/bin/${copyable_dll}.${dll_extension}" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
 		else()
-			message("DLL ${copyable_dll} already copied.")
+			message(STATUS "DLL ${copyable_dll} already copied.")
 		endif()
 	endforeach()
 endif()

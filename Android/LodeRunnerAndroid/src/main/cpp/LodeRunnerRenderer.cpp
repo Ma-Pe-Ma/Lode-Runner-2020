@@ -10,10 +10,8 @@
 
 void LodeRunnerRenderer::Initialize() {
     std::string mainMenuTextureName = "Texture/MainMenu.png";
-    if (championship) {
-        mainMenuTextureName = "Texture/Championship.png";
-    }
-    else if (usCover) {
+    
+    if (usCover) {
         mainMenuTextureName = "Texture/MainMenuU.png";
     }
 

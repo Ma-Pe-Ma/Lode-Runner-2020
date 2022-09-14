@@ -1,4 +1,4 @@
-#version 450 core
+
 out vec4 FragColor;
 
 in vec2 TexCoord;
@@ -15,7 +15,7 @@ void main() {
 		texColor = texture(textureA, TexCoord);
 	}		
 	else {
-		texColor = texture(textureA, vec2(-TexCoord.x + 2 * ref + 1.0 / 12, TexCoord.y));
+		texColor = texture(textureA, vec2(-TexCoord.x + 2.0 * ref + 1.0 / 12.0, TexCoord.y));
 	}		
 	
 	if(texColor.r < 0.01 && texColor.g < 0.01 && texColor.b < 0.01) {
@@ -23,7 +23,7 @@ void main() {
 	}
 	
 	if(carryGold) {
-		if(texColor.r == 112.0/255 && texColor.g == 224.0/255 && texColor.b == 144.0/255) {
+		if(texColor.r == 112.0/255.0 && texColor.g == 224.0/255.0 && texColor.b == 144.0/255.0) {
 			texColor.b = 1.0;
 		}
 	}		
