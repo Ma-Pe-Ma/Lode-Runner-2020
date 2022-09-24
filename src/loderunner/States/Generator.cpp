@@ -7,13 +7,13 @@
 #include "States/StateContext.h"
 
 LayoutBlock** Generator::layout;
-std::unique_ptr <Brick>** Generator::brickO;
+std::unique_ptr <Brick>** Generator::brick;
 std::unique_ptr<Trapdoor>** Generator::trapdoors;
 Play* Generator::play;
 
-void Generator::setLayoutPointers(LayoutBlock** layout, std::unique_ptr <Brick>** brickO, std::unique_ptr <Trapdoor>** trapdoors, Play* play) {
+void Generator::setLayoutPointers(LayoutBlock** layout, std::unique_ptr <Brick>** brick, std::unique_ptr <Trapdoor>** trapdoors, Play* play) {
 	Generator::layout = layout;
-	Generator::brickO = brickO;
+	Generator::brick = brick;
 	Generator::trapdoors = trapdoors;
 	Generator::play = play;
 }
@@ -131,8 +131,13 @@ void Generator::update(float currentFrame) {
 	//drawing generator elements
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 17; j++) {
-			int ref = textureMap[gen[i][j]];
-			Drawing::drawLevel(i, j, ref);
+			int layoutType = gen[i][j];
+			
+			if (layoutType == 0) {
+				continue;
+			}
+
+			Drawing::drawLevel(i, j, textureMap[layoutType]);
 		}
 	}
 	
@@ -143,29 +148,29 @@ void Generator::update(float currentFrame) {
 
 		for (int i = 0; i < 30; i++) {
 			for (int j = 0; j < 17; j++) {
-				brickO[i][j].reset();
+				brick[i][j].reset();
 				trapdoors[i][j].reset();
 
-				Vector2DInt Pos = { i,j };
+				Vector2DInt pos = { i, j };
 				if (gen[i][j] == 1) {
-					brickO[i][j].reset(new Brick(Pos));
+					brick[i][j].reset(new Brick(pos));
 				}
 				else if (gen[i][j] == 5) {
-					trapdoors[i][j].reset(new Trapdoor(Pos));
+					trapdoors[i][j].reset(new Trapdoor(pos));
 				}
 				else if (gen[i][j] == 6) {
-					finisihingLadders.push_back(Pos);
+					finisihingLadders.push_back(pos);
 				}
 				else if (gen[i][j] == 7) {
-					std::unique_ptr<Gold> gold(new Gold(Pos));
+					std::unique_ptr<Gold> gold(new Gold(pos));
 					Gold::addGoldToUncollected(std::move(gold));
 				}
 				else if (gen[i][j] == 8) {
-					Enemy::addEnemy(Pos);
+					Enemy::addEnemy(pos);
 				}
 				else if (gen[i][j] == 9) {
 					if (!playerPresent) {
-						Player::addPlayer(Pos);
+						Player::addPlayer(pos);
 						playerPresent = true;
 					}
 				}
@@ -183,8 +188,8 @@ void Generator::update(float currentFrame) {
 
 				for (int i = 1; i < 30; i++) {
 					if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
-						Vector2DInt Pos = { i,j };
-						Player::addPlayer(Pos);
+						Vector2DInt pos = { i, j };
+						Player::addPlayer(pos);
 						playerPresent = true;
 						break; 
 					}
@@ -197,7 +202,7 @@ void Generator::update(float currentFrame) {
 
 			play->setLadders(highestLadder, finisihingLadders);
 			stateContext->transitionTo(stateContext->gamePlay);
-		}		
+		}
 	}
 }
 

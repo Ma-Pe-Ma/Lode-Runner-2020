@@ -9,8 +9,8 @@
 
 class Play : public GameState {
 private:
-	//std::unique_ptr<Brick> brickO[30][18];
-	std::unique_ptr<Brick>** brickO = nullptr;
+	//std::unique_ptr<Brick> brick[30][18];
+	std::unique_ptr<Brick>** brick = nullptr;
 	std::unique_ptr<Trapdoor>** trapdoors = nullptr;
 	LayoutBlock** layout = nullptr;	
 	

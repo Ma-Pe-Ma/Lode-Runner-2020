@@ -13,18 +13,18 @@
 
 Play::Play() {
 	layout = new LayoutBlock*[30];
-	brickO = new std::unique_ptr<Brick>*[30];
+	brick = new std::unique_ptr<Brick>*[30];
 	trapdoors = new std::unique_ptr<Trapdoor>*[30];
 
 	for (int i = 0; i < 30; i++) {
 		layout[i] = new LayoutBlock[18]{};
-		brickO[i] = new std::unique_ptr<Brick>[18];
+		brick[i] = new std::unique_ptr<Brick>[18];
 		trapdoors[i] = new std::unique_ptr<Trapdoor>[18];
 	}
 
-	Enemy::setLayoutPointers(layout, brickO, trapdoors, this);
-	Brick::setLayoutPointers(layout, brickO);
-	Generator::setLayoutPointers(layout, brickO, trapdoors, this);
+	Enemy::setLayoutPointers(layout, brick, trapdoors, this);
+	Brick::setLayoutPointers(layout, brick);
+	Generator::setLayoutPointers(layout, brick, trapdoors, this);
 }
 
 void Play::start() {
@@ -121,8 +121,8 @@ void Play::drawLevel() {
 
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 18; j++) {
-			if (brickO[i][j]) {
-				brickO[i][j]->handle(gameTime);
+			if (brick[i][j]) {
+				brick[i][j]->handle(gameTime);
 			}
 			//if layout is empty do nothing
 			else if (layout[i][j] == LayoutBlock::empty);
@@ -212,7 +212,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 			}
 			else {
 				for (int i = 0; i < 30; i++) {
-					brickO[i][17 - rowCounter].reset();
+					brick[i][17 - rowCounter].reset();
 					trapdoors[i][17 - rowCounter].reset();
 					//level elements
 					if (row[i] == '#') {
@@ -221,7 +221,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 						pos.y = 17 - rowCounter;
 
 						layout[i][17 - rowCounter] = LayoutBlock::brick;
-						brickO[i][17 - rowCounter].reset(new Brick(pos));
+						brick[i][17 - rowCounter].reset(new Brick(pos));
 					}
 					else if (row[i] == '@' || row[i] == '"') {
 						layout[i][17 - rowCounter] = LayoutBlock::concrete;

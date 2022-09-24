@@ -18,7 +18,7 @@ private:
 	std::map<int, LayoutBlock> layoutMap;
 	
 	static LayoutBlock** layout;
-	static std::unique_ptr<Brick>** brickO;
+	static std::unique_ptr<Brick>** brick;
 	static std::unique_ptr<Trapdoor>** trapdoors;
 	static Play* play;
 

@@ -14,7 +14,7 @@ enum BrickState {
 
 class Brick {
 private:
-	static std::unique_ptr<Brick>** brickO;
+	static std::unique_ptr<Brick>** brick;
 	static LayoutBlock** layout;
 	Vector2DInt position;
 	float timer;
