@@ -73,7 +73,7 @@ To use video recording capabilites [FFMPEG](https://ffmpeg.org/) (avformat, avut
 
 The game should compile without problems to WebAssemby build with Emscripten.
 
-## Controls:
+## Controls
 The game uses XInput API for controller handling.
 
 	Keyboard    	Controller	    Effect
@@ -117,14 +117,14 @@ For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
 To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.
 
 ### Hardware and software requirements
-Your graphics card has to support OpenGL 4.5 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
+Your graphics card has to support OpenGL 4.6 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
 
 ## Developer Notes
 This was my first complex project since I started programming. My earlier efforts were limited to calculate/solve math problems.
 
 I tested the game, I completed much of it but much of the code was rewritten so an other deep testing is needed.
 
-This was a good starting project as I learned a lot about programming and designing code.
+This was a good starting project as I learned a lot about programming and designing code while making it.
 
 I know that there are parts that are still badly implemented those parts will be fixed up sporadically as those are not high priorieties for me right now.
 
@@ -132,7 +132,7 @@ I know that there are parts that are still badly implemented those parts will be
 
 ### Desktop version
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lode Runner&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Championship Lode Runner
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lode Runner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Championship Lode Runner
 --- | ---
 ![](./Screenshots/Original.png) | ![](./Screenshots/Championship.png)
 ![](./Screenshots/Original-Gameplay.png) | ![](./Screenshots/Championship-Gameplay.png)
@@ -144,6 +144,8 @@ I know that there are parts that are still badly implemented those parts will be
 </p>
 
 ## Future tasks for this project:
+- Remake collision detection between enemies
+- Add demo scene + bonus fruits
 - Rewrite code to follow a C++ style guide, cleanup badly written parts
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.

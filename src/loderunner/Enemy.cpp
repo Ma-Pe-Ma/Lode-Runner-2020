@@ -10,7 +10,7 @@ std::unique_ptr<Enemy> Enemy::player;
 int Enemy::animationFactor = 20;
 LayoutBlock** Enemy::layout;
 Play* Enemy::play;
-std::unique_ptr<Brick>** Enemy::brickO;
+std::unique_ptr<Brick>** Enemy::brick;
 std::unique_ptr<Trapdoor>** Enemy::trapdoors;
 unsigned int Enemy::killCounter = 0;;
 float Enemy::playerSpeed = 0.9f;
@@ -61,9 +61,9 @@ bool Enemy::hasGold() {
 	return false;
 }
 
-void Enemy::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brickO, std::unique_ptr<Trapdoor>** trapdoors, Play* play) {
+void Enemy::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brick, std::unique_ptr<Trapdoor>** trapdoors, Play* play) {
 	Enemy::layout = layout;
-	Enemy::brickO = brickO;
+	Enemy::brick = brick;
 	Enemy::play = play;
 	Enemy::trapdoors = trapdoors;
 }
@@ -242,7 +242,7 @@ void Enemy::findPath() {
 
 			bool checkGold = Gold::goldChecker(x, y - 1);
 
-			if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole || /*belowCheckable == LayoutBlock::brick ||*/ brickO[x][y - 1] || belowCheckable == LayoutBlock::concrete
+			if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole || /*belowCheckable == LayoutBlock::brick ||*/ brick[x][y - 1] || belowCheckable == LayoutBlock::concrete
 				|| belowCheckable == LayoutBlock::ladder	|| enemyChecker(x, y - 1) || belowCheckable == LayoutBlock::pole || checkGold) {
 
 				//guard left to runner
@@ -304,7 +304,7 @@ void Enemy::scanFloor() {
 			break;
 		}
 
-		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick*/	|| brickO[x - 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick*/	|| brick[x - 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			--x;
 		}		
 		else {
@@ -324,7 +324,7 @@ void Enemy::scanFloor() {
 		if (checkable == LayoutBlock::brick || checkable == LayoutBlock::concrete) {
 			break;
 		}			
-		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick */ || brickO[x + 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick */ || brick[x + 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			++x;
 		}			
 		else {                                         // go on right anyway
@@ -345,7 +345,7 @@ void Enemy::scanFloor() {
 	//  3: up
 	//  4: down
 
-	if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+	if (/*belowCheckable != brick &&*/ !brick[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
 		scanDown(x, 4);
 	}		
 	if (checkable == LayoutBlock::ladder) {
@@ -370,7 +370,7 @@ void Enemy::scanFloor() {
 		checkable = layout[x][y];
 		belowCheckable = layout[x][y - 1];
 
-		if (/*belowCheckable != brick &&*/ !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+		if (/*belowCheckable != brick &&*/ !brick[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
 			scanDown(x, curPath);
 		}
 
@@ -419,16 +419,16 @@ void Enemy::scanDown(int x, int curPath) {
 
 	LayoutBlock belowCheckable = layout[x][y - 1];
 
-	while (y > 0 && (belowCheckable = layout[x][y - 1]) != LayoutBlock::brick && !brickO[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+	while (y > 0 && (belowCheckable = layout[x][y - 1]) != LayoutBlock::brick && !brick[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
 		bool checkGold = Gold::goldChecker(x, y);
 
 		//here is a problem, with champ 19?
-		if (layout[x][y] != LayoutBlock::empty || checkGold || brickO[x][y]) {
+		if (layout[x][y] != LayoutBlock::empty || checkGold || brick[x][y]) {
 			if (x > 1) {
 				LayoutBlock leftSideBelow = layout[x - 1][y - 1];
 				LayoutBlock leftSide = layout[x - 1][y];
 
-				if (leftSideBelow == LayoutBlock::brick || brickO[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
+				if (leftSideBelow == LayoutBlock::brick || brick[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -439,7 +439,7 @@ void Enemy::scanDown(int x, int curPath) {
 				LayoutBlock rightSideBelow = layout[x + 1][y - 1];
 				LayoutBlock rightSide = layout[x + 1][y];
 
-				if (rightSideBelow == LayoutBlock::brick || brickO[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
+				if (rightSideBelow == LayoutBlock::brick || brick[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -481,7 +481,7 @@ void Enemy::scanUp(int x, int curPath) {
 		LayoutBlock rightSide = layout[x + 1][y];
 
 		if (x > 1) {
-			if (/*leftSideBelow == brick ||*/ brickO[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
+			if (/*leftSideBelow == brick ||*/ brick[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -489,7 +489,7 @@ void Enemy::scanUp(int x, int curPath) {
 		}
 
 		if (x < 28) {
-			if (/*rightSideBelow == brick ||*/ brickO[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
+			if (/*rightSideBelow == brick ||*/ brick[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -888,8 +888,8 @@ void Enemy::initiateFallingStop() {
 }
 
 bool Enemy::checkHole() {
-	if (layout[curX][curY] == LayoutBlock::empty && brickO[curX][curY] && dPos.x == 0 && pos.y > curY) {
-		this->holeBrick = brickO[curX][curY].get();
+	if (layout[curX][curY] == LayoutBlock::empty && brick[curX][curY] && dPos.x == 0 && pos.y > curY) {
+		this->holeBrick = brick[curX][curY].get();
 		return true;
 	}
 
@@ -954,7 +954,7 @@ void Enemy::die() {
 		for (int i = 1; i < 29; i++) {
 			bool checkGold = Gold::goldChecker(i, vertical);
 
-			if (layout[i][vertical] == LayoutBlock::empty && !enemyChecker(i, vertical) && !checkGold && !brickO[i][vertical]) {
+			if (layout[i][vertical] == LayoutBlock::empty && !enemyChecker(i, vertical) && !checkGold && !brick[i][vertical]) {
 				nonEmptyBlocks.push_back(i);
 			}
 		}
@@ -1321,7 +1321,7 @@ void Enemy::checkGoldDrop() {
 				LayoutBlock prevBlock = layout[prevX][prevY];
 				LayoutBlock prevBlockUnder = layout[prevX][prevY - 1];
 
-				if (prevBlock == LayoutBlock::empty && !brickO[prevX][prevY] && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
+				if (prevBlock == LayoutBlock::empty && !brick[prevX][prevY] && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
 					carriedGold->setPos({ (float)prevX, (float)prevY });
 					Gold::addGoldToUncollected(std::move(carriedGold));
 				}

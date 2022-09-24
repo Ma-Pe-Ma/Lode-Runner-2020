@@ -51,7 +51,7 @@ void Player::findPath() {
 void Player::freeRun() {
 	//Check digging input
 	if (leftDigButton.impulse()) {
-		if (brickO[curX - 1][curY - 1] && brickO[curX - 1][curY -1]->initiateDig()) {
+		if (brick[curX - 1][curY - 1] && brick[curX - 1][curY -1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -62,7 +62,7 @@ void Player::freeRun() {
 	}
 	
 	if (rightDigButton.impulse()) {
-		if (brickO[curX + 1][curY - 1] && brickO[curX + 1][curY - 1]->initiateDig()) {
+		if (brick[curX + 1][curY - 1] && brick[curX + 1][curY - 1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;

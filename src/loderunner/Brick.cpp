@@ -4,12 +4,12 @@
 #include "GameTime.h"
 
 int Brick::randomDebris = 0;
-std::unique_ptr<Brick>** Brick::brickO;
+std::unique_ptr<Brick>** Brick::brick;
 LayoutBlock** Brick::layout;
 
-void Brick::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brickO) {
+void Brick::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brick) {
 	Brick::layout = layout;
-	Brick::brickO = brickO;
+	Brick::brick = brick;
 }
 
 Brick::Brick(Vector2DInt position) {

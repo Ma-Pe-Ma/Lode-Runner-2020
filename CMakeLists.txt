@@ -158,7 +158,7 @@ if (VIDEO_RECORDING AND WIN32)
 endif()
 
 # Release mode
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR EMSCRIPTEN)
 	add_definitions(-DRELEASE_VERSION)
 endif()
 
