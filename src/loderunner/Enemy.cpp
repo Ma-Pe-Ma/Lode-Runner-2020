@@ -10,8 +10,8 @@ std::unique_ptr<Enemy> Enemy::player;
 int Enemy::animationFactor = 20;
 LayoutBlock** Enemy::layout;
 Play* Enemy::play;
-std::unique_ptr<Brick>** Enemy::brick;
-std::unique_ptr<Trapdoor>** Enemy::trapdoors;
+std::shared_ptr<Brick>** Enemy::brick;
+std::shared_ptr<Trapdoor>** Enemy::trapdoors;
 unsigned int Enemy::killCounter = 0;;
 float Enemy::playerSpeed = 0.9f;
 float Enemy::enemySpeed = 0.415f;
@@ -61,7 +61,7 @@ bool Enemy::hasGold() {
 	return false;
 }
 
-void Enemy::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brick, std::unique_ptr<Trapdoor>** trapdoors, Play* play) {
+void Enemy::setLayoutPointers(LayoutBlock** layout, std::shared_ptr<Brick>** brick, std::shared_ptr<Trapdoor>** trapdoors, Play* play) {
 	Enemy::layout = layout;
 	Enemy::brick = brick;
 	Enemy::play = play;

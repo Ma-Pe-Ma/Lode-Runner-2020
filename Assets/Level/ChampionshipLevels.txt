@@ -252,7 +252,7 @@ var levelData2 = [
 "@H@H@@@@@@@@@@@H@H@@@H@H@@@S" +
 "@H@H H$H H$H H$H@H@H@H@H0H@S" +
 "@H@@@@@@@@@@@@@@@H@H@H@@@H@S" +
-"@H0H$H H@H H$H H$H@H$H H@H  ",
+"@H0H$H H@H H$H H$H@H$H H@H S",
 
 //======<<< Level 014 >>>======
 

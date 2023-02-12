@@ -160,7 +160,7 @@ namespace Drawing {
 		}
 	}
 
-	void drawLevel(float x, float y, int ref) {
+	/*void drawLevel(float x, float y, int ref) {
 		levelTextureMapping(ref);
 
 		GLHelper::levelShader->use();
@@ -171,7 +171,7 @@ namespace Drawing {
 		GLHelper::levelShader->setVec2("gPos", x, y);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
-	}
+	}*/
 
 	void drawEnemy(float x, float y, int ref, Direction direction, bool gold) {
 		bool dirToShader = true;

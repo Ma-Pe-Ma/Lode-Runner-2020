@@ -46,17 +46,19 @@ void Outro::update(float currentFrame) {
 	//draw Gold for score indicator
 	int timeFactor = int(2 * currentFrame) % 4;
 	timeFactor = timeFactor == 3 ? 1 : timeFactor;
+#ifdef NDEBUG
 	Drawing::drawLevel(11, 13.25, 36 + timeFactor);
+#endif 
 
 	for (int i = 7; i < 13; i++) {
 		for (int k = 0; k < 3; k++) {
 			//drawing ladder
 			if (i == 9) {
-				Drawing::drawLevel(i, k, 12 + timeFactor);
+				//Drawing::drawLevel(i, k, 12 + timeFactor);
 			}
 			//drawing bricks
 			else if (k == 2) {
-				Drawing::drawLevel(i, k, 0);
+				//Drawing::drawLevel(i, k, 0);
 			}
 		}
 	}

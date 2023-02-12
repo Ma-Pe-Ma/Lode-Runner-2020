@@ -5,13 +5,23 @@
 #include "Structs/Vector2DInt.h"
 
 class Trapdoor {
-	int textureRef = 0;
+	int* texturePointer;
 	Vector2DInt pos;
 public:
 	Trapdoor(Vector2DInt pos) { this->pos = pos; }
-	void setRevealed() { this->textureRef = 24;}
-	void handle() {
-		Drawing::drawLevel(pos.x, pos.y, textureRef);		
+	void setRevealed()
+	{ 
+		*(this->texturePointer) = 24;
+	}
+
+	void setTexturePointer(int* texturePointer)
+	{
+		this->texturePointer = texturePointer;
+	}
+
+	Vector2DInt getPos()
+	{
+		return this->pos;
 	}
 };
 

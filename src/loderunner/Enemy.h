@@ -56,8 +56,8 @@ protected:
 	static unsigned int killCounter;	
 	
 	static LayoutBlock** layout;
-	static std::unique_ptr<Brick>** brick;
-	static std::unique_ptr<Trapdoor>** trapdoors;
+	static std::shared_ptr<Brick>** brick;
+	static std::shared_ptr<Trapdoor>** trapdoors;
 	static Play* play;
 	static float gameTime;
 
@@ -147,7 +147,7 @@ public:
 	
 	virtual void updateCharSpeed();
 
-	static void setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>**, std::unique_ptr<Trapdoor>**, Play*);
+	static void setLayoutPointers(LayoutBlock** layout, std::shared_ptr<Brick>**, std::shared_ptr<Trapdoor>**, Play*);
 	static void notifyPlayerAboutDigEnd();
 	static bool hasGold();
 

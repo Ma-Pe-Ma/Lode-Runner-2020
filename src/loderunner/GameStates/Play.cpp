@@ -10,21 +10,29 @@
 //#include "Generator.h"
 
 #include "GameTime.h"
+#include <Shader.h>
+
+#include <array>
 
 Play::Play() {
 	layout = new LayoutBlock*[30];
-	brick = new std::unique_ptr<Brick>*[30];
-	trapdoors = new std::unique_ptr<Trapdoor>*[30];
+	brick = new std::shared_ptr<Brick>*[30];
+	trapdoors = new std::shared_ptr<Trapdoor>*[30];
 
 	for (int i = 0; i < 30; i++) {
 		layout[i] = new LayoutBlock[18]{};
-		brick[i] = new std::unique_ptr<Brick>[18];
-		trapdoors[i] = new std::unique_ptr<Trapdoor>[18];
+		brick[i] = new std::shared_ptr<Brick>[18];
+		trapdoors[i] = new std::shared_ptr<Trapdoor>[18];
 	}
 
 	Enemy::setLayoutPointers(layout, brick, trapdoors, this);
 	Brick::setLayoutPointers(layout, brick);
+
+	brickList = std::make_shared<std::vector<std::shared_ptr<Brick>>>();
+	
+#ifdef NDEBUG
 	Generator::setLayoutPointers(layout, brick, trapdoors, this);
+#endif
 }
 
 void Play::start() {
@@ -47,13 +55,20 @@ void Play::start() {
 void Play::update(float currentFrame) {
 	GameTime::update(currentFrame);
 
-	//play gamplay music cyclically
+	//play gameplay music cyclically
 	if (Audio::sfx[7].getPlayStatus() != AudioStatus::playing) {
 		Audio::sfx[7].playPause();
 	}
 	
-	drawLevel();
 	Enemy::handleCharacters();
+	
+	float gameTime = GameTime::getGameTime();
+	for (auto brick : *brickList)
+	{
+		brick->handle(gameTime);
+	}
+
+	drawLevel();
 	Gold::drawGolds();
 	gamePlay->writeGameTime();
 
@@ -114,41 +129,24 @@ void Play::setLadders(int highestLadder, std::vector<Vector2DInt> finishingLadde
 	this->finishingLadders = finishingLadders;
 }
 
-void Play::drawLevel() {
+inline void Play::drawLevel() {
 	float gameTime = GameTime::getGameTime();
 	int ladderFactor = int(gameTime) % 4;
 	ladderFactor = ladderFactor == 3 ? 1 : ladderFactor;
-
-	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 18; j++) {
-			if (brick[i][j]) {
-				brick[i][j]->handle(gameTime);
-			}
-			//if layout is empty do nothing
-			else if (layout[i][j] == LayoutBlock::empty);
-			//animating flashing ladder
-			else if (layout[i][j] == LayoutBlock::ladder) {
-				Drawing::drawLevel(i, j, 12 + ladderFactor);
-			}
-			//draw every other item simply
-			else if (layout[i][j] == LayoutBlock::brick) {
-				Drawing::drawLevel(i, j, 0);
-			}
-			else if (layout[i][j] == LayoutBlock::trapDoor) {
-				trapdoors[i][j]->handle();
-			}
-			else if (layout[i][j] == LayoutBlock::concrete) {
-				Drawing::drawLevel(i, j, 6);
-			}
-			else if (layout[i][j] == LayoutBlock::pole) {
-				Drawing::drawLevel(i, j, 18);
-			}
-		}
-	}
+	renderingManager.setLadderFlashFactor(ladderFactor);
+	renderingManager.render();
 }
 
 void Play::loadLevel(unsigned int levelNumber) {
 	clearContainers();
+	brickList->clear();
+
+	std::vector<std::tuple<int, int>> poleList;
+	std::vector<std::tuple<int, int>> concreteList;
+	std::vector<std::tuple<int, int>> ladderList;
+	std::vector<std::tuple<int, int>> finishingLadderList;
+
+	std::vector<std::shared_ptr<Trapdoor>> trapDoorList;
 
 	levelNumber = levelNumber < 1 ? 1 : levelNumber;
 	levelNumber = levelNumber > 150 ? 150 : levelNumber;
@@ -170,7 +168,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 	bool foundLevel = false;
 	//reading level into the layout matrix
 	int rowCounter = 0;
-
 
 #ifndef ANDROID_VERSION
 	std::fstream levelFile;
@@ -208,6 +205,8 @@ void Play::loadLevel(unsigned int levelNumber) {
 				//but the sides are closed
 				layout[0][17] = LayoutBlock::concrete;
 				layout[29][17] = LayoutBlock::concrete;
+				concreteList.push_back({ 0, 17 });
+				concreteList.push_back({ 29, 17 });
 				rowCounter++;
 			}
 			else {
@@ -221,13 +220,19 @@ void Play::loadLevel(unsigned int levelNumber) {
 						pos.y = 17 - rowCounter;
 
 						layout[i][17 - rowCounter] = LayoutBlock::brick;
-						brick[i][17 - rowCounter].reset(new Brick(pos));
+
+						std::shared_ptr<Brick> newBrick = std::make_shared<Brick>(pos);
+
+						brickList->push_back(newBrick);
+						brick[i][17 - rowCounter] = newBrick;
 					}
 					else if (row[i] == '@' || row[i] == '"') {
 						layout[i][17 - rowCounter] = LayoutBlock::concrete;
+						concreteList.push_back({ i, 17 - rowCounter });
 					}
 					else if (row[i] == 'H') {
 						layout[i][17 - rowCounter] = LayoutBlock::ladder;
+						ladderList.push_back({ i, 17 - rowCounter });
 
 						if (!highestLadder) {
 							highestLadder = 17 - rowCounter;
@@ -236,14 +241,20 @@ void Play::loadLevel(unsigned int levelNumber) {
 					}
 					else if (row[i] == '-') {
 						layout[i][17 - rowCounter] = LayoutBlock::pole;
+						poleList.push_back({i, 17 - rowCounter});
 					}
 					else if (row[i] == 'X') {
 						layout[i][17 - rowCounter] = LayoutBlock::trapDoor;
-						trapdoors[i][17 - rowCounter].reset(new Trapdoor({ i,17-rowCounter}));
+
+						std::shared_ptr<Trapdoor> trapdoor = std::make_shared<Trapdoor>(Trapdoor({ i, 17 - rowCounter }));
+					
+						trapDoorList.push_back(trapdoor);
+						trapdoors[i][17 - rowCounter] = trapdoor;
 					}
 					else if (row[i] == 'S') {
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
 						finishingLadders.push_back({ i, 17 - rowCounter });
+						finishingLadderList.push_back({ i, 17 - rowCounter });
 						if (!highestLadder) {
 							highestLadder = 17 - rowCounter;
 						}
@@ -251,22 +262,22 @@ void Play::loadLevel(unsigned int levelNumber) {
 					else if (row[i] == '&') {							//runner
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
 
-						Vector2DInt Pos = { i, 17 - rowCounter };
-						Player::addPlayer(Pos);
+						Vector2DInt pos = { i, 17 - rowCounter };
+						Player::addPlayer(pos);
 					}
 
 					else if (row[i] == '0') {							//guards
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
 
-						Vector2DInt Pos = { i, 17 - rowCounter };
-						Enemy::addEnemy(Pos);
+						Vector2DInt pos = { i, 17 - rowCounter };
+						Enemy::addEnemy(pos);
 					}
 
 					else if (row[i] == '$') {							//gold
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
-						Vector2DInt Pos = { i, 17 - rowCounter };
+						Vector2DInt pos = { i, 17 - rowCounter };
 
-						std::unique_ptr<Gold> gold(new Gold(Pos));
+						std::unique_ptr<Gold> gold(new Gold(pos));
 						Gold::addGoldToUncollected(std::move(gold));
 					}
 					else {
@@ -279,6 +290,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 				//filling first row with concrete, then quit initializing level
 				if (rowCounter == 17) {
 					for (int i = 0; i < 30; i++) {
+						concreteList.push_back({ i, 0 });
 						layout[i][0] = LayoutBlock::concrete;
 					}
 
@@ -303,9 +315,20 @@ void Play::loadLevel(unsigned int levelNumber) {
 	if (gamePlay->stateContext->level[gamePlay->stateContext->playerNr] == 115 && gameVersion == 0) {
 		highestLadder--;
 	}
+
+	renderingManager.clearRenderableObjects();
+	renderingManager.setPoleList(poleList);
+	renderingManager.setConcreteList(concreteList);
+	renderingManager.setBrickList(brickList);
+	renderingManager.setTrapdoorList(trapDoorList);
+	renderingManager.setLadderList(ladderList);
+	renderingManager.setFinishingLadderList(finishingLadderList);
+	renderingManager.initialize();
 }
 
 void Play::generateFinishingLadders() {
+	renderingManager.enableFinishingLadderDrawing();
+
 	for (auto finishLadder : finishingLadders) {
 		layout[finishLadder.x][finishLadder.y] = LayoutBlock::ladder;
 	}

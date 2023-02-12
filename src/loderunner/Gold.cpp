@@ -66,7 +66,9 @@ void Gold::draw() {
 		timeFactor = 1;
 	}
 
-	Drawing::drawLevel(pos.x, pos.y, 36 + timeFactor);
+#ifdef NDEBUG
+	Drawing::drawLevel(geX, geY, 54);
+#endif 
 }
 
 bool Gold::shouldBeReleased() {

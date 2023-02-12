@@ -30,7 +30,7 @@ namespace Drawing{
 	void levelTextureMapping(int);
 	void abcTextureMapping(char);
 	void textWriting(std::string, float, float);
-	void drawLevel(float, float, int);
+	//void drawLevel(float, float, int);
 	void drawEnemy(float, float, int, Direction, bool);
 }
 
