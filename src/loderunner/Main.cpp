@@ -63,7 +63,7 @@ int main(int argc, char**argv) {
 			break;
 		}
 	}
-	
+
 	RtAudio dac = RtAudio(SOUND_API);
 
 	if (dac.getDeviceCount() < 1) {
@@ -182,6 +182,8 @@ int main(int argc, char**argv) {
 #endif
 
 	ImGui::StyleColorsDark();
+
+	glEnable(GL_DEPTH_TEST);
 
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop((em_callback_func) update, 60, 1);
@@ -303,7 +305,9 @@ void handleImGuiConfigurer() {
 		}
 
 		if (ImGui::SliderFloat("Player speed", &Enemy::playerSpeed, 0.0f, 1.0f, "%.2f")) {
-			Enemy::player->updateCharSpeed();
+			if (Enemy::player) {
+				Enemy::player->updateCharSpeed();
+			}
 		}
 
 		if (ImGui::SliderFloat("Enemy speed", &Enemy::enemySpeed, 0.0f, 1.0f, "%.2f")) {

@@ -113,6 +113,11 @@ For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
   <img src="./Screenshots/Launcher.png" width = "500" height="350" />
 </p>
 
+#### ImGUI Configurer
+
+
+
+
 ### Championship Lode Runner ###
 To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.
 

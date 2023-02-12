@@ -125,7 +125,10 @@ void Generator::update(float currentFrame) {
 
 	//yellow cursor block
 	if (int(3 * currentFrame) % 2) {
+#ifdef NDEBUG
 		Drawing::drawLevel(geX, geY, 54);
+#endif 
+		
 	}
 
 	//drawing generator elements
@@ -137,7 +140,9 @@ void Generator::update(float currentFrame) {
 				continue;
 			}
 
-			Drawing::drawLevel(i, j, textureMap[layoutType]);
+#ifdef NDEBUG
+			Drawing::drawLevel(geX, geY, 54);
+#endif 
 		}
 	}
 	

@@ -4,10 +4,24 @@
 #include "GameTime.h"
 
 int Brick::randomDebris = 0;
-std::unique_ptr<Brick>** Brick::brick;
+
+int* Brick::pointerToDebrisTexture;
+int* Brick::pointerToDebrisLocation;
+
+std::shared_ptr<Brick>** Brick::brick;
 LayoutBlock** Brick::layout;
 
-void Brick::setLayoutPointers(LayoutBlock** layout, std::unique_ptr<Brick>** brick) {
+void Brick::setPointerToDebrisTexture(int* pointerToDebrisTexture)
+{
+	Brick::pointerToDebrisTexture = pointerToDebrisTexture;
+}
+
+void Brick::setPointerToDebrisLocation(int* pointerToDebrisLocation)
+{
+	Brick::pointerToDebrisLocation = pointerToDebrisLocation;
+}
+
+void Brick::setLayoutPointers(LayoutBlock** layout, std::shared_ptr<Brick>** brick) {
 	Brick::layout = layout;
 	Brick::brick = brick;
 }
@@ -18,20 +32,16 @@ Brick::Brick(Vector2DInt position) {
 
 void Brick::handle(float gameTime) {
 	switch (brickState)	{
-	case BrickState::original:
-		Drawing::drawLevel(position.x, position.y, 0);
-		break;
 	case BrickState::digging:
 		digging(gameTime);
 		break;
-	case BrickState::watiting:
+	case BrickState::watiting:	
 		waiting(gameTime);
 		break;
 	case BrickState::building:
 		building(gameTime);
 		break;
 	default:
-
 		break;
 	}
 }
@@ -40,7 +50,7 @@ bool Brick::initiateDig() {
 	int checkGold = Gold::goldChecker(position.x, position.y + 1);
 	LayoutBlock upBlock = layout[position.x][position.y + 1];
 
-	if (brickState == original && upBlock == LayoutBlock::empty && !checkGold) {
+	if (brickState == BrickState::original && upBlock == LayoutBlock::empty && !checkGold) {
 		brickState = BrickState::digging;
 		timer = GameTime::getGameTime();
 
@@ -57,14 +67,18 @@ bool Brick::initiateDig() {
 void Brick::digging(float gameTime) {
 	if (gameTime - timer > destroyTime) {
 		brickState = BrickState::watiting;
+		*pointerToTexture = 15;
 		timer = gameTime;
 		Enemy::notifyPlayerAboutDigEnd();
 		layout[position.x][position.y] = LayoutBlock::empty;
+		*pointerToDebrisTexture = 15;
+		pointerToDebrisLocation[0] = -1;
+		pointerToDebrisLocation[1] = -1;
 	}
 	else {
 		//growing hole
-		int timeFactor = int(5 * (gameTime - timer) / (destroyTime)) % 5;
-		Drawing::drawLevel(position.x, position.y, 1 + timeFactor);
+		int timeFactor = int(5 * (gameTime - timer) / (destroyTime)) % 5;	
+		*pointerToTexture = 1 + timeFactor;
 
 		if (Enemy::checkDigPrevention(position.x, position.y)) {
 			Audio::sfx[2].playPause();
@@ -72,14 +86,18 @@ void Brick::digging(float gameTime) {
 			Enemy::notifyPlayerAboutDigEnd();
 			layout[position.x][position.y] = LayoutBlock::brick;
 			brickState = BrickState::original;
-			Drawing::drawLevel(position.x, position.y, 0);
+			*pointerToTexture = 0;
+			*pointerToDebrisTexture = 15;
+			pointerToDebrisLocation[0] = -1;
+			pointerToDebrisLocation[1] = -1;
 			return;
 		}
 
 		//drawing debris above hole
 		if (layout[position.x][position.y + 1] != LayoutBlock::brick) {
-			int debrisFactor = 19 + randomDebris * 6;
-			Drawing::drawLevel(position.x, position.y + 1, debrisFactor + timeFactor);
+			*pointerToDebrisTexture = randomDebris * 6  + 19 + timeFactor;
+			pointerToDebrisLocation[0] = position.x;
+			pointerToDebrisLocation[1] = position.y + 1;
 		}
 	}		
 }
@@ -94,13 +112,13 @@ void Brick::waiting(float gameTime) {
 void Brick::building(float gameTime) {
 	if (gameTime - timer > buildTime) {
 		brickState = BrickState::original;
-		Drawing::drawLevel(position.x, position.y, 0);
+		*pointerToTexture = 0;
 
 		Enemy::checkDeaths(position.x, position.y);
 		layout[position.x][position.y] = LayoutBlock::brick;
 	}
 	else {
 		int timeFactor = int(5 * (gameTime - timer) / buildTime) % 5;
-		Drawing::drawLevel(position.x, position.y, 11 - timeFactor);
+		*pointerToTexture = 11 - timeFactor;
 	}	
 }

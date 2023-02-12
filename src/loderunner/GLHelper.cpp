@@ -10,7 +10,6 @@
 #include <stb_image_write.h>
 #endif
 
-
 #ifndef __EMSCRIPTEN__
 #include <thread>
 #endif
@@ -71,7 +70,7 @@ namespace GLHelper {
 		viewPortX = (width - 15.0f / 9 * height) / 2;
 		viewPortY = (height - 9.0f / 15 * width) / 2;
 
-		float screenRatio = ((float)width) / height;
+		float screenRatio = ((float) width) / height;
 
 		if (screenRatio >= 15.0f / 9) {
 			viewPortY = 0;
