@@ -14,10 +14,7 @@ void Death::start() {
 }
 
 void Death::update(float) {
-	Enemy::drawPlayerDeath();
 	gamePlay->play->drawLevel();
-	Gold::drawGolds();
-	gamePlay->writeGameTime();
 	
 	float deathLength = Audio::sfx[3].lengthInSec();
 

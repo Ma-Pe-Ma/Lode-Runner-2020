@@ -15,7 +15,7 @@
 #endif
 
 #include "Button.h"
-#include "GLHelper.h"
+#include "Rendering/GLHelper.h"
 #include "Structs/Vector2D.h"
 #include "Enemy.h"
 #include "GameTime.h"

@@ -3,59 +3,47 @@
 
 #include <string>
 #include "Audio.h"
-#include "Drawing.h"
 
 void Select::start() {
+	renderingManager->clearRenderableObjects();
 
+	std::vector<std::shared_ptr<Text>> textList;
+	textList.push_back(levelText);
+
+	renderingManager->setTextList(textList);
+	renderingManager->initializeCharacters();
+	updateLevelNr(stateContext->level[stateContext->playerNr]);
 }
 
 void Select::update(float currentFrame) {
+	int& levelNr = stateContext->level[stateContext->playerNr];
+
 	if (leftButton.simple()) {
-		stateContext->level[stateContext->playerNr]--;
+		setNewValidLevel(--levelNr);
+		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
 	if (rightButton.simple()) {
-		stateContext->level[stateContext->playerNr]++;
+		setNewValidLevel(++levelNr);
+		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
 	if (up.simple()) {
-		stateContext->level[stateContext->playerNr] += 10;
+		setNewValidLevel(levelNr += 10);
+		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
 	if (down.simple()) {
-		stateContext->level[stateContext->playerNr] -= 10;
+		setNewValidLevel(levelNr -= 10);
+		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
-	}
-
-
-	if (gameVersion == 1) {
-		if (stateContext->level[stateContext->playerNr] < 1) {
-			stateContext->level[stateContext->playerNr] = 51 + stateContext->level[stateContext->playerNr];
-		}			
-
-		if (stateContext->level[stateContext->playerNr] > 51) {
-			stateContext->level[stateContext->playerNr] = stateContext->level[stateContext->playerNr] % 10;
-		}			
-	}
-	else {
-		if (stateContext->level[stateContext->playerNr] == 160) {
-			stateContext->level[stateContext->playerNr] = 10;
-		}
-
-		if (stateContext->level[stateContext->playerNr] > 150) {
-			stateContext->level[stateContext->playerNr] = stateContext->level[stateContext->playerNr] % 10;
-		}			
-
-		if (stateContext->level[stateContext->playerNr] < 1) {
-			stateContext->level[stateContext->playerNr] = 150 + stateContext->level[stateContext->playerNr];
-		}			
 	}
 
 	if (enter.simple()) {
@@ -64,24 +52,24 @@ void Select::update(float currentFrame) {
 		Audio::sfx[8].playPause();
 	}
 
-	std::string levelNumber;
-
-	if (stateContext->level[stateContext->playerNr] > 99) {
-		levelNumber = std::to_string(stateContext->level[stateContext->playerNr]);
-	}
-
-	if (stateContext->level[stateContext->playerNr] > 9 && stateContext->level[stateContext->playerNr] < 100) {
-		levelNumber = '0' + std::to_string(stateContext->level[stateContext->playerNr]);
-	}
-
-	if (stateContext->level[stateContext->playerNr] < 10) {
-		levelNumber = "00" + std::to_string(stateContext->level[stateContext->playerNr]);
-	}
-
-	std::string levelName = "STAGE " + levelNumber;
-	Drawing::textWriting(levelName, 8, 12);
+	renderingManager->render();
 }
 
 void Select::end() {
 
+}
+
+void Select::setNewValidLevel(int& newLevel)
+{
+	int maxLevelNumber = gameVersion == 0 ? 150 : 51;
+	newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
+	newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
+}
+
+void Select::updateLevelNr(int levelNr)
+{
+	std::string levelNumber = std::to_string(levelNr);
+	levelNumber.insert(0, 3 - levelNumber.length(), '0');
+
+	levelText->changeContent("STAGE " + levelNumber);
 }

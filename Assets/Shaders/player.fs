@@ -1,32 +1,28 @@
 
 out vec4 FragColor;
 
-in vec2 TexCoord;
+in vec2 aTexCoord;
+flat in int instanceID;
 
 uniform sampler2D textureA;
-uniform bool direction;
-uniform bool carryGold;
-uniform float ref;
+
+uniform int textureID[340];
+uniform bool direction[340];
+uniform bool carryGold[340];
+
+const vec4 clothColor = vec4(112.0 / 255.0, 224.0 / 255.0, 144.0 / 255.0, 1.0); 
 
 void main() {
-	vec4 texColor;
 
-	if(direction) {
-		texColor = texture(textureA, TexCoord);
-	}		
-	else {
-		texColor = texture(textureA, vec2(-TexCoord.x + 2.0 * ref + 1.0 / 12.0, TexCoord.y));
-	}		
+	vec2 pTexCoord = aTexCoord + vec2((textureID[instanceID] % 12) / 12.0, (textureID[instanceID] / 12) / 5.0);
+
+	//vec4 texColor = direction[instanceID] ? texture(textureA, pTexCoord) : texture(textureA, vec2(-aTexCoord.x + 1.0 / 12 + (textureID[instanceID] % 12) / 12.0, pTexCoord.y));
+	vec4 texColor = direction[instanceID] ? texture(textureA, pTexCoord) : texture(textureA, vec2(pTexCoord.x - 2 * aTexCoord.x + 1.0 / 12, pTexCoord.y));
 	
-	if(texColor.r < 0.01 && texColor.g < 0.01 && texColor.b < 0.01) {
-		discard;
+	if(carryGold[instanceID] && texColor == clothColor)
+	{
+		texColor.b = 1.0;
 	}
-	
-	if(carryGold) {
-		if(texColor.r == 112.0/255.0 && texColor.g == 224.0/255.0 && texColor.b == 144.0/255.0) {
-			texColor.b = 1.0;
-		}
-	}		
 	
 	FragColor = texColor;
 } 

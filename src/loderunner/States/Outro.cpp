@@ -1,81 +1,115 @@
 #include "States/Outro.h"
 #include "Audio.h"
 #include "GameTime.h"
-#include "Drawing.h"
 #include "States/StateContext.h"
 
+#include "Rendering/RenderingManager.h"
+#include "../Player.h"
+#include <memory>
+
 void Outro::setScoreParameters(short killCounter, short goldCounter, short fruitID) {
-	enemyScore = killCounter * 200;
-	goldScore = goldCounter * 200;
+	this->enemyScore = killCounter * 200;
+	this->goldScore = goldCounter * 200;
 	this->fruitID = fruitID;
 }
 
+void Outro::setupRenderingManager()
+{
+	renderingManager->clearRenderableObjects();
+
+	//add bricks
+	std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList = std::make_shared<std::vector<std::shared_ptr<Brick>>>();
+	brickList->push_back(std::make_shared<Brick>(Brick({7, 2})));
+	brickList->push_back(std::make_shared<Brick>(Brick({8, 2 })));
+	brickList->push_back(std::make_shared<Brick>(Brick({10, 2 })));
+	brickList->push_back(std::make_shared<Brick>(Brick({11, 2 })));
+	brickList->push_back(std::make_shared<Brick>(Brick({12, 2 })));
+
+	//add ladders
+	std::vector<std::tuple<int, int>> ladderList;
+	ladderList.push_back({ 9, 0 });
+	ladderList.push_back({ 9, 1 });
+	ladderList.push_back({ 9, 2 });
+
+	//add gold indicator
+	std::vector<std::shared_ptr<Gold>> goldList;
+	goldList.push_back(std::make_shared<Gold>(Gold({11, 13})));
+
+	//add enemy indicator
+	std::vector<std::shared_ptr<Enemy>> enemyList;
+	enemyList.push_back(std::make_shared<Enemy>(Enemy({11, 9})));
+
+	//add climbing runner
+	this->player = std::make_shared<Player>(Player({ 9, 0 }));
+	enemyList.push_back(this->player);
+
+	std::vector<std::shared_ptr<Text>> textList;
+	textList.push_back(goldPoints);
+	textList.push_back(enemyPoints);
+	textList.push_back(totalPoints);
+
+	renderingManager->setBrickList(brickList);
+	renderingManager->setLadderList(ladderList);
+	renderingManager->setGoldList(goldList);
+
+	renderingManager->setEnemyList(enemyList);
+
+	renderingManager->setTextList(textList);
+
+	renderingManager->initializeLevelLayout();
+	renderingManager->initializeEnemies();
+
+	renderingManager->initializeCharacters();
+}
+
 void Outro::start() {
+	goldPoints = std::make_shared<Text>(Text(std::to_string(goldScore).append(" POINTS"), { 20, 6.75f }));
+	enemyPoints = std::make_shared<Text>(Text(std::to_string(enemyScore).append(" POINTS"), { 20, 12.75f }));
+	totalPoints = std::make_shared<Text>(Text(std::string("TOTAL ").append(std::to_string(goldScore + enemyScore)).append(" POINTS"), { 14.5f, 23.25f }));
+
+	setupRenderingManager();
+
 	Audio::sfx[13].playPause();
 
-	if (stateContext->playerLife[stateContext->playerNr] < 9) {
-		stateContext->playerLife[stateContext->playerNr]++;
-	}
+	int& playerLife = stateContext->playerLife[stateContext->playerNr];
+	playerLife = ++playerLife > 9 ? 9 : playerLife;
 
-	stateContext->level[stateContext->playerNr]++;
-	if (stateContext->level[stateContext->playerNr] > 150) {
-		stateContext->level[stateContext->playerNr] = 1;
-	}
+	int& playerLevel = stateContext->level[stateContext->playerNr];
+	playerLevel = ++playerLevel > 150 ? 1 : playerLevel;
 
-	stateContext->score[stateContext->playerNr] += enemyScore + goldScore;
-	if (stateContext->score[stateContext->playerNr] > stateContext->highScore) {
-		stateContext->highScore = stateContext->score[stateContext->playerNr];
-	}
+	int& playerScore = stateContext->score[stateContext->playerNr];
+	playerScore += enemyScore + goldScore;
+	stateContext->highScore = playerScore > stateContext->highScore ? playerScore : stateContext->highScore;
 
 	timer = GameTime::getCurrentFrame();
-	runnerY = 0;
-
-	gold_points = std::to_string(goldScore) + " POINTS";
-	enemy_points = std::to_string(enemyScore) + " POINTS";
-	total = "TOTAL " + std::to_string(goldScore + enemyScore) + " POINTS";
 }
 
 void Outro::update(float currentFrame) {
-	Drawing::textWriting(gold_points, 20, 6);
-	Drawing::textWriting(enemy_points, 20, 12);
-	Drawing::textWriting(total, 14.5, 23.25);
-
-	//draw enemy for score indicator
-	Drawing::drawEnemy(11, 9.5, 12, Direction::left, false);
-
-	//draw Gold for score indicator
 	int timeFactor = int(2 * currentFrame) % 4;
 	timeFactor = timeFactor == 3 ? 1 : timeFactor;
-#ifdef NDEBUG
-	Drawing::drawLevel(11, 13.25, 36 + timeFactor);
-#endif 
-
-	for (int i = 7; i < 13; i++) {
-		for (int k = 0; k < 3; k++) {
-			//drawing ladder
-			if (i == 9) {
-				//Drawing::drawLevel(i, k, 12 + timeFactor);
-			}
-			//drawing bricks
-			else if (k == 2) {
-				//Drawing::drawLevel(i, k, 0);
-			}
-		}
-	}
+	
+	renderingManager->setLadderFlashFactor(timeFactor);
+	renderingManager->render();
 
 	//runner climbs ladder
-	if (runnerY + GameTime::getSpeed() * 0.1f < 3) {
-		runnerY += GameTime::getSpeed() * 0.1;
-
+	if (this->player->pos.y + GameTime::getSpeed() * 0.1f < 3) {
+		
+		if (this->player->pos.y + GameTime::getSpeed() * 0.1f > 3) {
+			this->player->setPosition({ this->player->pos.x, 3});
+		}
+		else {
+			this->player->setPosition({ this->player->pos.x, this->player->pos.y + GameTime::getSpeed() * 0.1f });
+		}
+		
 		int timeFactor = ((currentFrame - timer) * 4);
-		int TextureRef = 36 + timeFactor % 4;
+		int textureRef = 36 + timeFactor % 4;
 
-		Drawing::drawEnemy(9, runnerY, TextureRef, Direction::left, false);
+		this->player->setTextureRef(textureRef);
 	}
 	//nail bitting after reaching top of ladder
 	else {
 		int timeFactor = int((currentFrame - timer) * 3) % 4;
-		Drawing::drawEnemy(9, 3, 44 + timeFactor, Direction::left, false);
+		this->player->setTextureRef(44 + timeFactor);
 	}
 
 	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || enter.simple()) {

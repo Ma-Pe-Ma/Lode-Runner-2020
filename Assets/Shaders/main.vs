@@ -2,18 +2,21 @@
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTexturePos;
 
-//mode 0 = mainScreen (streched by main texture), mode 1 = pauseScreen (unstreched)
+out vec2 aTexCoord;
+flat out int instanceID;
 
-uniform int mode;
-out vec2 TexCoord;
+uniform vec2 vertexScales[2];
+uniform vec2 vertexOffsets[2];
+
+uniform vec2 cursorOffsets[2];
+uniform int cursor[2];
 
 void main() {	
-	if(mode == 0) {
-		gl_Position = vec4((24.0 / 35.0) * aPos.x, aPos.y, 0.0, 1.0);
-	}
-	else if(mode == 1)	{
-		gl_Position = vec4(aPos.x, aPos.y, -0.1, 1.0);
-	}		
 	
-	TexCoord = aTexturePos;	
+	vec2 position = vertexScales[gl_InstanceID] * aPos + vertexOffsets[gl_InstanceID] + cursor[gl_InstanceID] * cursorOffsets[gl_InstanceID];
+	instanceID = gl_InstanceID;
+
+	gl_Position = vec4(position, 0.0, 1.0);
+	
+	aTexCoord = aTexturePos;	
 }

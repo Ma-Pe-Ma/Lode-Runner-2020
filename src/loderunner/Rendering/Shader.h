@@ -20,6 +20,11 @@ public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
 
+    Shader(std::string vertexPath, std::string fragmentPath) : Shader(vertexPath.c_str(), fragmentPath.c_str())
+    {
+
+    }
+
     Shader(const char* vertexPath, const char* fragmentPath)
     {
         // 1. retrieve the vertex/fragment source code from filePath
@@ -127,6 +132,12 @@ public:
     { 
         glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
     }
+
+    void setVec2Array(const std::string& name, float* values, float size)
+    {
+        glUniform2fv(glGetUniformLocation(ID, name.c_str()), size,  values);
+    }
+
     // ------------------------------------------------------------------------
     void setVec3(const std::string &name, float x, float y, float z) const
     { 

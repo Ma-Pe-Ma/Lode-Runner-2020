@@ -35,11 +35,18 @@ private:
 
 	virtual void checkCollisionWithOthers() override {}
 public:
-	static void addPlayer(Vector2DInt);
+	static void addPlayer(std::shared_ptr<Player>);
 	Player(float, float);
 	void die() override;
 	void dying() override;
 	void updateCharSpeed() override;
+	void setPosition(Vector2D pos)
+	{
+		this->pos = pos;
+
+		positionPointer[0] = pos.x;
+		positionPointer[1] = pos.y;
+	}
 };
 
 #endif

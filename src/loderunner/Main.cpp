@@ -13,8 +13,6 @@
 #endif
 
 #include <GLFW/glfw3.h>
-#include <Shader.h>
-
 #include <RtAudio.h>
 
 #ifdef VIDEO_RECORDING
@@ -26,8 +24,8 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include "GLHelper.h"
-#include "Drawing.h"
+#include "Rendering/GLHelper.h"
+#include "Rendering/RenderingManager.h"
 
 #include <cstdio>
 #include <chrono>
@@ -121,6 +119,11 @@ int main(int argc, char**argv) {
 		std::cin >> a;
 		return -1;
 	}
+
+	GLFWimage icon;
+	int iconNrComp;
+	icon.pixels = GLHelper::getRawCharArrayWithSTBI("Assets/Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
+	glfwSetWindowIcon(GLHelper::window, 1, &icon);
 	
 	glfwSetInputMode(GLHelper::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -142,8 +145,6 @@ int main(int argc, char**argv) {
 		mainMenuTextureName = "Assets/Texture/MainMenuU.png";
 	}
 
-	GLHelper::initialize(mainMenuTextureName);
-
 #ifdef VIDEO_RECORDING
 	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 	AudioParameters* audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
@@ -159,8 +160,18 @@ int main(int argc, char**argv) {
 	GLHelper::multiMedia = &media;
 #endif
 
+	std::shared_ptr<RenderingManager> renderingManager = std::make_shared<RenderingManager>("./Assets/");
+
 	State::initialize(new StateContext());
 	GameState::initialize(State::stateContext->gamePlay);
+
+	State::stateContext->gamePlay->play->setRenderingManager(renderingManager);
+	State::stateContext->select->setRenderingManager(renderingManager);
+	State::stateContext->intro->setRenderingManager(renderingManager);
+	State::stateContext->outro->setRenderingManager(renderingManager);
+	State::stateContext->mainMenu->setRenderingManager(renderingManager);
+	State::stateContext->gameOver->setRenderingManager(renderingManager);
+	State::stateContext->generator->setRenderingManager(renderingManager);
 
 	prevFrameStart = std::chrono::system_clock::now();
 
@@ -183,8 +194,6 @@ int main(int argc, char**argv) {
 
 	ImGui::StyleColorsDark();
 
-	glEnable(GL_DEPTH_TEST);
-
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop((em_callback_func) update, 60, 1);
 #else
@@ -204,7 +213,7 @@ int main(int argc, char**argv) {
 	}
 
 #endif
-	GLHelper::terminate();
+	renderingManager->terminate();
 
 	glfwTerminate();
 	return 0;
@@ -282,9 +291,6 @@ void handleImGuiConfigurer() {
 
 		if (ImGui::RadioButton("Original", &gameVersion, 0)) {
 			levelFileName = "Assets/Level/OriginalLevels.txt";
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, GLHelper::originalMenu);
-			GLHelper::mainShader->setInt("textureA", 2);
 			setCorrectLevel();
 		}
 
@@ -292,9 +298,6 @@ void handleImGuiConfigurer() {
 		if (ImGui::RadioButton("Championship", &gameVersion, 1)) {
 			State::stateContext->menuCursor = 0;
 			levelFileName = "Assets/Level/ChampionshipLevels.txt";
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, GLHelper::championshipMenu);
-			GLHelper::mainShader->setInt("textureA", 2);
 			setCorrectLevel();
 		}
 

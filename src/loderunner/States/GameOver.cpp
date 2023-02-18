@@ -1,18 +1,30 @@
 #include "States/GameOver.h"
 #include "GameTime.h"
 #include "Audio.h"
-#include "Drawing.h"
 #include "States/StateContext.h"
 
 void GameOver::start() {
-	playerName = "PLAYER " + std::to_string(stateContext->playerNr + 1);
+	playerNameText = std::make_shared<Text>(Text("PLAYER " + std::to_string(stateContext->playerNr + 1), { 12.5, 6.0 }));
 	timer = GameTime::getCurrentFrame();
 	Audio::sfx[6].playPause();
+
+	setupRenderingManager();
+}
+
+void GameOver::setupRenderingManager() {
+	renderingManager->clearRenderableObjects();
+
+	std::vector<std::shared_ptr<Text>> textList;
+
+	textList.push_back(gameOverText);
+	textList.push_back(playerNameText);
+
+	renderingManager->setTextList(textList);
+	renderingManager->initializeCharacters();
 }
 
 void GameOver::update(float currentFrame) {
-	Drawing::textWriting(playerName, 12.5, 6);
-	Drawing::textWriting(gameOverText, 12, 10);
+	renderingManager->render();
 
 	if (GameTime::getCurrentFrame() - timer > Audio::sfx[6].lengthInSec()) {
 		if (stateContext->menuCursor == 0) {

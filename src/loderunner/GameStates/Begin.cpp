@@ -1,11 +1,7 @@
 #include "GameStates/Begin.h"
 #include "States/GamePlay.h"
 
-#include "GameTime.h"
-#include "Enemy.h"
-#include "../IOHandler.h"
 #include "States/StateContext.h"
-
 
 void Begin::start() {
 	startTime = GameTime::getCurrentFrame();
@@ -14,11 +10,7 @@ void Begin::start() {
 }
 
 void Begin::update(float currentFrame) {
-	Enemy::drawPaused();
-	Gold::drawGolds();
-
 	gamePlay->play->drawLevel();
-	gamePlay->writeGameTime();
 
 	if (currentFrame - startTime > 2.0f) {
 		gamePlay->transitionTo(gamePlay->play);

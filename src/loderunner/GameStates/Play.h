@@ -10,6 +10,7 @@
 #include "Rendering/RenderingManager.h"
 
 class Shader;
+class Text;
 
 class Play : public GameState {
 private:
@@ -24,9 +25,11 @@ private:
 	
 	void handleNonControlButtons();
 
-	RenderingManager renderingManager;
+	std::shared_ptr<RenderingManager> renderingManager;
 
 	std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList;
+
+	std::shared_ptr<Text> timeText;
 
 public:
 	Play();
@@ -42,6 +45,11 @@ public:
 	void transitionToOutro(short, short, short);
 	void clearContainers();
 	void setLadders(int, std::vector<Vector2DInt>);
+
+	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
+	{
+		this->renderingManager = renderingManager;
+	}
 };
 
 #endif

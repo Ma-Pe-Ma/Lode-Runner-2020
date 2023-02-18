@@ -9,6 +9,8 @@
 #include "GameStates/Play.h"
 #include "IOHandler.h"
 
+#include "Rendering/RenderingManager.h"
+
 class Generator : public State {
 private:
 	short gen[30][18];
@@ -22,12 +24,19 @@ private:
 	static std::unique_ptr<Trapdoor>** trapdoors;
 	static Play* play;
 
+	std::shared_ptr<RenderingManager> renderingManager;
+
 public:
 	Generator();
 	void start() override;
 	void update(float) override;
 	void end() override;
 	static void setLayoutPointers(LayoutBlock**, std::unique_ptr <Brick>**, std::unique_ptr<Trapdoor>**, Play*);
+
+	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
+	{
+		this->renderingManager = renderingManager;
+	}
 };
 
 #endif
