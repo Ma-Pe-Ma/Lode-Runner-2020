@@ -5,8 +5,6 @@
 #include "../shader_a.h"
 #else
 
-#include <Shader.h>
-
 #if defined __EMSCRIPTEN__
 #include <GLES3/gl3.h>
 #include <emscripten/emscripten.h>
@@ -26,18 +24,6 @@ namespace GLHelper {
 #ifdef VIDEO_RECORDING
 	extern MultiMedia* multiMedia;
 #endif
-
-	extern Shader* selectShader;
-	extern Shader* mainShader;
-	extern Shader* levelShader;
-	extern Shader* playerShader;
-
-	extern unsigned int selectVBO, selectVAO, selectEBO;
-	extern unsigned int levelVBO, levelVAO, levelEBO;
-	extern unsigned int playerVBO, playerVAO, playerEBO;
-	extern unsigned int mainVBO, mainVAO, mainEBO;
-	extern unsigned int cursorVAO, cursorVBO, cursorEBO;
-
 	extern unsigned int viewPortX;
 	extern unsigned int viewPortY;
 	extern unsigned int viewPortWidth;
@@ -68,18 +54,8 @@ namespace GLHelper {
 #endif
 
 	extern void updateViewPortValues(int, int);
-
 	extern void screenCapture();
-	extern unsigned int loadTexture(char const* path);
-
-	extern void initialize(std::string);
-	extern void terminate();
-
-	extern unsigned int originalMenu;
-	extern unsigned int championshipMenu;
-	extern unsigned int characterSet;
-	extern unsigned int tileSet;
-	extern unsigned int selectScreenT;
+	extern unsigned int loadTexture(char const* path, bool);
 };
 
 #endif // !GLHELPER_H

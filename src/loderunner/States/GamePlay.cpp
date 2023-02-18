@@ -4,7 +4,6 @@
 #include "Audio.h"
 #include "Enemy.h"
 #include "Gold.h"
-#include "Drawing.h"
 #include "GameTime.h"
 
 GamePlay::GamePlay() {
@@ -44,10 +43,4 @@ void GamePlay::update(float currentFrame) {
 void GamePlay::end() {
 	Audio::sfx[4].stopAndRewind();
 	Audio::sfx[7].stopAndRewind();
-}
-
-void GamePlay::writeGameTime() {
-	std::string timeValue = std::to_string(GameTime::getGameTime());
-	timeValue = timeValue.substr(0, timeValue.length() - 5);
-	Drawing::textWriting("GAMETIME: " + timeValue + " SEC", -5, 0);
 }

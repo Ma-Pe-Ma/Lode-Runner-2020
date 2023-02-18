@@ -1,6 +1,5 @@
 #include "States/Generator.h"
 #include "Audio.h"
-#include "Drawing.h"
 #include "Enemy.h"
 #include "Gold.h"
 #include "Player.h"
@@ -171,11 +170,15 @@ void Generator::update(float currentFrame) {
 					Gold::addGoldToUncollected(std::move(gold));
 				}
 				else if (gen[i][j] == 8) {
+#ifdef NDEBUG
 					Enemy::addEnemy(pos);
+#endif
 				}
 				else if (gen[i][j] == 9) {
 					if (!playerPresent) {
+#ifdef NDEBUG
 						Player::addPlayer(pos);
+#endif
 						playerPresent = true;
 					}
 				}
@@ -194,7 +197,10 @@ void Generator::update(float currentFrame) {
 				for (int i = 1; i < 30; i++) {
 					if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
 						Vector2DInt pos = { i, j };
+
+#ifdef NDEBUG
 						Player::addPlayer(pos);
+#endif
 						playerPresent = true;
 						break; 
 					}

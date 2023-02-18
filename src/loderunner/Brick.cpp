@@ -2,6 +2,7 @@
 #include "Enemy.h"
 #include "Player.h"
 #include "GameTime.h"
+#include "Gold.h"
 
 int Brick::randomDebris = 0;
 

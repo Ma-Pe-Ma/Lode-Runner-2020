@@ -1,5 +1,6 @@
 #include "IOHandler.h"
 #include <map>
+#include <fstream>
 
 Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt, configButton;
 Vector2D debugPos[2];

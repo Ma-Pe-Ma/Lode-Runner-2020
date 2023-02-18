@@ -1,9 +1,10 @@
 #ifndef BRICK_H
 #define BRICK_H
 
-#include "Drawing.h"
 #include "Structs/Vector2DInt.h"
 #include "Enums/LayoutBlock.h"
+
+#include <memory>
 
 enum class BrickState {
 	original,

@@ -5,14 +5,9 @@
 #include "Enemy.h"
 #include "Player.h"
 #include "Gold.h"
-#include "Drawing.h"
 
 //#include "Generator.h"
-
 #include "GameTime.h"
-#include <Shader.h>
-
-#include <array>
 
 Play::Play() {
 	layout = new LayoutBlock*[30];
@@ -69,8 +64,10 @@ void Play::update(float currentFrame) {
 	}
 
 	drawLevel();
-	Gold::drawGolds();
-	gamePlay->writeGameTime();
+
+	std::string timeValue = std::to_string(GameTime::getGameTime());
+	timeValue = timeValue.substr(0, timeValue.length() - 5);
+	timeText->changeContent("GAMETIME: " + timeValue + " SEC");
 
 	//handle select and pause
 	handleNonControlButtons();
@@ -129,12 +126,12 @@ void Play::setLadders(int highestLadder, std::vector<Vector2DInt> finishingLadde
 	this->finishingLadders = finishingLadders;
 }
 
-inline void Play::drawLevel() {
+void Play::drawLevel() {
 	float gameTime = GameTime::getGameTime();
 	int ladderFactor = int(gameTime) % 4;
 	ladderFactor = ladderFactor == 3 ? 1 : ladderFactor;
-	renderingManager.setLadderFlashFactor(ladderFactor);
-	renderingManager.render();
+	renderingManager->setLadderFlashFactor(ladderFactor);
+	renderingManager->render();
 }
 
 void Play::loadLevel(unsigned int levelNumber) {
@@ -147,6 +144,10 @@ void Play::loadLevel(unsigned int levelNumber) {
 	std::vector<std::tuple<int, int>> finishingLadderList;
 
 	std::vector<std::shared_ptr<Trapdoor>> trapDoorList;
+
+	std::vector<std::shared_ptr<Gold>> goldList;
+
+	std::vector<std::shared_ptr<Enemy>> enemyList;
 
 	levelNumber = levelNumber < 1 ? 1 : levelNumber;
 	levelNumber = levelNumber > 150 ? 150 : levelNumber;
@@ -237,7 +238,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 						if (!highestLadder) {
 							highestLadder = 17 - rowCounter;
 						}
-
 					}
 					else if (row[i] == '-') {
 						layout[i][17 - rowCounter] = LayoutBlock::pole;
@@ -260,25 +260,32 @@ void Play::loadLevel(unsigned int levelNumber) {
 						}
 					}
 					else if (row[i] == '&') {							//runner
-						layout[i][17 - rowCounter] = LayoutBlock::empty;
+						layout[i][17 - rowCounter] = LayoutBlock::empty;	
 
-						Vector2DInt pos = { i, 17 - rowCounter };
-						Player::addPlayer(pos);
+						std::shared_ptr<Player> player = std::make_shared<Player>(float(i), float(17-rowCounter));
+
+						Player::addPlayer(player);
+
+						enemyList.push_back(player);
 					}
 
 					else if (row[i] == '0') {							//guards
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
 
-						Vector2DInt pos = { i, 17 - rowCounter };
-						Enemy::addEnemy(pos);
+						std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(float(i), float(17 - rowCounter));
+						Enemy::addEnemy(enemy);
+
+						enemyList.push_back(enemy);
 					}
 
 					else if (row[i] == '$') {							//gold
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
 						Vector2DInt pos = { i, 17 - rowCounter };
 
-						std::unique_ptr<Gold> gold(new Gold(pos));
-						Gold::addGoldToUncollected(std::move(gold));
+						std::shared_ptr<Gold> gold = std::make_shared<Gold>(pos);
+						goldList.push_back(gold);
+
+						Gold::addGoldToUncollected(gold);
 					}
 					else {
 						layout[i][17 - rowCounter] = LayoutBlock::empty;
@@ -316,22 +323,36 @@ void Play::loadLevel(unsigned int levelNumber) {
 		highestLadder--;
 	}
 
-	renderingManager.clearRenderableObjects();
-	renderingManager.setPoleList(poleList);
-	renderingManager.setConcreteList(concreteList);
-	renderingManager.setBrickList(brickList);
-	renderingManager.setTrapdoorList(trapDoorList);
-	renderingManager.setLadderList(ladderList);
-	renderingManager.setFinishingLadderList(finishingLadderList);
-	renderingManager.initialize();
+	timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
+	
+	std::vector<std::shared_ptr<Text>> textList;
+	textList.push_back(timeText);
+
+	renderingManager->clearRenderableObjects();
+	renderingManager->setPoleList(poleList);
+	renderingManager->setConcreteList(concreteList);
+	renderingManager->setBrickList(brickList);
+	renderingManager->setTrapdoorList(trapDoorList);
+	renderingManager->setLadderList(ladderList);
+	renderingManager->setFinishingLadderList(finishingLadderList);
+	renderingManager->setGoldList(goldList);
+	renderingManager->initializeLevelLayout();
+
+	renderingManager->setEnemyList(enemyList);
+	renderingManager->initializeEnemies();
+
+	renderingManager->setTextList(textList);
+	renderingManager->initializeCharacters();
 }
 
 void Play::generateFinishingLadders() {
-	renderingManager.enableFinishingLadderDrawing();
+	renderingManager->enableFinishingLadderDrawing();
 
 	for (auto finishLadder : finishingLadders) {
 		layout[finishLadder.x][finishLadder.y] = LayoutBlock::ladder;
 	}
+
+	finishingLadders.clear();
 }
 
 short Play::getHighestLadder() {
@@ -344,5 +365,6 @@ void Play::transitionToDeath() {
 
 void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
 	gamePlay->stateContext->outro->setScoreParameters(killCounter, goldNr, fruitID);
+	gamePlay->stateContext->outro->setRenderingManager(renderingManager);
 	gamePlay->stateContext->transitionTo(gamePlay->stateContext->outro);
 }

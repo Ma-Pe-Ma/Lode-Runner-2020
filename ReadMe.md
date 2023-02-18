@@ -98,8 +98,6 @@ Just simply unpack the 7z archive and launch the "Lode Runner.exe".
 
 For the Android notes please check the [aforementioned ReadMe](./Android/ReadMe.md).
 
-Note: Linux port currently is not available however it is planned.
-
 ### Configuring the game
 In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
 
@@ -114,9 +112,8 @@ For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
 </p>
 
 #### ImGUI Configurer
-
-
-
+On the desktop and browser ports a simple imgui configurer dialog is available (which can be shown by pressing the 'C' button).
+Here you can specify the same parameters as in the config file but they cannot be saved (yet).
 
 ### Championship Lode Runner ###
 To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.

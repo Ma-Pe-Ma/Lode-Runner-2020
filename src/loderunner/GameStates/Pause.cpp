@@ -30,10 +30,7 @@ void Pause::update(float) {
 		}
 	}
 
-	Gold::drawGolds();
-	Enemy::drawPaused();
 	gamePlay->play->drawLevel();
-	gamePlay->writeGameTime();
 }
 
 void Pause::end() {

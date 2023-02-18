@@ -10,30 +10,39 @@
 class Enemy;
 
 class Gold {
-	static std::vector<std::unique_ptr<Gold>> uncollectedGold;
-	static std::vector<std::unique_ptr<Gold>> collectedGold;
+	static std::vector<std::shared_ptr<Gold>> uncollectedGold;
+	static std::vector<std::shared_ptr<Gold>> collectedGold;
 
 	//Enemy* carrier;
-	void draw();
 	short releaseCounter = 0;
-	Vector2D pos;
+	Vector2DInt pos;
+	int* positionPointer;
 
 public:
-	Gold(Vector2DInt pos) { this->pos = { (float) pos.x, (float) pos.y}; }
-	void initialize(int, Vector2D);
-	static void drawGolds();
+	Gold(Vector2DInt pos) { this->pos = { pos.x, pos.y}; }
 	static bool goldChecker(int, int);
-	static std::unique_ptr<Gold> goldCollectChecker(float, float);
+	static std::shared_ptr<Gold> goldCollectChecker(float, float);
 	static void clearGoldHolders();
-	static void addGoldToUncollected(std::unique_ptr<Gold>);
-	static void addGoldToCollected(std::unique_ptr<Gold>);
+	static void addGoldToUncollected(std::shared_ptr<Gold>);
+	static void addGoldToCollected(std::shared_ptr<Gold>);
 
 	static short getCollectedSize();
 	static short getUncollectedSize();
 
 	void setReleaseCounter(short releaseCounter) { this->releaseCounter = releaseCounter; }
 	bool shouldBeReleased();
-	void setPos(Vector2D pos) { this->pos = pos; }
+	Vector2DInt getPos() { return this->pos; }
+
+	void setPos(Vector2DInt pos) { 
+		this->pos = pos;
+		positionPointer[0] = pos.x;
+		positionPointer[1] = pos.y;
+	}
+
+	void setPositionPointer(int* positionPointer)
+	{
+		this->positionPointer = positionPointer;
+	}
 };
 
 #endif // !GOLD_H

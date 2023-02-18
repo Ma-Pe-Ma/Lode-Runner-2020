@@ -2,8 +2,8 @@
 #include "Gold.h"
 #include "GameTime.h"
 
-std::vector<std::unique_ptr<Gold>> Gold::uncollectedGold;
-std::vector<std::unique_ptr<Gold>> Gold::collectedGold;
+std::vector<std::shared_ptr<Gold>> Gold::uncollectedGold;
+std::vector<std::shared_ptr<Gold>> Gold::collectedGold;
 
 short Gold::getCollectedSize() {
 	return collectedGold.size();
@@ -12,8 +12,9 @@ short Gold::getUncollectedSize() {
 	return uncollectedGold.size();
 }
 
-void Gold::addGoldToCollected(std::unique_ptr<Gold> collectedGold) {
-	Gold::collectedGold.push_back(std::move(collectedGold));
+void Gold::addGoldToCollected(std::shared_ptr<Gold> collectedGold) {
+	collectedGold->setPos(Vector2DInt{ -1, -1 });
+	Gold::collectedGold.push_back(collectedGold);
 }
 
 void Gold::clearGoldHolders() {
@@ -21,18 +22,8 @@ void Gold::clearGoldHolders() {
 	collectedGold.clear();
 }
 
-void Gold::initialize(int indexIn, Vector2D pos) {
-	this->pos = pos;
-}
-
-void Gold::drawGolds() {
-	for (auto& gol : uncollectedGold) {
-		gol->draw();
-	}
-}
-
-void Gold::addGoldToUncollected(std::unique_ptr<Gold> newGold) {
-	uncollectedGold.push_back(std::move(newGold));
+void Gold::addGoldToUncollected(std::shared_ptr<Gold> newGold) {
+	uncollectedGold.push_back(newGold);
 }
 
 bool Gold::goldChecker(int x, int y) {
@@ -45,30 +36,17 @@ bool Gold::goldChecker(int x, int y) {
 	return false;
 }
 
-std::unique_ptr<Gold> Gold::goldCollectChecker(float x, float y) {
+std::shared_ptr<Gold> Gold::goldCollectChecker(float x, float y) {
 	for (auto it = uncollectedGold.begin(); it != uncollectedGold.end(); it++) {
 		if (std::abs(it->get()->pos.x - x) < 0.15f && std::abs(it->get()->pos.y - y) < 0.15f) {
-			std::unique_ptr<Gold> foundGold = std::move(*it);
+			std::shared_ptr<Gold> foundGold = *it;
 			uncollectedGold.erase(it);
 
-			//return std::move(foundGold);
 			return foundGold;
 		}
 	}
 
 	return nullptr;
-}
-
-void Gold::draw() {
-	int timeFactor = int(GameTime::getGameTime()) % 4;
-
-	if (timeFactor == 3) {
-		timeFactor = 1;
-	}
-
-#ifdef NDEBUG
-	Drawing::drawLevel(geX, geY, 54);
-#endif 
 }
 
 bool Gold::shouldBeReleased() {

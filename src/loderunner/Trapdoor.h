@@ -1,7 +1,6 @@
 #ifndef TRAPDOOR_H
 #define TRAPDOOR_H
 
-#include "Drawing.h"
 #include "Structs/Vector2DInt.h"
 
 class Trapdoor {

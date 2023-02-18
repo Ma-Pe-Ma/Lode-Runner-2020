@@ -119,13 +119,24 @@ protected:
 	int textureRef;
 
 	PitState pitState;
+
+	float* positionPointer;
+	int* texturePointer;
+	int* directionPointer;
+	int* carryGoldPointer;
 public:
 	virtual ~Enemy() {}
 
-	static std::unique_ptr<Enemy> player;
-	static std::vector<std::unique_ptr<Enemy>> enemies;
+	int getTextureRef()
+	{
+		return this->textureRef;
+	}
+
+	static std::shared_ptr<Enemy> player;
+	static std::vector<std::shared_ptr<Enemy>> enemies;
 	static void clearEnemyVector();
-	static void addEnemy(Vector2DInt);
+	//static void addEnemy(Vector2DInt);
+	static void addEnemy(std::shared_ptr<Enemy>);
 
 	static bool enemyCheckerGlobal(float, float);
 	static void handleCharacters();
@@ -138,7 +149,27 @@ public:
 
 	Enemy(float, float);
 
-	std::unique_ptr<Gold> carriedGold;
+	std::shared_ptr<Gold> carriedGold;
+
+	void setPositionPointer(float* positionPointer)
+	{
+		this->positionPointer = positionPointer;
+	}
+
+	void setTexturePointer(int* texturePointer)
+	{
+		this->texturePointer = texturePointer;
+	}
+
+	void setDirectionPointer(int* directionPointer)
+	{
+		this->directionPointer = directionPointer;
+	}
+
+	void setCarryGoldPointer(int* carryGoldPointer)
+	{
+		this->carryGoldPointer = carryGoldPointer;
+	}
 
 	Vector2D pos;
 	Vector2D dPos;
@@ -157,9 +188,13 @@ public:
 	static void setPlayerSpeed(float);
 	static void setEnemySpeed(float);
 	static unsigned int getKillCounter();
-	static void drawPaused();
-	static void drawPlayerDeath();
 	static void handlePlayerDying();
+
+	void setTextureRef(int textureRef)
+	{
+		this->textureRef = textureRef;
+		*texturePointer = textureRef;
+	}
 };
 
 #endif // !ENEMY_H

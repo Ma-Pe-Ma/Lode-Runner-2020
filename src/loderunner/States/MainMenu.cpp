@@ -2,7 +2,6 @@
 #include "States/StateContext.h"
 
 #include "Audio.h"
-#include "GLHelper.h"
 
 #include "IOHandler.h"
 
@@ -16,6 +15,7 @@ void MainMenu::start() {
 
 	//stateContext->level[0] = 1;
 	//stateContext->level[1] = 1;
+
 	stateContext->playerNr = 0;
 }
 
@@ -25,58 +25,28 @@ void MainMenu::update(float currentFrame) {
 		Audio::sfx[5].playPause();
 	}
 
-	//Drawing main menu
-	if (gameVersion == 1) {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	}
-	else {
-		glClearColor(110.0 / 256, 93.0 / 256, 243.0 / 256, 1.0f);
-	}
-
-	//drawing background
-	glClear(GL_COLOR_BUFFER_BIT);
-	GLHelper::mainShader->use();
-	GLHelper::mainShader->setInt("mode", 0);
-	GLHelper::mainShader->setInt("textureA", 2);
-	glBindVertexArray(GLHelper::mainVAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	int& menuCursor = stateContext->menuCursor;
 
 	//changing gamemode
 	if (down.simple()) {
-		if (++stateContext->menuCursor == 3) {
-			stateContext->menuCursor = 0;
-		}
+		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
 	}
 
 	if (up.simple()) {
-		if (--stateContext->menuCursor == -1) {
-			stateContext->menuCursor = 2;
-		}
+		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
 	}
 
 	if (gameVersion == 1) {
-		stateContext->menuCursor = 0;
+		menuCursor = 0;
 	}
 
-	//drawing cursor
-	if (gameVersion == 0) {
-		glBindVertexArray(GLHelper::cursorVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, GLHelper::cursorVBO);
-		float cursorY = (1.0f - 2 * stateContext->menuCursor) / 14;
-		float cursorLocation[] = { -3.0f / 14, cursorY - 1.0f / 14, -6.0f / 35, cursorY - 1.0f / 14, -6.0f / 35, cursorY, -3.0f / 14, cursorY };
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 8, cursorLocation);
-
-		GLHelper::mainShader->setInt("mode", 1);
-		GLHelper::mainShader->setInt("textureA", 1);
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	}
+	renderingManager->drawMainMenu(menuCursor, gameVersion);
 
 	//choosing selected gamemode
 	if (enter.simple()) {
 		Audio::sfx[5].stopAndRewind();
 
-		switch (stateContext->menuCursor) {
+		switch (menuCursor) {
 			//single player
 			case 0:
 			//multiplayer

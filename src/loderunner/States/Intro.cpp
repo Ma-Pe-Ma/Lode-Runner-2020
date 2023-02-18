@@ -1,10 +1,8 @@
 #include "States/Intro.h"
 #include "States/StateContext.h"
 
-#include "GLHelper.h"
 #include "Enemy.h"
 #include "Gold.h"
-#include "Drawing.h"
 #include "Audio.h"
 #include "GameTime.h"
 
@@ -16,62 +14,91 @@ void Intro::start() {
 	timer = GameTime::getCurrentFrame();
 	Audio::sfx[8].playPause();
 
-	if (stateContext->level[stateContext->playerNr] < 1) {
-		stateContext->level[stateContext->playerNr] = 1;
-	}
-	else {
-		if (gameVersion == 1) {
-			if(stateContext->level[stateContext->playerNr] > 51) {
-				stateContext->level[stateContext->playerNr] = 1;
-			}
-		}
-		else if (stateContext->level[stateContext->playerNr] > 150) {
-			stateContext->level[stateContext->playerNr] = 1;
-		}
-	}
+	int& level = stateContext->level[stateContext->playerNr];
+	level = level < 1 ? 1 : level;
 
-	if (stateContext->menuCursor < 2) {
-		stateContext->gamePlay->play->loadLevel(stateContext->level[stateContext->playerNr]);
-	}
+	int maxLevelNumber = gameVersion == 0 ? 150 : 51;
+	level = level > maxLevelNumber ? 1 : level;
+
 	/*else {
 		//stateContext->gamePlay->play->loadLevel(stateContext->level[stateContext->playerNr]);
 	}*/
 
-	std::string number = "00" + std::to_string(stateContext->level[stateContext->playerNr]);
+	//write player id 
+	std::string playerString = gameVersion == 0 ? "PLAYER " + std::to_string(stateContext->playerNr + 1) : "";
+	playerName = std::make_shared<Text>(Text(playerString, { 12, 6 }));
 
-	if (stateContext->level[stateContext->playerNr] > 9) {
-		number = '0' + std::to_string(stateContext->level[stateContext->playerNr]);
-	}
+	//write level number
+	std::string levelNumber = std::to_string(level);
+	levelNumber.insert(0, 3 - levelNumber.length(), '0');
+	levelName = std::make_shared<Text>(Text("STAGE " + levelNumber, {8,12}));
 
-	if (stateContext->level[stateContext->playerNr] > 99) {
-		number = std::to_string(stateContext->level[stateContext->playerNr]);
-	}
+	//write remaining life number
+	lifeLeft = std::make_shared<Text>(Text("LEFT " + std::to_string(stateContext->playerLife[stateContext->playerNr]), { 19, 12}));
 
-	levelName = "STAGE " + number;
-	playerName = "PLAYER " + std::to_string(stateContext->playerNr + 1);
-	lifeLeft = "LEFT " + std::to_string(stateContext->playerLife[stateContext->playerNr]);
-
+	//write current player score
 	std::string point = std::to_string(stateContext->score[stateContext->playerNr]);
-	std::string zeros = "";
+	point.insert(0, 8 - point.length(), '0');
+	scoreText = std::make_shared<Text>(Text("SCORE    " + point, { 8,18 }));
 
-	for (int i = 0; i < 8 - point.length(); i++) {
-		zeros = zeros + '0';
-	}
-
-	scoret = "SCORE    " + zeros + point;
-
+	//write high score
 	std::string record = std::to_string(stateContext->highScore);
-	zeros = "";
+	record.insert(0, 8 - record.length(), '0');
+	hiscore = std::make_shared<Text>(Text("HISCORE  " + record, { 8,20 }));
 
-	for (int i = 0; i < 8 - record.length(); i++) {
-		zeros = zeros + '0';
+	saveCurrentLevel();
+
+	setupRenderingManager();
+}
+
+void Intro::setupRenderingManager()
+{
+	renderingManager->clearRenderableObjects();
+
+	std::vector<std::shared_ptr<Text>> textList;
+
+	textList.push_back(levelName);
+	textList.push_back(playerName);
+	textList.push_back(lifeLeft);
+	textList.push_back(scoreText);
+	textList.push_back(hiscore);
+
+	renderingManager->setTextList(textList);
+
+	renderingManager->initializeCharacters();
+}
+
+void Intro::update(float currentFrame) {
+	renderingManager->render();
+
+	if (GameTime::getCurrentFrame() - timer < Audio::sfx[8].lengthInSec()) {
+		if (space.simple()) {
+			stateContext->transitionTo(stateContext->select);
+		}
+
+		if (enter.simple()) {
+			stateContext->transitionTo(stateContext->gamePlay);
+		}
 	}
-	hiscore = "HISCORE  " + zeros + record;
+	else {
+		stateContext->transitionTo(stateContext->gamePlay);
+	}
+}
 
-	//save starting level
+void Intro::end() {
+	Audio::sfx[8].stopAndRewind();
+	Audio::sfx[7].stopAndRewind();
+
+	if (stateContext->menuCursor < 2) {
+		stateContext->gamePlay->play->loadLevel(stateContext->level[stateContext->playerNr]);
+	}
+}
+
+void Intro::saveCurrentLevel()
+{
+#if !defined ANDROID_VERSION && !defined __EMSCRIPTEN__
 	std::string line;
 
-#if !defined ANDROID_VERSION && !defined __EMSCRIPTEN__
 	std::ifstream configFileOld;
 	std::ofstream configFileNew;
 	configFileOld.open("config.txt");
@@ -112,33 +139,4 @@ void Intro::start() {
 	ndk_helper::JNIHelper* jniHelper = ndk_helper::JNIHelper::GetInstance();
 	jniHelper->setLastLevel(stateContext->level[stateContext->playerNr]);
 #endif
-}
-
-void Intro::update(float currentFrame) {
-	Drawing::textWriting(levelName, 8, 12);
-	if (gameVersion == 0) {
-		Drawing::textWriting(playerName, 12, 6);
-	}
-
-	Drawing::textWriting(lifeLeft, 19, 12);
-	Drawing::textWriting(scoret, 8, 18);
-	Drawing::textWriting(hiscore, 8, 20);
-
-	if (GameTime::getCurrentFrame() - timer < Audio::sfx[8].lengthInSec()) {
-		if (space.simple()) {
-			stateContext->transitionTo(stateContext->select);
-		}
-
-		if (enter.simple()) {
-			stateContext->transitionTo(stateContext->gamePlay);
-		}
-	}
-	else {
-		stateContext->transitionTo(stateContext->gamePlay);
-	}
-}
-
-void Intro::end() {
-	Audio::sfx[8].stopAndRewind();
-	Audio::sfx[7].stopAndRewind();
 }

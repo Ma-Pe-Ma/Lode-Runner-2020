@@ -9,8 +9,8 @@ Player::Player(float x, float y) : Enemy(x, y) {
 	textureRef = textureMap.going;
 }
 
-void Player::addPlayer(Vector2DInt position) {
-	Enemy::player = std::make_unique<Player>((float)position.x, (float)position.y);
+void Player::addPlayer(std::shared_ptr<Player> player) {
+	Enemy::player = player;
 }
 
 void Player::updateCharSpeed() {
@@ -209,13 +209,13 @@ void Player::animateOnPole() {
 
 //player does not check gold rather top of level,
 void Player::checkGoldCollect() {
-	if ((carriedGold = Gold::goldCollectChecker(pos.x, pos.y))) {
+	if (carriedGold = Gold::goldCollectChecker(pos.x, pos.y)) {
 		if (Audio::sfx[0].getPlayStatus() == AudioStatus::playing) {
 			Audio::sfx[0].stopAndRewind();
 		}
 
 		Audio::sfx[0].playPause();
-		Gold::addGoldToCollected(std::move(carriedGold));
+		Gold::addGoldToCollected(carriedGold);
 
 		//if every gold is collected draw the ladders which are needed to finish the level
 		if (!Enemy::hasGold() && Gold::getUncollectedSize() == 0) {
@@ -246,5 +246,5 @@ void Player::dying() {
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
 
 	textureRef = textureMap.death + timeFactor;
-	Drawing::drawEnemy(pos.x, pos.y, textureRef, direction, false);
+	*texturePointer = textureRef;
 }

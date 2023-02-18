@@ -5,30 +5,16 @@
 #include "IOHandler.h"
 #include <cmath>
 
-std::vector<std::unique_ptr<Enemy>> Enemy::enemies;
-std::unique_ptr<Enemy> Enemy::player;
+std::vector<std::shared_ptr<Enemy>> Enemy::enemies;
+std::shared_ptr<Enemy> Enemy::player;
 int Enemy::animationFactor = 20;
 LayoutBlock** Enemy::layout;
 Play* Enemy::play;
 std::shared_ptr<Brick>** Enemy::brick;
 std::shared_ptr<Trapdoor>** Enemy::trapdoors;
-unsigned int Enemy::killCounter = 0;;
+unsigned int Enemy::killCounter = 0;
 float Enemy::playerSpeed = 0.9f;
 float Enemy::enemySpeed = 0.415f;
-
-void Enemy::drawPaused() {
-	Drawing::drawEnemy(player->pos.x, player->pos.y, player->textureRef, player->direction, false);
-
-	for (auto& enemy : enemies) {
-		Drawing::drawEnemy(enemy->pos.x, enemy->pos.y, enemy->textureRef, enemy->direction, enemy->carriedGold != nullptr);
-	}
-}
-
-void Enemy::drawPlayerDeath() {
-	for (auto& enemy : enemies) {
-		Drawing::drawEnemy(enemy->pos.x, enemy->pos.y, enemy->textureRef, enemy->direction, enemy->carriedGold != nullptr);
-	}
-}
 
 unsigned int Enemy::getKillCounter() {
 	return Enemy::killCounter;
@@ -84,8 +70,9 @@ Enemy::Enemy(float x, float y) {
 	charSpeed = enemySpeed;
 }
 
-void Enemy::addEnemy(Vector2DInt position) {
-	enemies.push_back(std::make_unique<Enemy>((float) position.x, (float)position.y));
+void Enemy::addEnemy(std::shared_ptr<Enemy> enemy) {
+	//enemies.push_back(std::make_unique<Enemy>((float) position.x, (float)position.y));
+	enemies.push_back(enemy);
 }
 
 void Enemy::notifyPlayerAboutDigEnd() {
@@ -128,7 +115,6 @@ void Enemy::checkDeath(int x, int y) {
 bool Enemy::enemyChecker(float x, float y) {
 	for (auto& enemy : enemies) {
 		if (enemy.get() != this) {
-			//if (std::abs(pos.x - enemy->pos.x) < 0.5 && std::abs(pos.x - enemy->pos.y) < 0.5) {
 			if (std::abs(x - enemy->pos.x) < 0.5f && std::abs(y - enemy->pos.y) < 0.5f) {
 				return true;
 			}
@@ -181,6 +167,9 @@ void Enemy::handle() {
 	pos.x += dPos.x;
 	pos.y += dPos.y;
 
+	positionPointer[0] = pos.x;
+	positionPointer[1] = pos.y;
+
 	if (prevPos.x != pos.x && state != EnemyState::digging) {
 		if (pos.x - prevPos.x > 0) {
 			direction = Direction::right;
@@ -195,7 +184,9 @@ void Enemy::handle() {
 
 	animate();
 
-	Drawing::drawEnemy(pos.x, pos.y, textureRef, direction, carriedGold != nullptr);
+	*texturePointer = textureRef;
+	*directionPointer = direction == Direction::left;
+	*carryGoldPointer = carriedGold != nullptr;
 
 	dPrevPos.x = pos.x - prevPos.x;
 	dPrevPos.y = pos.y - prevPos.y;
@@ -1061,7 +1052,7 @@ void Enemy::fallingToPit() {
 		holeTimer = gameTime;
 
 		if (carriedGold) {
-			carriedGold->setPos({ float(brickPosition.x), float(brickPosition.y + 1.0f) });
+			carriedGold->setPos({ brickPosition.x, brickPosition.y + 1 });
 			Gold::addGoldToUncollected(std::move(carriedGold));
 		}
 	}
@@ -1305,6 +1296,7 @@ void Enemy::checkGoldCollect() {
 	if (!carriedGold) {
 		if ((carriedGold = Gold::goldCollectChecker(pos.x, pos.y))) {
 			carriedGold->setReleaseCounter(rand() % 26 + 14);
+			carriedGold->setPos(Vector2DInt{-1, -1});
 		}		
 	}
 }
@@ -1322,7 +1314,7 @@ void Enemy::checkGoldDrop() {
 				LayoutBlock prevBlockUnder = layout[prevX][prevY - 1];
 
 				if (prevBlock == LayoutBlock::empty && !brick[prevX][prevY] && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
-					carriedGold->setPos({ (float)prevX, (float)prevY });
+					carriedGold->setPos({ prevX, prevY });
 					Gold::addGoldToUncollected(std::move(carriedGold));
 				}
 			}

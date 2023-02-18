@@ -27,9 +27,6 @@ public:
 	Play* play;
 	Pause* pause;
 	Death* death;
-
-	float startingTimer = currentFrame;	
-	void writeGameTime();
 };
 
 #endif
