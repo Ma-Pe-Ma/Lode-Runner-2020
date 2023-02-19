@@ -5,33 +5,7 @@
 #include "Player.h"
 #include "States/StateContext.h"
 
-LayoutBlock** Generator::layout;
-std::unique_ptr <Brick>** Generator::brick;
-std::unique_ptr<Trapdoor>** Generator::trapdoors;
-Play* Generator::play;
-
-void Generator::setLayoutPointers(LayoutBlock** layout, std::unique_ptr <Brick>** brick, std::unique_ptr <Trapdoor>** trapdoors, Play* play) {
-	Generator::layout = layout;
-	Generator::brick = brick;
-	Generator::trapdoors = trapdoors;
-	Generator::play = play;
-}
-
 Generator::Generator() {
-	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 17; j++) {
-			if (j == 0) {
-				gen[i][j] = 2;
-			}
-			else if (i == 0 || i == 29) {
-				gen[i][j] = 2;
-			}
-			else {
-				gen[i][j] = 0;
-			}
-		}
-	}
-
 	textureMap.insert(std::pair<short, short>(0, 17));
 	textureMap.insert(std::pair<short, short>(1, 0));
 	textureMap.insert(std::pair<short, short>(2, 6));
@@ -43,80 +17,117 @@ Generator::Generator() {
 	textureMap.insert(std::pair<short, short>(8, 42));
 	textureMap.insert(std::pair<short, short>(9, 48));
 
-	layoutMap.insert(std::pair<short, LayoutBlock> (0, LayoutBlock::empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (1, LayoutBlock::brick));
-	layoutMap.insert(std::pair<short, LayoutBlock> (2, LayoutBlock::concrete));
-	layoutMap.insert(std::pair<short, LayoutBlock> (3, LayoutBlock::ladder));
-	layoutMap.insert(std::pair<short, LayoutBlock> (4, LayoutBlock::pole));
-	layoutMap.insert(std::pair<short, LayoutBlock> (5, LayoutBlock::trapDoor));
-	layoutMap.insert(std::pair<short, LayoutBlock> (6, LayoutBlock::empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (7, LayoutBlock::empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (8, LayoutBlock::empty));
-	layoutMap.insert(std::pair<short, LayoutBlock> (9, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock>(0, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock>(1, LayoutBlock::brick));
+	layoutMap.insert(std::pair<short, LayoutBlock>(2, LayoutBlock::concrete));
+	layoutMap.insert(std::pair<short, LayoutBlock>(3, LayoutBlock::ladder));
+	layoutMap.insert(std::pair<short, LayoutBlock>(4, LayoutBlock::pole));
+	layoutMap.insert(std::pair<short, LayoutBlock>(5, LayoutBlock::trapDoor));
+	layoutMap.insert(std::pair<short, LayoutBlock>(6, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock>(7, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock>(8, LayoutBlock::empty));
+	layoutMap.insert(std::pair<short, LayoutBlock>(9, LayoutBlock::empty));
+
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 18; j++) {
+			if (j == 0) {
+				gen[i][j] = 2;
+				texture[i][j] = textureMap[2];
+			}
+			else if (i == 0 || i == 29) {
+				gen[i][j] = 2;
+				texture[i][j] = textureMap[2];
+			}
+			else {
+				gen[i][j] = 0;
+				texture[i][j] = textureMap[0];
+			}
+		}
+	}
+
+	for (int i = 0; i < 30; i++)
+	{
+		for (int j = 0; j < 18; j++)
+		{
+			pos[i][j][0] = i;
+			pos[i][j][1] = j;
+		}
+	}
+
+	geX = 1;
+	geY = 16;
 }
 
 void Generator::start() {
-	geX = 1;
-	geY = 16;
-	play->clearContainers();
+	renderingManager->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
+
+	getStateContext()->getGamePlay()->getPlay()->clearContainers();
 }
 
 void Generator::update(float currentFrame) {
-	if (rightButton.simple()) {
+	if (IOHandler::rightButton.simple()) {
 		if (++geX > 28) {
 			geX = 28;
 		}
 		else {
+			texture[geX - 1][geY] = textureMap[gen[geX - 1][geY]];
 			Audio::sfx[9].stopAndRewind();
 			Audio::sfx[9].playPause();
 		}
 	}
 
-	if (leftButton.simple()) {
+	if (IOHandler::leftButton.simple()) {
 		if (--geX < 1) {
 			geX = 1;
 		}
 		else {
+			texture[geX + 1][geY] = textureMap[gen[geX + 1][geY]];
 			Audio::sfx[9].stopAndRewind();
 			Audio::sfx[9].playPause();
 		}
 	}
 
-	if (up.simple()) {
+	if (IOHandler::up.simple()) {
 		if (++geY > 16) {
 			geY = 16;
 		}
 		else {
+			texture[geX][geY - 1] = textureMap[gen[geX][geY - 1]];
 			Audio::sfx[9].stopAndRewind();
 			Audio::sfx[9].playPause();
 		}
 	}
 
-	if (down.simple()) {
+	if (IOHandler::down.simple()) {
 		if (--geY < 1) {
 			geY = 1;
 		}
 		else {
+			texture[geX][geY + 1] = textureMap[gen[geX][geY + 1]];
 			Audio::sfx[9].stopAndRewind();
 			Audio::sfx[9].playPause();
 		}
 	}
 
 	//chaning element upwards
-	if (rightDigButton.simple()) {
+	if (IOHandler::rightDigButton.simple()) {
 		if (++gen[geX][geY] > 9) {
-			gen[geX][geY] = 0;
+			gen[geX][geY] = 0;	
 		}
+
+		texture[geX][geY] = textureMap[gen[geX][geY]];
 
 		Audio::sfx[10].stopAndRewind();
 		Audio::sfx[10].playPause();
 	}
 
-	//chaning element downwards
-	if (leftDigButton.simple()) {
+	//chaning element IOHandler::downwards
+	if (IOHandler::leftDigButton.simple()) {
 		if (--gen[geX][geY] < 0) {
 			gen[geX][geY] = 9;
 		}
+
+		texture[geX][geY] = textureMap[gen[geX][geY]];
 
 		Audio::sfx[10].stopAndRewind();
 		Audio::sfx[10].playPause();
@@ -124,99 +135,171 @@ void Generator::update(float currentFrame) {
 
 	//yellow cursor block
 	if (int(3 * currentFrame) % 2) {
-#ifdef NDEBUG
-		Drawing::drawLevel(geX, geY, 54);
-#endif 
-		
+		texture[geX][geY] = 54;
 	}
-
-	//drawing generator elements
-	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 17; j++) {
-			int layoutType = gen[i][j];
-			
-			if (layoutType == 0) {
-				continue;
-			}
-
-#ifdef NDEBUG
-			Drawing::drawLevel(geX, geY, 54);
-#endif 
-		}
+	else {
+		texture[geX][geY] = textureMap[gen[geX][geY]];
 	}
 	
-	if (enter.simple()) {
-		bool playerPresent = false;
-		int highestLadder = 0;
-		std::vector<Vector2DInt> finisihingLadders;
+	renderingManager->renderGenerator();
 
-		for (int i = 0; i < 30; i++) {
-			for (int j = 0; j < 17; j++) {
-				brick[i][j].reset();
-				trapdoors[i][j].reset();
+	if (IOHandler::enter.simple()) {
+		texture[geX][geY] = textureMap[gen[geX][geY]];
 
-				Vector2DInt pos = { i, j };
-				if (gen[i][j] == 1) {
-					brick[i][j].reset(new Brick(pos));
-				}
-				else if (gen[i][j] == 5) {
-					trapdoors[i][j].reset(new Trapdoor(pos));
-				}
-				else if (gen[i][j] == 6) {
-					finisihingLadders.push_back(pos);
-				}
-				else if (gen[i][j] == 7) {
-					std::unique_ptr<Gold> gold(new Gold(pos));
-					Gold::addGoldToUncollected(std::move(gold));
-				}
-				else if (gen[i][j] == 8) {
-#ifdef NDEBUG
-					Enemy::addEnemy(pos);
-#endif
-				}
-				else if (gen[i][j] == 9) {
-					if (!playerPresent) {
-#ifdef NDEBUG
-						Player::addPlayer(pos);
-#endif
-						playerPresent = true;
-					}
-				}
-
-				layout[i][j] = layoutMap[gen[i][j]];
-			}
-		}
-
-		//if no player was given, put in one!
-		if (!playerPresent) {
-			for (int j = 1; j < 18; j++) {
-				if (playerPresent) {
-					break;
-				}
-
-				for (int i = 1; i < 30; i++) {
-					if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
-						Vector2DInt pos = { i, j };
-
-#ifdef NDEBUG
-						Player::addPlayer(pos);
-#endif
-						playerPresent = true;
-						break; 
-					}
-				}
-			}
-		}
-
-		if (playerPresent) {
-			highestLadder = highestLadder < 15 ? 15 : highestLadder;
-
-			play->setLadders(highestLadder, finisihingLadders);
-			stateContext->transitionTo(stateContext->gamePlay);
-		}
+		generateLevel();
 	}
 }
 
 void Generator::end() {
 
+}
+
+void Generator::generateLevel()
+{
+	int highestLadder = 0;
+
+	LayoutBlock** layout = new LayoutBlock * [30];
+	std::shared_ptr<Brick>** bricks = new std::shared_ptr<Brick>*[30];
+	std::shared_ptr<Trapdoor>** trapdoors = new std::shared_ptr<Trapdoor>*[30];
+
+	for (int i = 0; i < 30; i++) {
+		layout[i] = new LayoutBlock[18]{};
+		bricks[i] = new std::shared_ptr<Brick>[18];
+		trapdoors[i] = new std::shared_ptr<Trapdoor>[18];
+	}
+
+	std::vector<std::shared_ptr<Brick>> brickList;
+	std::vector<std::shared_ptr<Trapdoor>> trapDoorList;
+	std::vector<std::shared_ptr<Gold>> goldList;
+	std::vector<std::shared_ptr<Enemy>> enemyList;
+
+	std::vector<std::tuple<int, int>> poleList;
+	std::vector<std::tuple<int, int>> concreteList;
+	std::vector<std::tuple<int, int>> ladderList;
+	std::vector<std::tuple<int, int>> finishingLadderList;
+
+	std::shared_ptr<Player> player = nullptr;
+
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 17; j++) {
+			layout[i][j] = layoutMap[gen[i][j]];
+
+			Vector2DInt pos = { i, j };
+
+			if (gen[i][j] == 1) {
+				std::shared_ptr<Brick> newBrick = std::make_shared<Brick>(Brick({ pos.x, pos.y }));
+
+				brickList.push_back(newBrick);
+				bricks[i][j] = newBrick;
+
+				newBrick->setGameContext(gameContext);
+			}
+			else if (gen[i][j] == 2) {
+				concreteList.push_back({ pos.x, pos.y });
+			}
+			else if (gen[i][j] == 3) {
+				ladderList.push_back({ pos.x, pos.y });
+			}
+			else if (gen[i][j] == 4) {
+				poleList.push_back({ pos.x, pos.y });
+			}
+			else if (gen[i][j] == 5) {
+				std::shared_ptr<Trapdoor> newTrapdoor = std::make_shared<Trapdoor>(Trapdoor({pos.x, pos.y}));
+				
+				trapDoorList.push_back(newTrapdoor);
+				trapdoors[i][j] = newTrapdoor;
+			}
+			else if (gen[i][j] == 6) {
+				finishingLadderList.push_back({ pos.x, pos.y });
+			}
+			else if (gen[i][j] == 7) {
+				std::shared_ptr<Gold> gold = std::make_shared<Gold>(pos);				
+				goldList.push_back(gold);
+			}
+			else if (gen[i][j] == 8) {
+				std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(pos.x, pos.y);
+				enemy->setGameContext(gameContext);
+				enemy->setCharSpeed(gameContext->getEnemySpeed());
+				enemyList.push_back(enemy);
+			}
+			else if (gen[i][j] == 9) {
+				if (player == nullptr) {
+					player = std::make_shared<Player>(pos.x, pos.y);
+					player->setGameContext(gameContext);
+					player->setCharSpeed(gameContext->getPlayerSpeed());
+				}
+			}
+
+			layout[i][j] = layoutMap[gen[i][j]];
+		}
+	}
+
+	//if no player was given, put in one!
+	if (player == nullptr) {
+		for (int j = 1; j < 18; j++) {
+			if (player) {
+				break;
+			}
+
+			for (int i = 1; i < 30; i++) {
+				if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
+					Vector2DInt pos = { i, j };
+
+					player = std::make_shared<Player>(pos.x, pos.y);
+					player->setGameContext(gameContext);
+					player->setCharSpeed(gameContext->getPlayerSpeed());
+					break;
+				}
+			}
+		}
+	}
+
+	if (player) {
+		highestLadder = highestLadder < 15 ? 15 : highestLadder;
+
+		timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
+		stateContext->getGamePlay()->getPlay()->setTimeText(timeText);
+
+		std::vector<std::shared_ptr<Text>> textList;
+		textList.push_back(timeText);
+
+		enemyList.insert(enemyList.end(), player);
+
+		gameContext->setHighestLadder(highestLadder);
+
+		renderingManager->setGameContext(gameContext);
+		gameContext->setRenderingManager(renderingManager);
+
+		renderingManager->clearRenderableObjects();
+		renderingManager->setPoleList(poleList);
+		renderingManager->setConcreteList(concreteList);
+		renderingManager->setBrickList(brickList);
+		renderingManager->setTrapdoorList(trapDoorList);
+		renderingManager->setLadderList(ladderList);
+		renderingManager->setFinishingLadderList(finishingLadderList);
+		renderingManager->setGoldList(goldList);
+		renderingManager->initializeLevelLayout();
+
+		renderingManager->setEnemyList(enemyList);
+		renderingManager->initializeEnemies();
+
+		renderingManager->setTextList(textList);
+		renderingManager->initializeCharacters();
+
+		enemyList.erase(enemyList.end() - 1);
+		gameContext->setEnemies(enemyList);
+		gameContext->setPlayer(player);
+		gameContext->setBrickList(brickList);
+		gameContext->setTrapdoorList(trapDoorList);
+		gameContext->setTrapdoors(trapdoors);
+		gameContext->setLayout(layout);
+		gameContext->setHighestLadder(highestLadder);
+		gameContext->setFinishingLadders(finishingLadderList);
+		gameContext->setBricks(bricks);
+		gameContext->setUncollectedGoldList(goldList);
+
+		//gameContext->setLadders(highestLadder, finisihingLadders);
+		stateContext->getGamePlay()->setGameContext(gameContext);
+		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
+	}
 }

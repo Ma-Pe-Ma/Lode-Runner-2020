@@ -16,8 +16,11 @@
 class StateContext {
 private:
 	State* currentState;
+	//void transitionTo(State*);
+	void transitionTo(State*, bool start = true, bool end = true);
 
-public:
+	State* transitionableAtEndOfFrame = nullptr;
+
 	MainMenu* mainMenu;
 	Intro* intro;
 	GamePlay* gamePlay;
@@ -25,10 +28,11 @@ public:
 	Outro* outro;
 	GameOver* gameOver;
 	Generator* generator;
+public:	
 
-	//void transitionTo(State*);
-	void transitionTo(State*, bool start = true, bool end = true);
 	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
+	void checkTransitionAtEndofFrame();
+
 	StateContext();
 	
 	void update(float);
@@ -41,6 +45,79 @@ public:
 
 	int playerNr = 0;
 	int highScore = 0;
+
+	void setRenderingManager(std::shared_ptr<RenderingManager>);
+
+	void setMainMenu(MainMenu* mainMenu)
+	{
+		this->mainMenu = mainMenu;
+	}
+
+	MainMenu* getMainMenu()
+	{
+		return this->mainMenu;
+	}
+
+	void setIntro(Intro* intro)
+	{
+		this->intro = intro;
+	}
+
+	Intro* getIntro()
+	{
+		return this->intro;
+	}
+
+	void setGamePlay(GamePlay* gamePlay)
+	{
+		this->gamePlay = gamePlay;
+	}
+
+	GamePlay* getGamePlay()
+	{
+		return this->gamePlay;
+	}
+
+	void setSelect(Select* select)
+	{
+		this->select= select;
+	}
+
+	Select* getSelect()
+	{
+		return this->select;
+	}
+
+	void setOutro(Outro* outro)
+	{
+		this->outro = outro;
+	}
+
+	Outro* getOutro()
+	{
+		return this->outro;
+	}
+
+	void setGameOver(GameOver* gameOver)
+	{
+		this->gameOver = gameOver;
+	}
+
+	GameOver* getGameOver()
+	{
+		return this->gameOver;
+	}
+
+	void setGenerator(Generator* generator)
+	{
+		this->generator = generator;
+	}
+
+	Generator* getGenerator()
+	{
+		return this->generator;
+	}
+
 };
 
 #endif

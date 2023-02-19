@@ -21,17 +21,18 @@
 #include "Trapdoor.h"
 #include "Brick.h"
 
+#include "GameContext.h"
+
 class Gold;
 class Play;
 
 class Enemy {
 private:
-	static int bestPath;
-	static float bestRating;
+	int bestPath = 0.0f;
+	float bestRating = 0.0f;
 
-	static void moveCharacters();
 	//factor to slow or fasten animationSpeed
-	static int animationFactor;
+	int animationFactor = 20;
 
 	float holeIdle = 2.2f;
 	float holeHorizontalTime = 0.25;
@@ -42,7 +43,6 @@ private:
 	void scanUp(int, int);
 
 	bool enemyChecker(float, float);
-	void handle();
 
 	virtual void checkCollisionWithOthers();
 
@@ -53,15 +53,10 @@ private:
 	Brick* holeBrick = nullptr;
 	
 protected:
-	static unsigned int killCounter;	
-	
-	static LayoutBlock** layout;
-	static std::shared_ptr<Brick>** brick;
-	static std::shared_ptr<Trapdoor>** trapdoors;
-	static Play* play;
-	static float gameTime;
+	std::shared_ptr<Gold> carriedGold;
 
-	inline void determineDirection();
+	float gameTime;
+
 	void determineNearbyObjects();
 	LayoutBlock middle;
 	LayoutBlock downBlock;
@@ -113,7 +108,7 @@ protected:
 	float holeTimer;
 	float dieTimer;
 	float actualSpeed;
-	float charSpeed;
+	float charSpeed = 0.0f;
 
 	Direction direction;
 	int textureRef;
@@ -124,32 +119,36 @@ protected:
 	int* texturePointer;
 	int* directionPointer;
 	int* carryGoldPointer;
+
+	std::shared_ptr<GameContext> gameContext;
+
+	Vector2D pos;
+	Vector2D dPos;
+	Vector2D prevPos;
+	Vector2D dPrevPos;
 public:
 	virtual ~Enemy() {}
+	Enemy(float, float);
+
+	//static std::shared_ptr<Enemy> player;
+
+	Vector2D getPos()
+	{
+		return this->pos;
+	}
 
 	int getTextureRef()
 	{
 		return this->textureRef;
 	}
 
-	static std::shared_ptr<Enemy> player;
-	static std::vector<std::shared_ptr<Enemy>> enemies;
-	static void clearEnemyVector();
-	//static void addEnemy(Vector2DInt);
-	static void addEnemy(std::shared_ptr<Enemy>);
+	virtual void setCharSpeed(float);
 
-	static bool enemyCheckerGlobal(float, float);
-	static void handleCharacters();
+	void handle();
 
-	static bool checkDigPrevention(int, int);
-	static void checkDeaths(int, int);
 	void checkDeath(int, int);
 
-	virtual void die();
-
-	Enemy(float, float);
-
-	std::shared_ptr<Gold> carriedGold;
+	virtual void die();		
 
 	void setPositionPointer(float* positionPointer)
 	{
@@ -171,30 +170,18 @@ public:
 		this->carryGoldPointer = carryGoldPointer;
 	}
 
-	Vector2D pos;
-	Vector2D dPos;
-	Vector2D prevPos;
-	Vector2D dPrevPos;
-	
-	virtual void updateCharSpeed();
-
-	static void setLayoutPointers(LayoutBlock** layout, std::shared_ptr<Brick>**, std::shared_ptr<Trapdoor>**, Play*);
-	static void notifyPlayerAboutDigEnd();
-	static bool hasGold();
-
-	static float enemySpeed;
-	static float playerSpeed;
-
-	static void setPlayerSpeed(float);
-	static void setEnemySpeed(float);
-	static unsigned int getKillCounter();
-	static void handlePlayerDying();
-
 	void setTextureRef(int textureRef)
 	{
 		this->textureRef = textureRef;
 		*texturePointer = textureRef;
 	}
+
+	bool carriesGold()
+	{
+		return carriedGold != nullptr;
+	}
+
+	void setGameContext(std::shared_ptr<GameContext> gameContext);
 };
 
 #endif // !ENEMY_H

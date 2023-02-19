@@ -1,11 +1,10 @@
 #include "GameStates/GameState.h"
 
-GamePlay* GameState::gamePlay;
-
-void GameState::initialize(GamePlay* gamePlay) {
-	GameState::gamePlay = gamePlay;
-}
-
 void GameState::setGamePlay(GamePlay* gamePlay) {
 	this->gamePlay = gamePlay;
+}
+
+void GameState::setGameContext(std::shared_ptr<GameContext> gameContext)
+{
+	this->gameContext = gameContext;
 }

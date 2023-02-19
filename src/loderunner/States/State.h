@@ -2,20 +2,32 @@
 #define STATE_H
 
 class StateContext;
+class RenderingManager;
+#include <memory>
 
 class State {
 protected:
 	float timer = 0;
+	std::shared_ptr<RenderingManager> renderingManager;
 
-public:
-	static StateContext* stateContext;
-	static void initialize(StateContext*);
+	StateContext* stateContext;
+public:	
 
 	virtual void start() = 0;
 	virtual void update(float) = 0;
 	virtual void end() = 0;
 
 	void setStateContext(StateContext*);
+
+	StateContext* getStateContext()
+	{
+		return this->stateContext;
+	}
+
+	virtual void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
+	{
+		this->renderingManager = renderingManager;
+	}
 };
 
 #endif

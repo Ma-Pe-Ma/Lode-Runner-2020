@@ -28,22 +28,22 @@ void MainMenu::update(float currentFrame) {
 	int& menuCursor = stateContext->menuCursor;
 
 	//changing gamemode
-	if (down.simple()) {
+	if (IOHandler::down.simple()) {
 		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
 	}
 
-	if (up.simple()) {
+	if (IOHandler::up.simple()) {
 		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
 	}
 
-	if (gameVersion == 1) {
+	if (IOHandler::gameVersion == 1) {
 		menuCursor = 0;
 	}
 
-	renderingManager->drawMainMenu(menuCursor, gameVersion);
+	renderingManager->drawMainMenu(menuCursor, IOHandler::gameVersion);
 
 	//choosing selected gamemode
-	if (enter.simple()) {
+	if (IOHandler::enter.simple()) {
 		Audio::sfx[5].stopAndRewind();
 
 		switch (menuCursor) {
@@ -51,11 +51,11 @@ void MainMenu::update(float currentFrame) {
 			case 0:
 			//multiplayer
 			case 1:
-				stateContext->transitionTo(stateContext->intro);
+				stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 				break;
 			//level generator
 			case 2:
-				stateContext->transitionTo(stateContext->generator);
+				stateContext->transitionToAtEndOfFrame(stateContext->getGenerator());
 				break;
 		}
 	}

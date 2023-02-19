@@ -18,38 +18,36 @@ void Select::start() {
 void Select::update(float currentFrame) {
 	int& levelNr = stateContext->level[stateContext->playerNr];
 
-	if (leftButton.simple()) {
+	if (IOHandler::leftButton.simple()) {
 		setNewValidLevel(--levelNr);
 		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
-	if (rightButton.simple()) {
+	if (IOHandler::rightButton.simple()) {
 		setNewValidLevel(++levelNr);
 		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
-	if (up.simple()) {
+	if (IOHandler::up.simple()) {
 		setNewValidLevel(levelNr += 10);
 		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
-	if (down.simple()) {
+	if (IOHandler::down.simple()) {
 		setNewValidLevel(levelNr -= 10);
 		updateLevelNr(levelNr);
 		Audio::sfx[16].stopAndRewind();
 		Audio::sfx[16].playPause();
 	}
 
-	if (enter.simple()) {
-		stateContext->transitionTo(stateContext->intro);
-		Audio::sfx[8].stopAndRewind();
-		Audio::sfx[8].playPause();
+	if (IOHandler::enter.simple()) {
+		stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 	}
 
 	renderingManager->render();
@@ -61,7 +59,7 @@ void Select::end() {
 
 void Select::setNewValidLevel(int& newLevel)
 {
-	int maxLevelNumber = gameVersion == 0 ? 150 : 51;
+	int maxLevelNumber = IOHandler::gameVersion == 0 ? 150 : 51;
 	newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
 	newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
 }

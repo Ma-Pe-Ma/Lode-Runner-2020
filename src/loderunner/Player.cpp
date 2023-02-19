@@ -5,44 +5,39 @@
 
 Player::Player(float x, float y) : Enemy(x, y) {
 	this->textureMap = {28, 52, 48, 36, 40, 26};
-	this->charSpeed = Enemy::playerSpeed;
 	textureRef = textureMap.going;
 }
 
-void Player::addPlayer(std::shared_ptr<Player> player) {
-	Enemy::player = player;
-}
-
-void Player::updateCharSpeed() {
-	this->charSpeed = Enemy::playerSpeed;
+void Player::setCharSpeed(float charSpeed) {
+	this->charSpeed = charSpeed;
 }
 
 void Player::findPath() {
 	actualSpeed = charSpeed * GameTime::getSpeed();
 
-	if (rightButton.continuous() && leftButton.continuous()) {
+	if (IOHandler::rightButton.continuous() && IOHandler::leftButton.continuous()) {
 		dPos.x = 0;
 	}
-	else if (rightButton.continuous()) {
+	else if (IOHandler::rightButton.continuous()) {
 		dPos.x = actualSpeed;
 	}
-	else if (leftButton.continuous()) {
+	else if (IOHandler::leftButton.continuous()) {
 		dPos.x = -actualSpeed;
 	}
 
-	if (up.continuous() && down.continuous()) {
+	if (IOHandler::up.continuous() && IOHandler::down.continuous()) {
 		dPos.y = 0;
 	}
-	else if (up.continuous()) {
+	else if (IOHandler::up.continuous()) {
 		dPos.y = actualSpeed;
 	}
-	else if (down.continuous()) {
+	else if (IOHandler::down.continuous()) {
 		dPos.y = -actualSpeed;
 	}
 
 	//check if runner dies by enemy
-	for (auto& enemy : enemies) {
-		if (std::abs(enemy->pos.x - pos.x) < 0.5f && std::abs(enemy->pos.y - pos.y) < 0.5f) {
+	for (auto& enemy : gameContext->getEnemies()) {
+		if (std::abs(enemy->getPos().x - pos.x) < 0.5f && std::abs(enemy->getPos().y - pos.y) < 0.5f) {
 			die();
 		}
 	}
@@ -50,8 +45,8 @@ void Player::findPath() {
 
 void Player::freeRun() {
 	//Check digging input
-	if (leftDigButton.impulse()) {
-		if (brick[curX - 1][curY - 1] && brick[curX - 1][curY -1]->initiateDig()) {
+	if (IOHandler::leftDigButton.impulse()) {
+		if (gameContext->getBricks()[curX - 1][curY - 1] && gameContext->getBricks()[curX - 1][curY -1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -61,8 +56,8 @@ void Player::freeRun() {
 		}
 	}
 	
-	if (rightDigButton.impulse()) {
-		if (brick[curX + 1][curY - 1] && brick[curX + 1][curY - 1]->initiateDig()) {
+	if (IOHandler::rightDigButton.impulse()) {
+		if (gameContext->getBricks()[curX + 1][curY - 1] && gameContext->getBricks()[curX + 1][curY - 1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -86,8 +81,8 @@ void Player::initiateFallingStop() {
 }
 
 void Player::falling() {
-	if (layout[curX][curY] == LayoutBlock::trapDoor) {
-		trapdoors[curX][curY]->setRevealed();
+	if (gameContext->getLayout()[curX][curY] == LayoutBlock::trapDoor) {
+		gameContext->getTrapdoors()[curX][curY]->setRevealed();
 	}
 
 	Enemy::falling();
@@ -209,26 +204,27 @@ void Player::animateOnPole() {
 
 //player does not check gold rather top of level,
 void Player::checkGoldCollect() {
-	if (carriedGold = Gold::goldCollectChecker(pos.x, pos.y)) {
+	if (carriedGold = gameContext->goldCollectChecker(pos.x, pos.y)) {
 		if (Audio::sfx[0].getPlayStatus() == AudioStatus::playing) {
 			Audio::sfx[0].stopAndRewind();
 		}
 
 		Audio::sfx[0].playPause();
-		Gold::addGoldToCollected(carriedGold);
+		gameContext->addGoldToCollectedList(carriedGold);
 
 		//if every gold is collected draw the ladders which are needed to finish the level
-		if (!Enemy::hasGold() && Gold::getUncollectedSize() == 0) {
+		if (!gameContext->enemyCarriesGold() && gameContext->getUncollectedGoldSize() == 0) {
 			Audio::sfx[4].playPause();
-			play->generateFinishingLadders();
+			gameContext->generateFinishingLadders();
 		}
 	}
 	
 	//if every gold collected!
-	if (Gold::getUncollectedSize() == 0 && !Enemy::hasGold()) {
+	if (gameContext->getUncollectedGoldSize() == 0 && !gameContext->enemyCarriesGold()) {
 		//top of level reached
-		if (curY >= play->getHighestLadder() + 1) {
-			play->transitionToOutro(killCounter, Gold::getCollectedSize(), 0);
+		if (curY >= gameContext->getHighestLadder() + 1) {
+			gameContext->transitionToOutro();
+			//play->transitionToOutro(gameContext->getKillCounter(), gameContext->getCollectedGoldSize(), 0);
 			
 			//score_gold = collectedsize * 200;
 		}
@@ -237,7 +233,7 @@ void Player::checkGoldCollect() {
 
 void Player::die() {
 	dieTimer = GameTime::getCurrentFrame();
-	play->transitionToDeath();
+	gameContext->transitionToDeath();
 }
 
 void Player::dying() {

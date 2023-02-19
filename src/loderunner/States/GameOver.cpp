@@ -28,15 +28,15 @@ void GameOver::update(float currentFrame) {
 
 	if (GameTime::getCurrentFrame() - timer > Audio::sfx[6].lengthInSec()) {
 		if (stateContext->menuCursor == 0) {
-			stateContext->transitionTo(stateContext->mainMenu);
+			stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 		}
 		else if (stateContext->menuCursor == 1) {
 			if (stateContext->playerLife[1 - stateContext->playerNr] != 0) {
 				stateContext->playerNr = 1 - stateContext->playerNr;
-				stateContext->transitionTo(stateContext->intro);
+				stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 			}
 			else {
-				stateContext->transitionTo(stateContext->mainMenu);
+				stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 			}
 		}
 	}

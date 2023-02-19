@@ -6,6 +6,8 @@
 
 #include <memory>
 
+class GameContext;
+
 enum class BrickState {
 	original,
 	digging,
@@ -15,8 +17,6 @@ enum class BrickState {
 
 class Brick {
 private:
-	static std::shared_ptr<Brick>** brick;
-	static LayoutBlock** layout;
 	Vector2DInt position;
 	float timer;
 	BrickState brickState = BrickState::original;
@@ -29,17 +29,13 @@ private:
 	inline void waiting(float);
 	inline void building(float);
 
-	static int randomDebris;
-	
-	static int* pointerToDebrisTexture;
-	static int* pointerToDebrisLocation;
-
 	int* pointerToTexture;
+
+	std::shared_ptr<GameContext> gameContext;
 public:
 	Brick(Vector2DInt);
 	void handle(float);
 	bool initiateDig();
-	static void setLayoutPointers(LayoutBlock** layout, std::shared_ptr<Brick>**);
 	Vector2DInt getPosition() { return position; }
 
 	void setTexturePointer(int* pointerToTexture)
@@ -47,8 +43,7 @@ public:
 		this->pointerToTexture = pointerToTexture;
 	}
 
-	static void setPointerToDebrisTexture(int*);
-	static void setPointerToDebrisLocation(int*);
+	void setGameContext(std::shared_ptr<GameContext> gameContext);
 };
 
 #endif // !BRICK_H

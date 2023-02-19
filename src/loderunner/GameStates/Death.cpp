@@ -14,25 +14,25 @@ void Death::start() {
 }
 
 void Death::update(float) {
-	gamePlay->play->drawLevel();
+	gamePlay->getPlay()->drawScene();
 	
 	float deathLength = Audio::sfx[3].lengthInSec();
 
 	if (GameTime::getCurrentFrame() - timer < deathLength) {
-		Enemy::handlePlayerDying();
+		gameContext->handlePlayerDying();
 	}
 	else {
-		if (gamePlay->stateContext->menuCursor < 2) {
-			if (--gamePlay->stateContext->playerLife[gamePlay->stateContext->playerNr] != 0) {
-				gamePlay->stateContext->transitionTo(gamePlay->stateContext->intro);
-				gamePlay->stateContext->playerNr = gamePlay->stateContext->menuCursor == 1 ? 1 - gamePlay->stateContext->playerNr : gamePlay->stateContext->playerNr;
+		if (gamePlay->getStateContext()->menuCursor < 2) {
+			if (--gamePlay->getStateContext()->playerLife[gamePlay->getStateContext()->playerNr] != 0) {
+				gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getIntro());
+				gamePlay->getStateContext()->playerNr = gamePlay->getStateContext()->menuCursor == 1 ? 1 - gamePlay->getStateContext()->playerNr : gamePlay->getStateContext()->playerNr;
 			}
 			else {
-				gamePlay->stateContext->transitionTo(gamePlay->stateContext->gameOver);
+				gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGameOver());
 			}
 		}
 		else {
-			gamePlay->stateContext->transitionTo(gamePlay->stateContext->generator);
+			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGenerator());
 		}
 	}
 }

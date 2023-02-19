@@ -20,38 +20,43 @@
 #include "Enemy.h"
 #include "GameTime.h"
 
-extern Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt, configButton;
-extern std::string levelFileName;
+namespace IOHandler  {
+	extern Button up, down, leftButton, rightButton, space, enter, pButton, leftDigButton, rightDigButton, REC, lAlt, configButton;
+	extern std::string levelFileName;
 
-extern int gameVersion;
-extern bool usCover;
-extern unsigned int startingLevel;
-extern unsigned int recordingHeight;
+	extern int gameVersion;
+	extern bool usCover;
+	extern unsigned int startingLevel;
+	extern unsigned int recordingHeight;
+
+	extern float enemySpeed;
+	extern float playerSpeed;
 
 #ifdef ANDROID_VERSION
-extern "C" {
-JNIEXPORT void JNICALL
-Java_com_mpm_lodeRunner_GameActivity_processInput( JNIEnv* env, jobject thiz, jint buttonID, jboolean pushed);
+	extern "C" {
+		JNIEXPORT void JNICALL
+			Java_com_mpm_lodeRunner_GameActivity_processInput(JNIEnv* env, jobject thiz, jint buttonID, jboolean pushed);
 
-JNIEXPORT void JNICALL
-Java_com_mpm_lodeRunner_GameActivity_initializeGame( JNIEnv* env, jobject thiz, jboolean champ, jboolean usCover, jboolean joystick, jint level, jfloat player, jfloat enemy);
+		JNIEXPORT void JNICALL
+			Java_com_mpm_lodeRunner_GameActivity_initializeGame(JNIEnv* env, jobject thiz, jboolean champ, jboolean usCover, jboolean joystick, jint level, jfloat player, jfloat enemy);
 
-JNIEXPORT void JNICALL
-Java_com_mpm_lodeRunner_GameActivity_processJoystick( JNIEnv* env, jobject thiz, jint angle, jint strength);
-}
+		JNIEXPORT void JNICALL
+			Java_com_mpm_lodeRunner_GameActivity_processJoystick(JNIEnv* env, jobject thiz, jint angle, jint strength);
+	}
 #else
-void processInput(GLFWwindow*);
-void loadConfig();
+	void processInput(GLFWwindow*);
+	void loadConfig();
 #endif
 
-//number of earlier taken screenshots and videos
-extern unsigned int scr;
-extern unsigned int vid;
+	//number of earlier taken screenshots and videos
+	extern unsigned int scr;
+	extern unsigned int vid;
 
-unsigned int findScreenShotCount();
-unsigned int findVideoCount();
-std::string generateNewVideoName();
+	unsigned int findScreenShotCount();
+	unsigned int findVideoCount();
+	std::string generateNewVideoName();
 
-extern Vector2D debugPos[2];
+	extern Vector2D debugPos[2];
+}
 
 #endif // !IOHANDLER_H

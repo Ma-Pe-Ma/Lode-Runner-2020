@@ -17,7 +17,7 @@ void Intro::start() {
 	int& level = stateContext->level[stateContext->playerNr];
 	level = level < 1 ? 1 : level;
 
-	int maxLevelNumber = gameVersion == 0 ? 150 : 51;
+	int maxLevelNumber = IOHandler::gameVersion == 0 ? 150 : 51;
 	level = level > maxLevelNumber ? 1 : level;
 
 	/*else {
@@ -25,7 +25,7 @@ void Intro::start() {
 	}*/
 
 	//write player id 
-	std::string playerString = gameVersion == 0 ? "PLAYER " + std::to_string(stateContext->playerNr + 1) : "";
+	std::string playerString = IOHandler::gameVersion == 0 ? "PLAYER " + std::to_string(stateContext->playerNr + 1) : "";
 	playerName = std::make_shared<Text>(Text(playerString, { 12, 6 }));
 
 	//write level number
@@ -72,16 +72,16 @@ void Intro::update(float currentFrame) {
 	renderingManager->render();
 
 	if (GameTime::getCurrentFrame() - timer < Audio::sfx[8].lengthInSec()) {
-		if (space.simple()) {
-			stateContext->transitionTo(stateContext->select);
+		if (IOHandler::space.simple()) {
+			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 
-		if (enter.simple()) {
-			stateContext->transitionTo(stateContext->gamePlay);
+		if (IOHandler::enter.simple()) {
+			stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
 		}
 	}
 	else {
-		stateContext->transitionTo(stateContext->gamePlay);
+		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
 	}
 }
 
@@ -90,7 +90,7 @@ void Intro::end() {
 	Audio::sfx[7].stopAndRewind();
 
 	if (stateContext->menuCursor < 2) {
-		stateContext->gamePlay->play->loadLevel(stateContext->level[stateContext->playerNr]);
+		stateContext->getGamePlay()->getPlay()->loadLevel(stateContext->level[stateContext->playerNr]);
 	}
 }
 

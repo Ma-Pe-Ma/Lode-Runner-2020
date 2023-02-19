@@ -20,6 +20,8 @@ private:
 	void falling() override;
 	virtual bool checkHole() override;
 
+	//unsigned int killCounter = 0;
+
 	//Animating
 	inline void animateFreeRun() override;
 	inline void animateDigging() override;
@@ -31,15 +33,15 @@ private:
 	
 	inline void checkGoldCollect() override;
 	inline void checkGoldDrop() override {};
-	void releaseFromDigging() override;
 
 	virtual void checkCollisionWithOthers() override {}
 public:
-	static void addPlayer(std::shared_ptr<Player>);
+	void releaseFromDigging() override;
+
 	Player(float, float);
 	void die() override;
 	void dying() override;
-	void updateCharSpeed() override;
+	void setCharSpeed(float) override;
 	void setPosition(Vector2D pos)
 	{
 		this->pos = pos;

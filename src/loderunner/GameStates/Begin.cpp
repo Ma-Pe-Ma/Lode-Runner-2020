@@ -10,23 +10,23 @@ void Begin::start() {
 }
 
 void Begin::update(float currentFrame) {
-	gamePlay->play->drawLevel();
+	gamePlay->getPlay()->drawScene();
 
 	if (currentFrame - startTime > 2.0f) {
-		gamePlay->transitionTo(gamePlay->play);
+		gamePlay->transitionToAtEndOfFrame(gamePlay->getPlay());
 	}
 
 	//levelselect with space
-	if (space.simple()) {
+	if (IOHandler::space.simple()) {
 		Audio::sfx[17].stopAndRewind();
 		Audio::sfx[4].stopAndRewind();
 		Audio::sfx[7].stopAndRewind();
 
-		if (gamePlay->stateContext->menuCursor < 2) {
-			gamePlay->stateContext->transitionTo(gamePlay->stateContext->select);
+		if (gamePlay->getStateContext()->menuCursor < 2) {
+			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());
 		}
 		else {
-			gamePlay->stateContext->transitionTo(gamePlay->stateContext->generator);
+			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGenerator());
 		}
 	}
 }

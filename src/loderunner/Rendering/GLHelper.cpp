@@ -151,7 +151,7 @@ namespace GLHelper {
 	void saveImage(unsigned char* buffer) {
 		std::cout << "\n Trying to save image...";
 		//find next non-existing screenshot identifier
-		unsigned int scr = findScreenShotCount();
+		unsigned int scr = IOHandler::findScreenShotCount();
 
 		std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
 

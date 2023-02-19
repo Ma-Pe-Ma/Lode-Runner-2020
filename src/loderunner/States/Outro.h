@@ -19,7 +19,6 @@ private:
 	short goldScore = 0;
 	short fruitID = 0;
 
-	std::shared_ptr<RenderingManager> renderingManager = nullptr;
 	void setupRenderingManager();
 
 	std::shared_ptr<Player> player;
@@ -29,11 +28,6 @@ public:
 	void end() override;
 
 	void setScoreParameters(short, short, short);
-
-	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-	{
-		this->renderingManager = renderingManager;
-	}
 };
 
 #endif
