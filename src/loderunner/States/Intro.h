@@ -14,8 +14,6 @@ private:
 	std::shared_ptr<Text> scoreText;
 	std::shared_ptr<Text> hiscore;
 
-	std::shared_ptr<RenderingManager> renderingManager;
-
 	void saveCurrentLevel();
 
 	void setupRenderingManager();
@@ -23,11 +21,6 @@ public:
 	void start() override;
 	void update(float) override;
 	void end() override;
-
-	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-	{
-		this->renderingManager = renderingManager;
-	}
 };
 
 #endif

@@ -14,28 +14,29 @@
 class Generator : public State {
 private:
 	short gen[30][18];
+	
+	int pos[30][18][2];
+	int texture[30][18];
+
 	short geX = 1;
 	short geY = 16;
 	std::map<int, int> textureMap;
 	std::map<int, LayoutBlock> layoutMap;
-	
-	static LayoutBlock** layout;
-	static std::unique_ptr<Brick>** brick;
-	static std::unique_ptr<Trapdoor>** trapdoors;
-	static Play* play;
 
-	std::shared_ptr<RenderingManager> renderingManager;
+	void generateLevel();
 
+	std::shared_ptr<GameContext> gameContext;
+
+	std::shared_ptr<Text> timeText;
 public:
 	Generator();
 	void start() override;
 	void update(float) override;
 	void end() override;
-	static void setLayoutPointers(LayoutBlock**, std::unique_ptr <Brick>**, std::unique_ptr<Trapdoor>**, Play*);
-
-	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
+	
+	void setGameContext(std::shared_ptr<GameContext> gameContext)
 	{
-		this->renderingManager = renderingManager;
+		this->gameContext = gameContext;
 	}
 };
 

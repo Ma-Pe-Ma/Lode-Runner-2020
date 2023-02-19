@@ -45,19 +45,22 @@ inline void update();
 
 std::chrono::system_clock::time_point prevFrameStart = std::chrono::system_clock::now();
 
+std::shared_ptr<StateContext> stateContext;
+std::shared_ptr<GameContext> gameContext;
+
 int main(int argc, char**argv) {
 
 #if defined __EMSCRIPTEN__
 	Audio::initializeOpenAL();
 #else
 	//loading configuration file
-	loadConfig();
+	IOHandler::loadConfig();
 
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
-			levelFileName = "Assets/Level/ChampionshipLevels.txt";
-			gameVersion = 1;
+			IOHandler::levelFileName = "Assets/Level/ChampionshipLevels.txt";
+			IOHandler::gameVersion = 1;
 			break;
 		}
 	}
@@ -139,12 +142,6 @@ int main(int argc, char**argv) {
 	}
 #endif
 
-	std::string mainMenuTextureName = "Assets/Texture/MainMenu.png";
-
-	if (usCover) {
-		mainMenuTextureName = "Assets/Texture/MainMenuU.png";
-	}
-
 #ifdef VIDEO_RECORDING
 	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 	AudioParameters* audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
@@ -160,18 +157,22 @@ int main(int argc, char**argv) {
 	GLHelper::multiMedia = &media;
 #endif
 
-	std::shared_ptr<RenderingManager> renderingManager = std::make_shared<RenderingManager>("./Assets/");
+	std::string mainMenuTextureName = "Texture/MainMenu.png";
 
-	State::initialize(new StateContext());
-	GameState::initialize(State::stateContext->gamePlay);
+	if (IOHandler::usCover) {
+		mainMenuTextureName = "Texture/MainMenuU.png";
+	}
 
-	State::stateContext->gamePlay->play->setRenderingManager(renderingManager);
-	State::stateContext->select->setRenderingManager(renderingManager);
-	State::stateContext->intro->setRenderingManager(renderingManager);
-	State::stateContext->outro->setRenderingManager(renderingManager);
-	State::stateContext->mainMenu->setRenderingManager(renderingManager);
-	State::stateContext->gameOver->setRenderingManager(renderingManager);
-	State::stateContext->generator->setRenderingManager(renderingManager);
+	std::shared_ptr<RenderingManager> renderingManager = std::make_shared<RenderingManager>("./Assets/", mainMenuTextureName);
+
+	stateContext = std::make_shared<StateContext>();
+	stateContext->setRenderingManager(renderingManager);	
+
+	gameContext = std::make_shared<GameContext>();
+	gameContext->setEnemySpeed(IOHandler::enemySpeed);
+	gameContext->setPlayerSpeed(IOHandler::playerSpeed);
+	stateContext->getGamePlay()->setGameContext(gameContext);
+	stateContext->getGenerator()->setGameContext(gameContext);
 
 	prevFrameStart = std::chrono::system_clock::now();
 
@@ -225,18 +226,18 @@ void update() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	processInput(GLHelper::window);
+	IOHandler::processInput(GLHelper::window);
 
 #ifndef __EMSCRIPTEN__
-	if (lAlt.continuous() && enter.simple()) {
+	if (IOHandler::lAlt.continuous() && IOHandler::enter.simple()) {
 		GLHelper::fullscreenSwitch();
 	}
 #endif // !__EMSCRIPTEN__
 
-	State::stateContext->update(GameTime::getCurrentFrame());
+	stateContext->update(GameTime::getCurrentFrame());
 
 	//take a screenshot
-	if (pButton.simple()) {
+	if (IOHandler::pButton.simple()) {
 		GLHelper::screenCapture();
 	}
 
@@ -251,12 +252,12 @@ void update() {
 }
 
 void setCorrectLevel() {
-	int max = gameVersion == 0 ? 150 : 51;
+	int max = IOHandler::gameVersion == 0 ? 150 : 51;
 
-	State::stateContext->level[0] = State::stateContext->level[0] > max ? max : State::stateContext->level[0];
-	State::stateContext->level[0] = State::stateContext->level[0] < 1 ? 1 : State::stateContext->level[0];
+	stateContext->level[0] = stateContext->level[0] > max ? max : stateContext->level[0];
+	stateContext->level[0] = stateContext->level[0] < 1 ? 1 : stateContext->level[0];
 
-	State::stateContext->level[1] = State::stateContext->level[0];
+	stateContext->level[1] = stateContext->level[0];
 }
 
 void handleImGuiConfigurer() {
@@ -266,7 +267,7 @@ void handleImGuiConfigurer() {
 	static bool windowOpen = false;
 #endif
 	
-	if (configButton.simple()) {
+	if (IOHandler::configButton.simple()) {
 		windowOpen = !windowOpen;
 	}
 
@@ -289,33 +290,35 @@ void handleImGuiConfigurer() {
 
 		ImGui::Text("Game version");
 
-		if (ImGui::RadioButton("Original", &gameVersion, 0)) {
-			levelFileName = "Assets/Level/OriginalLevels.txt";
+		if (ImGui::RadioButton("Original", &IOHandler::gameVersion, 0)) {
+			IOHandler::levelFileName = "Assets/Level/OriginalLevels.txt";
 			setCorrectLevel();
 		}
 
 		ImGui::SameLine();
-		if (ImGui::RadioButton("Championship", &gameVersion, 1)) {
-			State::stateContext->menuCursor = 0;
-			levelFileName = "Assets/Level/ChampionshipLevels.txt";
+		if (ImGui::RadioButton("Championship", &IOHandler::gameVersion, 1)) {
+			stateContext->menuCursor = 0;
+			IOHandler::levelFileName = "Assets/Level/ChampionshipLevels.txt";
 			setCorrectLevel();
 		}
 
 		ImGui::PushItemWidth(GLHelper::SCR_WIDTH / 20);
 
-		if (ImGui::InputInt("Level", &State::stateContext->level[0], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
+		if (ImGui::InputInt("Level", &stateContext->level[0], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			setCorrectLevel();
 		}
 
-		if (ImGui::SliderFloat("Player speed", &Enemy::playerSpeed, 0.0f, 1.0f, "%.2f")) {
-			if (Enemy::player) {
-				Enemy::player->updateCharSpeed();
+		if (ImGui::SliderFloat("Player speed", gameContext->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {
+
+			if (gameContext->getPlayer())
+			{
+				gameContext->getPlayer()->setCharSpeed(gameContext->getPlayerSpeed());
 			}
 		}
 
-		if (ImGui::SliderFloat("Enemy speed", &Enemy::enemySpeed, 0.0f, 1.0f, "%.2f")) {
-			for (auto& enemy : Enemy::enemies) {
-				enemy->updateCharSpeed();
+		if (ImGui::SliderFloat("Enemy speed", gameContext->getEnemySpeedPointer(), 0.0f, 1.0f, "%.2f")) {
+			for (auto& enemy : gameContext->getEnemies()) {	
+				enemy->setCharSpeed(gameContext->getEnemySpeed());
 			}
 		}
 

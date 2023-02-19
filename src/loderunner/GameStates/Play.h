@@ -9,46 +9,52 @@
 
 #include "Rendering/RenderingManager.h"
 
+#include "GameContext.h"
+
 class Shader;
 class Text;
 
 class Play : public GameState {
-private:
-	//std::unique_ptr<Brick> brick[30][18];
-	std::shared_ptr<Brick>** brick = nullptr;
-
-	std::shared_ptr<Trapdoor>** trapdoors = nullptr;
-	LayoutBlock** layout = nullptr;	
-	
-	std::vector<Vector2DInt> finishingLadders;
-	short highestLadder = 30;
-	
+private:		
 	void handleNonControlButtons();
 
 	std::shared_ptr<RenderingManager> renderingManager;
-
-	std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList;
-
 	std::shared_ptr<Text> timeText;
 
 public:
 	Play();
-	void drawLevel();
+	void drawScene();
 	void start() override;
 	void update(float) override;
 	void end() override;
-	void generateFinishingLadders();
-	short getHighestLadder();
+	//void generateFinishingLadders();
+	//short getHighestLadder();
 
 	void loadLevel(unsigned int);
 	void transitionToDeath();
 	void transitionToOutro(short, short, short);
 	void clearContainers();
-	void setLadders(int, std::vector<Vector2DInt>);
+	//void setLadders(int, std::vector<Vector2DInt>);
 
 	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
 	{
 		this->renderingManager = renderingManager;
+	}
+
+	void setGameContext(std::shared_ptr<GameContext> gameContext) override
+	{
+		GameState::setGameContext(gameContext);
+		gameContext->setPlayState(this);
+	}
+
+	std::shared_ptr<GameContext> getGameContext()
+	{
+		return this->gameContext;
+	}
+
+	void setTimeText(std::shared_ptr<Text> timeText)
+	{
+		this->timeText = timeText;
 	}
 };
 

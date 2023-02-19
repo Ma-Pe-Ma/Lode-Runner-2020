@@ -18,12 +18,12 @@ void Outro::setupRenderingManager()
 	renderingManager->clearRenderableObjects();
 
 	//add bricks
-	std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList = std::make_shared<std::vector<std::shared_ptr<Brick>>>();
-	brickList->push_back(std::make_shared<Brick>(Brick({7, 2})));
-	brickList->push_back(std::make_shared<Brick>(Brick({8, 2 })));
-	brickList->push_back(std::make_shared<Brick>(Brick({10, 2 })));
-	brickList->push_back(std::make_shared<Brick>(Brick({11, 2 })));
-	brickList->push_back(std::make_shared<Brick>(Brick({12, 2 })));
+	std::vector<std::shared_ptr<Brick>> brickList;
+	brickList.push_back(std::make_shared<Brick>(Brick({7, 2})));
+	brickList.push_back(std::make_shared<Brick>(Brick({8, 2 })));
+	brickList.push_back(std::make_shared<Brick>(Brick({10, 2 })));
+	brickList.push_back(std::make_shared<Brick>(Brick({11, 2 })));
+	brickList.push_back(std::make_shared<Brick>(Brick({12, 2 })));
 
 	//add ladders
 	std::vector<std::tuple<int, int>> ladderList;
@@ -37,10 +37,10 @@ void Outro::setupRenderingManager()
 
 	//add enemy indicator
 	std::vector<std::shared_ptr<Enemy>> enemyList;
-	enemyList.push_back(std::make_shared<Enemy>(Enemy({11, 9})));
+	enemyList.push_back(std::make_shared<Enemy>(Enemy({11.0f, 9.0f})));
 
 	//add climbing runner
-	this->player = std::make_shared<Player>(Player({ 9, 0 }));
+	this->player = std::make_shared<Player>(Player({ 9.0f, 0.0f }));
 	enemyList.push_back(this->player);
 
 	std::vector<std::shared_ptr<Text>> textList;
@@ -92,13 +92,13 @@ void Outro::update(float currentFrame) {
 	renderingManager->render();
 
 	//runner climbs ladder
-	if (this->player->pos.y + GameTime::getSpeed() * 0.1f < 3) {
+	if (this->player->getPos().y < 3.0f) {
 		
-		if (this->player->pos.y + GameTime::getSpeed() * 0.1f > 3) {
-			this->player->setPosition({ this->player->pos.x, 3});
+		if (this->player->getPos().y + GameTime::getSpeed() * 0.1f >= 3.0f) {
+			this->player->setPosition({ this->player->getPos().x, 3.0f});
 		}
 		else {
-			this->player->setPosition({ this->player->pos.x, this->player->pos.y + GameTime::getSpeed() * 0.1f });
+			this->player->setPosition({ this->player->getPos().x, this->player->getPos().y + GameTime::getSpeed() * 0.1f });
 		}
 		
 		int timeFactor = ((currentFrame - timer) * 4);
@@ -112,12 +112,12 @@ void Outro::update(float currentFrame) {
 		this->player->setTextureRef(44 + timeFactor);
 	}
 
-	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || enter.simple()) {
+	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || IOHandler::enter.simple()) {
 		if (stateContext->menuCursor < 2) {
-			stateContext->transitionTo(stateContext->intro);
+			stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 		}
 		else {
-			stateContext->transitionTo(stateContext->generator);
+			stateContext->transitionToAtEndOfFrame(stateContext->getGenerator());
 		}	
 	}	
 }

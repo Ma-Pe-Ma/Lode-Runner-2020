@@ -22,7 +22,13 @@
 #include "Text.h"
 #include "GLHelper.h"
 
+class GameContext;
+
+#define USE_DYNAMIC_ARRAY
+
 class RenderingManager {
+	std::shared_ptr<GameContext> gameContext;
+
 	float levelVertices[16] = {
 		-1.0f,			-1.0f,
 		-14.0f / 15,	-1.0f,
@@ -79,7 +85,6 @@ class RenderingManager {
 	unsigned int enemyVAO, enemyVBO, enemyEBO;
 	unsigned int characterVAO, characterVBO, characterEBO;
 	unsigned int mainVAO, mainVBO, mainEBO;
-	unsigned int cursorVAO, cursorVBO, cursorEBO;
 
 	unsigned int levelTexture, enemyTexture, characterTexture, originalMainTexture, championshipMainTexture;
 
@@ -88,18 +93,27 @@ class RenderingManager {
 	Shader* characterShader;
 	Shader* mainShader;
 
-	int* textureIDs = nullptr;
-	int* drawables = nullptr;
-	int drawableSize = 0;
-	int currentDrawableSize = 0;
+#ifdef  USE_DYNAMIC_ARRAY
+	int* levelTextureIDs = nullptr;
+	int* levelDrawables = nullptr;
+#else
+	int levelTextureIDs[540];
+	int levelDrawables[540 * 2];
+#endif //  USE_D
 
-	std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList;
+	
+	int levelDrawableSize = 0;
+	int currentLevelDrawableSize = 0;
+
+	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
+	std::vector<std::shared_ptr<Gold>> goldList;
+	std::vector<std::shared_ptr<Enemy>> enemyList;
+
 	std::vector<std::tuple<int, int>> poleList;
 	std::vector<std::tuple<int, int>> concreteList;
 	std::vector<std::tuple<int, int>> ladderList;
-	std::vector<std::tuple<int, int>> finishingLadderList;
-	std::vector<std::shared_ptr<Gold>> goldList;
+	std::vector<std::tuple<int, int>> finishingLadderList;	
 
 	int goldStartIndex = 0;
 	int goldSize = 0;
@@ -108,19 +122,34 @@ class RenderingManager {
 	int ladderSize = 0;
 	int finishingLadderSize = 0;
 
-	std::vector<std::shared_ptr<Enemy>> enemyList;
-
+#ifdef  USE_DYNAMIC_ARRAY
+	float* enemyDrawables = nullptr;
 	int* enemyTextureIDs = nullptr;
 	int* enemyDirections = nullptr;
-	float* enemyDrawables = nullptr;
 	int* enemyGoldIndicator = nullptr;
+#else
+	float enemyDrawables[540 * 2];
+	int enemyTextureIDs[340];
+	int enemyDirections[340];
+	int enemyGoldIndicator[340];
+#endif
+
 	int enemyDrawableSize = 0;
 
 	std::vector<std::shared_ptr<Text>> textList;
 	
+#ifdef USE_DYNAMIC_ARRAY
 	int* characterTextureIDs = nullptr;
 	float* characterDrawables = nullptr;
+#else
+	int characterTextureIDs[864];
+	float characterDrawables[864 * 2];
+#endif // USE_DYNAMIC_ARRAY
+	
 	int characterDrawableSize = 0;
+
+	int* generatorDrawables;
+	int* generatorTextures;
 
 	void initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, float* vertices)
 	{
@@ -147,7 +176,7 @@ class RenderingManager {
 	std::string assetFolder;
 
 public:
-	RenderingManager(std::string assetFolder) {
+	RenderingManager(std::string assetFolder, std::string mainCover) {
 		Text::initCharMap();
 		this->assetFolder = assetFolder;
 
@@ -174,10 +203,10 @@ public:
 		mainShader = new Shader(assetFolder + "/Shaders/main.vs", assetFolder + "/Shaders/main.fs");
 		initializeBufferObjects(mainVAO, mainVBO, mainEBO, mainVertices);
 
-		loadTexture(0, characterTexture, assetFolder + "Texture/NES - Lode Runner - Characters.png", true);
+		loadTexture(0, enemyTexture, assetFolder + "Texture/NES - Lode Runner - Characters.png", true);
 		loadTexture(1, levelTexture, assetFolder + "Texture/NES - Lode Runner - Tileset.png", true);
 		loadTexture(2, characterTexture, assetFolder + "Texture/ABC.png");
-		loadTexture(3, originalMainTexture, assetFolder + "Texture/MainMenu.png");
+		loadTexture(3, originalMainTexture, assetFolder + mainCover);
 		loadTexture(4, championshipMainTexture, assetFolder + "Texture//Championship.png");
 
 		mainShader->use();
@@ -198,7 +227,7 @@ public:
 		mainShader->setVec2Array("cursorOffsets", cursorOffsets, 2);
 	}
 
-	void setBrickList(std::shared_ptr<std::vector<std::shared_ptr<Brick>>> brickList)
+	void setBrickList(std::vector<std::shared_ptr<Brick>> brickList)
 	{
 		this->brickList = brickList;
 	}
@@ -232,7 +261,7 @@ public:
 	{
 		this->goldList = goldList;
 	}
-
+	
 	void setEnemyList(std::vector<std::shared_ptr<Enemy>> enemyList)
 	{
 		this->enemyList = enemyList;
@@ -245,102 +274,108 @@ public:
 
 	void initializeLevelLayout()
 	{
-		drawableSize = 1 + poleList.size() + concreteList.size() + brickList->size() + trapdoorList.size() + goldList.size() + ladderList.size() + finishingLadderList.size();
-		currentDrawableSize = drawableSize - finishingLadderList.size();
-		drawables = new int[drawableSize * 2];
-		textureIDs = new int[drawableSize];
-
-		Brick::setPointerToDebrisTexture(&textureIDs[0]);
-		Brick::setPointerToDebrisLocation(&drawables[0]);
-
-		for (auto iterator = brickList->begin(); iterator != brickList->end(); iterator++)
-		{
-			int index = iterator - brickList->begin() + 1;
-
-			drawables[2 * index + 0] = (*iterator)->getPosition().x;
-			drawables[2 * index + 1] = (*iterator)->getPosition().y;
+		levelDrawableSize = 1 + poleList.size() + concreteList.size() + brickList.size() + trapdoorList.size() + goldList.size() + ladderList.size() + finishingLadderList.size();
+		currentLevelDrawableSize = levelDrawableSize - finishingLadderList.size();
 		
-			(*iterator)->setTexturePointer(&textureIDs[index]);
+#ifdef USE_DYNAMIC_ARRAY
+		levelDrawables = new int[levelDrawableSize * 2];
+		levelTextureIDs = new int[levelDrawableSize];
+#endif // USE_DYNAMIC_ARRAY		
+
+		gameContext->setPointerToDebrisTexture(&levelTextureIDs[0]);
+		gameContext->setPointerToDebrisLocation(&levelDrawables[0]);
+
+		for (auto iterator = brickList.begin(); iterator != brickList.end(); iterator++)
+		{
+			int index = iterator - brickList.begin() + 1;
+
+			levelDrawables[2 * index + 0] = (*iterator)->getPosition().x;
+			levelDrawables[2 * index + 1] = (*iterator)->getPosition().y;
+		
+			(*iterator)->setTexturePointer(&levelTextureIDs[index]);
 		}
 
-		std::fill_n(textureIDs + 1, brickList->size(), 0);
+		std::fill_n(levelTextureIDs + 1, brickList.size(), 0);
 
 		for (auto iterator = poleList.begin(); iterator != poleList.end(); iterator++)
 		{
-			int index = iterator - poleList.begin() + brickList->size() + 1;
+			int index = iterator - poleList.begin() + brickList.size() + 1;
 
-			drawables[2 * index + 0] = std::get<0>(*iterator);
-			drawables[2 * index + 1] = std::get<1>(*iterator);
+			levelDrawables[2 * index + 0] = std::get<0>(*iterator);
+			levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 		}
 
-		std::fill_n(textureIDs + brickList->size() + 1, poleList.size(), 18);
+		std::fill_n(levelTextureIDs + brickList.size() + 1, poleList.size(), 18);
 
 		for (auto iterator = concreteList.begin(); iterator != concreteList.end(); iterator++)
 		{
-			int index = iterator - concreteList.begin() + brickList->size() + poleList.size() + 1;
+			int index = iterator - concreteList.begin() + brickList.size() + poleList.size() + 1;
 
-			drawables[2 * index + 0] = std::get<0>(*iterator);
-			drawables[2 * index + 1] = std::get<1>(*iterator);
+			levelDrawables[2 * index + 0] = std::get<0>(*iterator);
+			levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 		}
 
-		std::fill_n(textureIDs + brickList->size() + poleList.size() + 1, concreteList.size(), 6);
+		std::fill_n(levelTextureIDs + brickList.size() + poleList.size() + 1, concreteList.size(), 6);
 
 		for (auto iterator = trapdoorList.begin(); iterator != trapdoorList.end(); iterator++)
 		{
-			int index = iterator - trapdoorList.begin() + brickList->size() + poleList.size() + concreteList.size() + 1;
+			int index = iterator - trapdoorList.begin() + brickList.size() + poleList.size() + concreteList.size() + 1;
 
-			drawables[2 * index + 0] = (*iterator)->getPos().x;
-			drawables[2 * index + 1] = (*iterator)->getPos().y;
+			levelDrawables[2 * index + 0] = (*iterator)->getPos().x;
+			levelDrawables[2 * index + 1] = (*iterator)->getPos().y;
 			
-			(*iterator)->setTexturePointer(&textureIDs[index]);
+			(*iterator)->setTexturePointer(&levelTextureIDs[index]);
 		}
 
-		std::fill_n(textureIDs + brickList->size() + poleList.size() + concreteList.size() + 1, trapdoorList.size(), 0);
+		std::fill_n(levelTextureIDs + brickList.size() + poleList.size() + concreteList.size() + 1, trapdoorList.size(), 0);
 
-		goldStartIndex = brickList->size() + poleList.size() + concreteList.size() + trapdoorList.size() + 1;
+		goldStartIndex = brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + 1;
 		goldSize = goldList.size();
 
 		for (auto iterator = goldList.begin(); iterator != goldList.end(); iterator++)
 		{
 			int index = iterator - goldList.begin() + goldStartIndex;
 
-			(*iterator)->setPositionPointer(&drawables[2 * index + 0]);
-			drawables[2 * index + 0] = (*iterator)->getPos().x;
-			drawables[2 * index + 1] = (*iterator)->getPos().y;
+			(*iterator)->setPositionPointer(&levelDrawables[2 * index + 0]);
+			levelDrawables[2 * index + 0] = (*iterator)->getPos().x;
+			levelDrawables[2 * index + 1] = (*iterator)->getPos().y;
 		}
 
-		std::fill_n(textureIDs + goldStartIndex, goldList.size(), 36);
+		std::fill_n(levelTextureIDs + goldStartIndex, goldList.size(), 36);
 
-		ladderStartIndex = brickList->size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
+		ladderStartIndex = brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
 		ladderSize = ladderList.size();
 
 		for (auto iterator = ladderList.begin(); iterator != ladderList.end(); iterator++)
 		{
-			int index = iterator - ladderList.begin() + brickList->size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
+			int index = iterator - ladderList.begin() + brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
 
-			drawables[2 * index + 0] = std::get<0>(*iterator);
-			drawables[2 * index + 1] = std::get<1>(*iterator);
+			levelDrawables[2 * index + 0] = std::get<0>(*iterator);
+			levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 		}
 
-		std::fill_n(textureIDs + ladderStartIndex, ladderSize, 12);
+		std::fill_n(levelTextureIDs + ladderStartIndex, ladderSize, 12);
 
 		for (auto iterator = finishingLadderList.begin(); iterator != finishingLadderList.end(); iterator++)
 		{
 			int index = iterator - finishingLadderList.begin() + ladderStartIndex + ladderSize;
 
-			drawables[2 * index + 0] = std::get<0>(*iterator);
-			drawables[2 * index + 1] = std::get<1>(*iterator);
+			levelDrawables[2 * index + 0] = std::get<0>(*iterator);
+			levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 		}
 
 		finishingLadderSize = finishingLadderList.size();
 
-		brickList = nullptr;
-		poleList.clear();
-		concreteList.clear();
-		trapdoorList.clear();
-		goldList.clear();
-		ladderList.clear();
-		finishingLadderList.clear();
+		//brickList = nullptr;
+		//brickList.clear();
+		//poleList.clear();
+		//concreteList.clear();
+		//trapdoorList.clear();
+		//trapdoorList = nullptr;
+		//goldList.clear();
+		//goldList = nullptr;
+		//ladderList.clear();
+		//finishingLadderList.clear();
 
 		levelShader->use();
 		levelShader->setInt("textureA", 1);
@@ -348,23 +383,26 @@ public:
 
 	void setLadderFlashFactor(int factor)
 	{
-		std::fill_n(textureIDs + goldStartIndex, goldSize, 36 + factor);
-		std::fill_n(textureIDs + ladderStartIndex, ladderSize, 12 + factor);
+		std::fill_n(levelTextureIDs + goldStartIndex, goldSize, 36 + factor);
+		std::fill_n(levelTextureIDs + ladderStartIndex, ladderSize, 12 + factor);
 	}
 
 	void enableFinishingLadderDrawing()
 	{
-		currentDrawableSize = drawableSize;
+		currentLevelDrawableSize = levelDrawableSize;
 		ladderSize += finishingLadderSize;
 	}
 
 	void initializeEnemies()
 	{
 		enemyDrawableSize = enemyList.size();
+
+#ifdef USE_DYNAMIC_ARRAY
 		enemyDrawables = new float[2 * enemyDrawableSize];
 		enemyTextureIDs = new int[enemyDrawableSize];
 		enemyDirections = new int[enemyDrawableSize];
 		enemyGoldIndicator = new int[enemyDrawableSize];
+#endif
 
 		for (auto iterator = enemyList.begin(); iterator != enemyList.end(); iterator++)
 		{
@@ -377,8 +415,8 @@ public:
 			enemy->setDirectionPointer(&enemyDirections[index]);
 			enemy->setCarryGoldPointer(&enemyGoldIndicator[index]);
 
-			enemyDrawables[2 * index + 0] = enemy->pos.x;
-			enemyDrawables[2 * index + 1] = enemy->pos.y;
+			enemyDrawables[2 * index + 0] = enemy->getPos().x;
+			enemyDrawables[2 * index + 1] = enemy->getPos().y;
 
 			enemyGoldIndicator[index] = false;
 			enemyDirections[index] = false;
@@ -386,11 +424,11 @@ public:
 			enemyTextureIDs[index] = enemy->getTextureRef();
 		}
 
-		enemyList.clear();
-
 		enemyShader->use();
 		enemyShader->setInt("textureA", 0);
 	}
+
+
 
 	void initializeCharacters()
 	{
@@ -401,8 +439,10 @@ public:
 			characterDrawableSize += text->getLength();
 		}
 
+#ifdef USE_DYNAMIC_ARRAY
 		characterDrawables = new float[2 * characterDrawableSize];
 		characterTextureIDs = new int[characterDrawableSize];
+#endif
 
 		int positionCounter = 0;
 
@@ -422,13 +462,22 @@ public:
 		characterShader->setInt("textureA", 2);
 	}
 
+	void setGeneratorParameters(int* generatorDrawables, int* generatorTextures)
+	{
+		this->generatorDrawables = generatorDrawables;
+		this->generatorTextures = generatorTextures;
+
+		levelShader->use();
+		levelShader->setInt("textureA", 1);
+	}
+
 	void render()
 	{
 		levelShader->use();
 		glBindVertexArray(levelVAO);
-		levelShader->setIntArray("textureID", textureIDs, currentDrawableSize);
-		levelShader->setInt2Array("gPos", drawables, currentDrawableSize);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, currentDrawableSize);
+		levelShader->setIntArray("textureID", levelTextureIDs, currentLevelDrawableSize);
+		levelShader->setInt2Array("gPos", levelDrawables, currentLevelDrawableSize);
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, currentLevelDrawableSize);
 
 		enemyShader->use();
 		glBindVertexArray(enemyVAO);
@@ -447,24 +496,46 @@ public:
 
 	void clearRenderableObjects()
 	{
-		ladderSize = 0;
-		finishingLadderSize = 0;
-		goldSize = 0;
+		levelDrawableSize = 0;
+		currentLevelDrawableSize = 0;
 
-		drawableSize = 0;
-		currentDrawableSize = 0;
 		enemyDrawableSize = 0;
 
 		characterDrawableSize = 0;
 
-		checkAndDeleteArray(drawables);
-		checkAndDeleteArray(textureIDs);
-		checkAndDeleteArray(enemyTextureIDs);
-		checkAndDeleteArray(enemyDirections);
+		goldStartIndex = 0;
+		goldSize = 0;
+
+		ladderStartIndex = 0;
+		ladderSize = 0;
+		finishingLadderSize = 0;
+
+#ifdef USE_DYNAMIC_ARRAY
+		checkAndDeleteArray(levelDrawables);
+		checkAndDeleteArray(levelTextureIDs);
+
 		checkAndDeleteArray(enemyDrawables);
+		checkAndDeleteArray(enemyTextureIDs);
+		checkAndDeleteArray(enemyDirections);		
 		checkAndDeleteArray(enemyGoldIndicator);
+
 		checkAndDeleteArray(characterTextureIDs);
 		checkAndDeleteArray(characterDrawables);
+#endif
+	
+		brickList.clear();
+		trapdoorList.clear();
+		goldList.clear();
+
+		enemyList.clear();
+
+		poleList.clear();
+		concreteList.clear();
+
+		ladderList.clear();
+		finishingLadderList.clear();
+
+		textList.clear();
 	}
 
 	template<typename T>
@@ -509,6 +580,15 @@ public:
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1 + (gameVersion == 0));
 	}
 
+	void renderGenerator()
+	{
+		levelShader->use();
+		glBindVertexArray(levelVAO);
+		levelShader->setIntArray("textureID", generatorTextures, 540);
+		levelShader->setInt2Array("gPos", generatorDrawables, 540);
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 540);
+	}
+
 	void terminate()
 	{
 		glDeleteVertexArrays(1, &levelVAO);
@@ -541,6 +621,11 @@ public:
 		delete enemyShader;
 		delete characterShader;
 		delete mainShader;
+	}
+
+	void setGameContext(std::shared_ptr<GameContext> gameContext)
+	{
+		this->gameContext = gameContext;
 	}
 };
 
