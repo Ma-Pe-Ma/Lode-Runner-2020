@@ -99,8 +99,7 @@ class RenderingManager {
 #else
 	int levelTextureIDs[540];
 	int levelDrawables[540 * 2];
-#endif //  USE_D
-
+#endif //  USE_DYNAMIC_ARRAY
 	
 	int levelDrawableSize = 0;
 	int currentLevelDrawableSize = 0;
@@ -366,17 +365,6 @@ public:
 
 		finishingLadderSize = finishingLadderList.size();
 
-		//brickList = nullptr;
-		//brickList.clear();
-		//poleList.clear();
-		//concreteList.clear();
-		//trapdoorList.clear();
-		//trapdoorList = nullptr;
-		//goldList.clear();
-		//goldList = nullptr;
-		//ladderList.clear();
-		//finishingLadderList.clear();
-
 		levelShader->use();
 		levelShader->setInt("textureA", 1);
 	}
@@ -421,14 +409,12 @@ public:
 			enemyGoldIndicator[index] = false;
 			enemyDirections[index] = false;
 
-			enemyTextureIDs[index] = enemy->getTextureRef();
+			enemyTextureIDs[index] = enemy->getTextureMap().going;
 		}
 
 		enemyShader->use();
 		enemyShader->setInt("textureA", 0);
 	}
-
-
 
 	void initializeCharacters()
 	{
@@ -571,10 +557,10 @@ public:
 		mainShader->use();
 		glBindVertexArray(mainVAO);
 
-		int mainTextures[2] = { 3 + (gameVersion == 1), 1 };		
+		int mainTextures[2] = { 3 + (gameVersion == 1), 1 };
+		int cursor[2] = { 0, -menuCursor };
+		
 		mainShader->setIntArray("textures", mainTextures, 2);
-
-		int cursor[2] = { 0, -menuCursor};		
 		mainShader->setIntArray("cursor", cursor, 2);
 
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1 + (gameVersion == 0));

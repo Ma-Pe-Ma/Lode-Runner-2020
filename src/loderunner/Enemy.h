@@ -12,10 +12,7 @@
 #include "Structs/Vector2D.h"
 #include "Structs/Vector2DInt.h"
 
-#include "Audio.h"
-
 #include "Enums/LayoutBlock.h"
-
 #include "TextureMap.h"
 
 #include "Trapdoor.h"
@@ -28,14 +25,13 @@ class Play;
 
 class Enemy {
 private:
+	// time parameters
+	const float holeIdle = 2.2f;
+	const float holeHorizontalTime = 0.25f;
+
+	//factors used for determining the next step
 	int bestPath = 0.0f;
 	float bestRating = 0.0f;
-
-	//factor to slow or fasten animationSpeed
-	int animationFactor = 20;
-
-	float holeIdle = 2.2f;
-	float holeHorizontalTime = 0.25;
 
 	//PathFinding
 	void scanFloor();
@@ -43,7 +39,6 @@ private:
 	void scanUp(int, int);
 
 	bool enemyChecker(float, float);
-
 	virtual void checkCollisionWithOthers();
 
 	void fallingToPit();
@@ -53,26 +48,23 @@ private:
 	Brick* holeBrick = nullptr;
 	
 protected:
-	std::shared_ptr<Gold> carriedGold;
+	//factor to slow or fasten animationSpeed
+	int animationFactor = 20;
 
-	float gameTime;
+	std::shared_ptr<GameContext> gameContext;
 
 	void determineNearbyObjects();
-	LayoutBlock middle;
-	LayoutBlock downBlock;
-	int curX;
-	int curY;
-	short directionX;
-	short directionY;
-
-	virtual void initiateFallingStart();
-	virtual void initiateFallingStop();
-		
+	void ladderTransformation();
 	void checkCollisionsWithEnvironment();
 
-	void ladderTransformation();
+	virtual void checkGoldCollect();
+	virtual void checkGoldDrop();
 
-	TextureMap textureMap = { 8,16,12,0,4,-1};
+	virtual void releaseFromDigging() {};
+	virtual bool checkHole();
+
+	virtual void initiateFallingStart();
+	virtual void initiateFallingStop();	
 
 	virtual void findPath();
 	void move();
@@ -97,30 +89,31 @@ protected:
 	virtual void animateFalling();
 	virtual void animatePitting();
 	
-	virtual void checkGoldCollect();
-	virtual void checkGoldDrop();
-	
-	virtual void releaseFromDigging() {};
+	float gameTime;
 
-	virtual bool checkHole();
+	LayoutBlock middle;
+	LayoutBlock downBlock;
 
-	EnemyState state;
-	float holeTimer;
-	float dieTimer;
-	float actualSpeed;
+	Vector2DInt current = { 0, 0 };
+	Vector2DInt directionHelper = { 0, 0 };
+
+	TextureMap textureMap = { 8, 16, 12, 0, 4, -1 };
+
+	std::shared_ptr<Gold> carriedGold;
+
+	EnemyState state = EnemyState::freeRun;
+	float holeTimer = 0.0f;
+	float dieTimer = 0.0f;
+	float actualSpeed = 0.0f;
 	float charSpeed = 0.0f;
 
 	Direction direction;
-	int textureRef;
-
-	PitState pitState;
+	PitState pitState;	
 
 	float* positionPointer;
 	int* texturePointer;
 	int* directionPointer;
 	int* carryGoldPointer;
-
-	std::shared_ptr<GameContext> gameContext;
 
 	Vector2D pos;
 	Vector2D dPos;
@@ -130,58 +123,28 @@ public:
 	virtual ~Enemy() {}
 	Enemy(float, float);
 
-	//static std::shared_ptr<Enemy> player;
-
-	Vector2D getPos()
-	{
-		return this->pos;
-	}
-
-	int getTextureRef()
-	{
-		return this->textureRef;
-	}
-
-	virtual void setCharSpeed(float);
-
 	void handle();
 
+	bool carriesGold() { return carriedGold != nullptr; }
 	void checkDeath(int, int);
 
-	virtual void die();		
+	virtual void die();
 
-	void setPositionPointer(float* positionPointer)
-	{
-		this->positionPointer = positionPointer;
-	}
+	//Getters and setters
+	void setGameContext(std::shared_ptr<GameContext> gameContext) { this->gameContext = gameContext; }
 
-	void setTexturePointer(int* texturePointer)
-	{
-		this->texturePointer = texturePointer;
-	}
+	TextureMap getTextureMap() { return this->textureMap; }
+	virtual void setCharSpeed(float charSpeed) { this->charSpeed = charSpeed; }
 
-	void setDirectionPointer(int* directionPointer)
-	{
-		this->directionPointer = directionPointer;
-	}
+	void setPositionPointer(float* positionPointer)	{ this->positionPointer = positionPointer; }
+	void setTexturePointer(int* texturePointer) { this->texturePointer = texturePointer; }
+	void setDirectionPointer(int* directionPointer) { this->directionPointer = directionPointer; }
+	void setCarryGoldPointer(int* carryGoldPointer)	{ this->carryGoldPointer = carryGoldPointer; }
+	
+	void setTexture(int texture) { *texturePointer = texture; }
 
-	void setCarryGoldPointer(int* carryGoldPointer)
-	{
-		this->carryGoldPointer = carryGoldPointer;
-	}
-
-	void setTextureRef(int textureRef)
-	{
-		this->textureRef = textureRef;
-		*texturePointer = textureRef;
-	}
-
-	bool carriesGold()
-	{
-		return carriedGold != nullptr;
-	}
-
-	void setGameContext(std::shared_ptr<GameContext> gameContext);
+	Vector2D getPos() {	return this->pos; }
+	void setDPos(Vector2D dPos) { this->dPos = dPos; }	
 };
 
 #endif // !ENEMY_H

@@ -104,12 +104,12 @@ void Outro::update(float currentFrame) {
 		int timeFactor = ((currentFrame - timer) * 4);
 		int textureRef = 36 + timeFactor % 4;
 
-		this->player->setTextureRef(textureRef);
+		this->player->setTexture(textureRef);
 	}
 	//nail bitting after reaching top of ladder
 	else {
 		int timeFactor = int((currentFrame - timer) * 3) % 4;
-		this->player->setTextureRef(44 + timeFactor);
+		this->player->setTexture(44 + timeFactor);
 	}
 
 	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || IOHandler::enter.simple()) {

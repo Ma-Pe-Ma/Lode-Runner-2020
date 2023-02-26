@@ -113,10 +113,10 @@ For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
 
 #### ImGUI Configurer
 On the desktop and browser ports a simple imgui configurer dialog is available (which can be shown by pressing the 'C' button).
-Here you can specify the same parameters as in the config file but they cannot be saved (yet).
+Here you can specify the same parameters as in the config file but they cannot be saved.
 
-### Championship Lode Runner ###
-To play with this version you just have to edit the config file/set it in the launcher or launch the exe with "Championship" argument.
+### Championship Lode Runner
+To play with this version you just have to set it in the imgui configurer, edit the config file, set it in the launcher or launch the exe with "Championship" argument.
 
 ### Hardware and software requirements
 Your graphics card has to support OpenGL 4.6 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
@@ -147,9 +147,12 @@ I know that there are parts that are still badly implemented those parts will be
 
 ## Future tasks for this project:
 - Remake collision detection between enemies
-- Add demo scene + bonus fruits
-- Rewrite code to follow a C++ style guide, cleanup badly written parts
+- Make browser/wasm port playable on mobile
+- Remake Android port by using the default cmake project instead of defining a custom one for it
+- Rewrite code to follow a C++ style guide, cleanup badly written parts (eg. IOHandler)
+- Cleanup audio handling class
 - Further FFMPEG optimization
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
+- Add demo scene + bonus fruits
 
 **Have fun playing with it!**

@@ -1,8 +1,10 @@
 #include "Brick.h"
 #include "Enemy.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "Gold.h"
+
+#include "GameTime.h"
+#include "Audio.h"
 
 Brick::Brick(Vector2DInt position) {
 	this->position = position;

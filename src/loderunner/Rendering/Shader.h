@@ -55,12 +55,12 @@ public:
             
             unsigned int vertex, fragment;
 
-#if defined __EMSCRIPTEN__
-            const GLchar* vertex_shader_with_version[2] = { "#version 300 es\nprecision highp float;", vertexCode.c_str() };
-            const GLchar* fragment_shader_with_version[2] = { "#version 300 es\nprecision highp float;", fragmentCode.c_str() };
+#if defined __EMSCRIPTEN__ || defined ANDROID_VERSION
+            const GLchar* vertex_shader_with_version[2] = { "#version 300 es\nprecision highp float;\n", vertexCode.c_str() };
+            const GLchar* fragment_shader_with_version[2] = { "#version 300 es\nprecision highp float;\n", fragmentCode.c_str() };
 #else
-            const GLchar* vertex_shader_with_version[2] = { "#version 460 core", vertexCode.c_str() };
-            const GLchar* fragment_shader_with_version[2] = { "#version 460 core", fragmentCode.c_str() };
+            const GLchar* vertex_shader_with_version[2] = { "#version 460 core\n", vertexCode.c_str() };
+            const GLchar* fragment_shader_with_version[2] = { "#version 460 core\n", fragmentCode.c_str() };
 
 #endif // __EMSCRIPTEN__
 

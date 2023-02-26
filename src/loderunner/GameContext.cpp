@@ -10,15 +10,15 @@
 
 #include "GameStates/Play.h"
 
+#include "IOHandler.h"
+
 void GameContext::run() {
 	float gameTime = GameTime::getGameTime();
 
-/*#ifndef RELEASE_VERSION
-	//(*enemies)[0]->dPos.x = debugPos[0].x;
-	//(*enemies)[0]->dPos.y = debugPos[0].y;
-	//(*enemies)[1]->dPos.x = debugPos[1].x;
-	//(*enemies)[1]->dPos.y = debugPos[1].y;
-#endif // !RELEASE_VERSION*/
+#ifndef RELEASE_VERSION
+	enemies[0]->setDPos(IOHandler::debugPos[0]);
+	enemies[1]->setDPos(IOHandler::debugPos[1]);
+#endif // !RELEASE_VERSION
 
 	player->handle();
 
@@ -27,10 +27,8 @@ void GameContext::run() {
 	}
 
 #ifndef RELEASE_VERSION
-	//debugPos[0].x = 0;
-	//debugPos[0].y = 0;
-	//debugPos[1].x = 0;
-	//debugPos[1].y = 0;
+	IOHandler::debugPos[0] = { 0.0f, 0.0f };
+	IOHandler::debugPos[1] = { 0.0f, 0.0f };
 #endif
 
 	for (auto brick : brickList)
@@ -39,39 +37,18 @@ void GameContext::run() {
 	}
 }
 
-void GameContext::setBrickList(std::vector<std::shared_ptr<Brick>> brickList)
-{
-	this->brickList = brickList;
+bool GameContext::checkDigPrevention(int x, int y) {
+	for (auto& enemy : enemies) {
+		if (std::abs(enemy->getPos().x - x) <= 0.75f && y + 1 <= enemy->getPos().y && enemy->getPos().y < y + 1.5f) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-void GameContext::setTrapdoorList(std::vector<std::shared_ptr<Trapdoor>> trapdoorList)
-{
-	this->trapdoorList = trapdoorList;
-}
-
-void GameContext::setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-{
-	this->renderingManager = renderingManager;
-}
-
-void GameContext::setPlayer(std::shared_ptr<Player> player)
-{
-	this->player = player;
-}
-
-std::shared_ptr<Player> GameContext::getPlayer()
-{
-	return this->player;
-}
-
-void GameContext::setEnemies(std::vector<std::shared_ptr<Enemy>> enemies)
-{
-	this->enemies = enemies;
-}
-
-std::vector<std::shared_ptr<Enemy>> GameContext::getEnemies()
-{
-	return this->enemies;
+void GameContext::notifyPlayerAboutDigEnd() {
+	player->releaseFromDigging();
 }
 
 void GameContext::checkDeaths(int x, int y)
@@ -81,10 +58,6 @@ void GameContext::checkDeaths(int x, int y)
 	for (auto& enemy : enemies) {
 		enemy->checkDeath(x, y);
 	}
-}
-
-void GameContext::notifyPlayerAboutDigEnd() {
-	player->releaseFromDigging();
 }
 
 void GameContext::handlePlayerDying() {
@@ -102,11 +75,42 @@ bool GameContext::enemyCarriesGold()
 	return false;
 }
 
+std::shared_ptr<Gold> GameContext::goldCollectChecker(float x, float y) {
+	for (auto it = uncollectedGoldList.begin(); it != uncollectedGoldList.end(); it++) {
+		if (std::abs(it->get()->getPos().x - x) < 0.15f && std::abs(it->get()->getPos().y - y) < 0.15f) {
+			std::shared_ptr<Gold> foundGold = *it;
+			uncollectedGoldList.erase(it);
+
+			return foundGold;
+		}
+	}
+
+	return nullptr;
+}
+
+bool GameContext::goldChecker(int x, int y) {
+	for (auto& gold : uncollectedGoldList) {
+		if (gold->getPos().x == x && gold->getPos().y == y) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void GameContext::addGoldToCollectedList(std::shared_ptr<Gold> collectedGold) {
+	collectedGold->setPos(Vector2DInt{ -1, -1 });
+	this->collectedGoldList.push_back(collectedGold);
+}
+
+void GameContext::addGoldToUncollectedList(std::shared_ptr<Gold> newGold) {
+	this->uncollectedGoldList.push_back(newGold);
+}
+
 void GameContext::generateFinishingLadders() {
 	renderingManager->enableFinishingLadderDrawing();
 
 	for (auto finishLadder : finishingLadders) {
-
 		int x = std::get<0>(finishLadder);
 		int y = std::get<1>(finishLadder);
 
@@ -116,14 +120,14 @@ void GameContext::generateFinishingLadders() {
 	finishingLadders.clear();
 }
 
-bool GameContext::checkDigPrevention(int x, int y) {
-	for (auto& enemy : enemies) {
-		if (std::abs(enemy->getPos().x - x) <= 0.75f && y + 1 <= enemy->getPos().y && enemy->getPos().y < y + 1.5f) {
-			return true;
-		}
-	}
+void GameContext::transitionToDeath()
+{
+	play->transitionToDeath();
+}
 
-	return false;
+void GameContext::transitionToOutro()
+{
+	play->transitionToOutro(killCounter, getCollectedGoldSize(), 0);
 }
 
 void GameContext::clearContainers()
@@ -136,7 +140,7 @@ void GameContext::clearContainers()
 	uncollectedGoldList.clear();
 	collectedGoldList.clear();
 
-	for (auto & brick : brickList)
+	for (auto& brick : brickList)
 	{
 		brick = nullptr;
 	}
@@ -162,47 +166,5 @@ void GameContext::clearContainers()
 
 		bricks = nullptr;
 		trapdoors = nullptr;
-	}	
-}
-
-std::shared_ptr<Gold> GameContext::goldCollectChecker(float x, float y) {
-	for (auto it = uncollectedGoldList.begin(); it != uncollectedGoldList.end(); it++) {
-		if (std::abs(it->get()->getPos().x - x) < 0.15f && std::abs(it->get()->getPos().y - y) < 0.15f) {
-			std::shared_ptr<Gold> foundGold = *it;
-			uncollectedGoldList.erase(it);
-
-			return foundGold;
-		}
 	}
-
-	return nullptr;
-}
-
-void GameContext::addGoldToCollectedList(std::shared_ptr<Gold> collectedGold) {
-	collectedGold->setPos(Vector2DInt{ -1, -1 });
-	this->collectedGoldList.push_back(collectedGold);
-}
-
-void GameContext::addGoldToUncollectedList(std::shared_ptr<Gold> newGold) {
-	this->uncollectedGoldList.push_back(newGold);
-}
-
-bool GameContext::goldChecker(int x, int y) {
-	for (auto& gold : uncollectedGoldList) {
-		if (gold->getPos().x == x && gold->getPos().y == y) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void GameContext::transitionToDeath()
-{
-	play->transitionToDeath();
-}
-
-void GameContext::transitionToOutro()
-{
-	play->transitionToOutro(killCounter, getCollectedGoldSize(), 0);
 }
