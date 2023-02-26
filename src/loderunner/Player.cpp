@@ -5,7 +5,6 @@
 
 Player::Player(float x, float y) : Enemy(x, y) {
 	this->textureMap = {28, 52, 48, 36, 40, 26};
-	textureRef = textureMap.going;
 }
 
 void Player::setCharSpeed(float charSpeed) {
@@ -46,23 +45,23 @@ void Player::findPath() {
 void Player::freeRun() {
 	//Check digging input
 	if (IOHandler::leftDigButton.impulse()) {
-		if (gameContext->getBricks()[curX - 1][curY - 1] && gameContext->getBricks()[curX - 1][curY -1]->initiateDig()) {
+		if (gameContext->getBricks()[current.x - 1][current.y - 1] && gameContext->getBricks()[current.x - 1][current.y -1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
 			direction = Direction::left;
-			textureRef = 24;
+			*texturePointer = 24;
 			return;
 		}
 	}
 	
 	if (IOHandler::rightDigButton.impulse()) {
-		if (gameContext->getBricks()[curX + 1][curY - 1] && gameContext->getBricks()[curX + 1][curY - 1]->initiateDig()) {
+		if (gameContext->getBricks()[current.x + 1][current.y - 1] && gameContext->getBricks()[current.x + 1][current.y - 1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
 			direction = Direction::right;
-			textureRef = 25;
+			*texturePointer = 25;
 			return;
 		}
 	}
@@ -81,8 +80,8 @@ void Player::initiateFallingStop() {
 }
 
 void Player::falling() {
-	if (gameContext->getLayout()[curX][curY] == LayoutBlock::trapDoor) {
-		gameContext->getTrapdoors()[curX][curY]->setRevealed();
+	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::trapDoor) {
+		gameContext->getTrapdoors()[current.x][current.y]->setRevealed();
 	}
 
 	Enemy::falling();
@@ -98,17 +97,17 @@ bool Player::checkHole() {
 
 void Player::digging() {
 	//Position runner to middle and hold him in place
-	if (pos.x > curX) {
-		if (pos.x - actualSpeed < curX) {
-			dPos.x = curX - pos.x;
+	if (pos.x > current.x) {
+		if (pos.x - actualSpeed < current.x) {
+			dPos.x = current.x - pos.x;
 		}
 		else {
 			dPos.x = -actualSpeed;
 		}
 	}
-	else if (pos.x < curX) {
-		if (pos.x + actualSpeed > curX) {
-			dPos.x = curX - pos.x;
+	else if (pos.x < current.x) {
+		if (pos.x + actualSpeed > current.x) {
+			dPos.x = current.x - pos.x;
 		}
 		else {
 			dPos.x = actualSpeed;
@@ -118,17 +117,17 @@ void Player::digging() {
 		dPos.x = 0;
 	}
 
-	if (pos.y > curY) {
-		if (pos.y - actualSpeed < curY) {
-			dPos.y = curY - pos.y;
+	if (pos.y > current.y) {
+		if (pos.y - actualSpeed < current.y) {
+			dPos.y = current.y - pos.y;
 		}
 		else {
 			dPos.y = -actualSpeed;
 		}
 	}
-	else if (pos.y < curY) {
-		if (pos.y + actualSpeed > curY) {
-			dPos.y = curY - pos.y;
+	else if (pos.y < current.y) {
+		if (pos.y + actualSpeed > current.y) {
+			dPos.y = current.y - pos.y;
 		}
 		else {
 			dPos.y = actualSpeed;
@@ -151,8 +150,8 @@ void Player::animateFreeRun() {
 	}
 
 	//runner idle animation
-	if (pos.x - prevPos.x == 0 && pos.y - prevPos.y == 0 && gameTime - idleTimeStart > 1 && (middle != LayoutBlock::pole) && pos.y == curY) {
-		textureRef = textureMap.idle + (int (gameTime)) % 2;
+	if (pos.x - prevPos.x == 0 && pos.y - prevPos.y == 0 && gameTime - idleTimeStart > 1 && (middle != LayoutBlock::pole) && pos.y == current.y) {
+		*texturePointer = textureMap.idle + (int (gameTime)) % 2;
 	}
 
 	Enemy::animateFreeRun();
@@ -160,19 +159,11 @@ void Player::animateFreeRun() {
 
 void Player::animateDigging() {
 	if (middle == LayoutBlock::pole) {
-		textureRef = textureMap.pole;
+		*texturePointer = textureMap.pole;
 	}
 	else if (middle == LayoutBlock::ladder) {
-		textureRef = textureMap.ladder;
+		*texturePointer = textureMap.ladder;
 	}
-}
-
-void Player::animateDying() {
-	
-}
-
-void Player::animateFalling() {
-	Enemy::animateFalling();
 }
 
 void Player::animateGoing() {
@@ -202,9 +193,8 @@ void Player::animateOnPole() {
 	}	
 }
 
-//player does not check gold rather top of level,
 void Player::checkGoldCollect() {
-	if (carriedGold = gameContext->goldCollectChecker(pos.x, pos.y)) {
+	if ((carriedGold = gameContext->goldCollectChecker(pos.x, pos.y))) {
 		if (Audio::sfx[0].getPlayStatus() == AudioStatus::playing) {
 			Audio::sfx[0].stopAndRewind();
 		}
@@ -222,11 +212,8 @@ void Player::checkGoldCollect() {
 	//if every gold collected!
 	if (gameContext->getUncollectedGoldSize() == 0 && !gameContext->enemyCarriesGold()) {
 		//top of level reached
-		if (curY >= gameContext->getHighestLadder() + 1) {
+		if (current.y >= gameContext->getHighestLadder() + 1) {
 			gameContext->transitionToOutro();
-			//play->transitionToOutro(gameContext->getKillCounter(), gameContext->getCollectedGoldSize(), 0);
-			
-			//score_gold = collectedsize * 200;
 		}
 	}
 }
@@ -241,6 +228,5 @@ void Player::dying() {
 	int timeFactor = ((int) (9 * (GameTime::getCurrentFrame() - dieTimer) / deathLength)) % 9;
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
 
-	textureRef = textureMap.death + timeFactor;
-	*texturePointer = textureRef;
+	*texturePointer = textureMap.death + timeFactor;
 }

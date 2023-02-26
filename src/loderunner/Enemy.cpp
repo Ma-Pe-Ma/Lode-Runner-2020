@@ -1,10 +1,13 @@
 #include "Enemy.h"
+#include "Player.h"
 #include "Gold.h"
+
 #include "GameTime.h"
 #include "GameStates/Play.h"
 #include "IOHandler.h"
+#include "Audio.h"
+
 #include <cmath>
-#include "Player.h"
 
 Enemy::Enemy(float x, float y) {
 	this->pos = { x, y };
@@ -16,13 +19,7 @@ Enemy::Enemy(float x, float y) {
 	pitState = PitState::fallingToPit;
 	state = EnemyState::freeRun;
 
-	textureRef = textureMap.going;
-
 	carriedGold = nullptr;
-}
-
-void Enemy::setCharSpeed(float charSpeed) {
-	this->charSpeed = charSpeed;
 }
 
 void Enemy::checkDeath(int x, int y) {
@@ -68,20 +65,19 @@ void Enemy::handle() {
 
 	animate();
 
-	*texturePointer = textureRef;
 	*directionPointer = direction == Direction::left;
 	*carryGoldPointer = carriedGold != nullptr;
 
-	dPrevPos = {pos.x - prevPos.x, pos.y - prevPos.y};
+	dPrevPos = { pos.x - prevPos.x, pos.y - prevPos.y };
 	prevPos = { pos.x, pos.y };
 }
 
 void Enemy::determineNearbyObjects() {
-	curX = int(pos.x + 0.5);
-	curY = int(pos.y + 0.5);
+	current.x = int(pos.x + 0.5);
+	current.y = int(pos.y + 0.5);
 
-	middle = gameContext->getLayout()[curX][curY];
-	downBlock = gameContext->getLayout()[curX][curY - 1];
+	middle = gameContext->getLayout()[current.x][current.y];
+	downBlock = gameContext->getLayout()[current.x][current.y - 1];
 }
 
 //-----------------------------------------------------------
@@ -95,15 +91,14 @@ void Enemy::findPath() {
 	//if a hole is created then the value of brick in act is emptied, but in the base it is unchanged!
 	actualSpeed = charSpeed * GameTime::getSpeed();
 
-	int x = curX;
-	int y = curY;
+	int x = current.x;
+	int y = current.y;
 
-	int runnerX = gameContext->getPlayer()->curX;
-	int runnerY = gameContext->getPlayer()->curY;
+	Vector2DInt runnerPos = gameContext->getPlayer()->current;
 	
 	//while
-	if (y == runnerY && gameContext->getPlayer()->state != EnemyState::falling) {
-		while (x != runnerX) {
+	if (y == runnerPos.y && gameContext->getPlayer()->state != EnemyState::falling) {
+		while (x != runnerPos.x) {
 			//std::cout << "\n x != runnerx";
 			LayoutBlock checkable = gameContext->getLayout()[x][y];
 			LayoutBlock belowCheckable = gameContext->getLayout()[x][y - 1];
@@ -114,12 +109,12 @@ void Enemy::findPath() {
 				|| belowCheckable == LayoutBlock::ladder	|| enemyChecker(x, y - 1) || belowCheckable == LayoutBlock::pole || checkGold) {
 
 				//guard left to runner
-				if (x < runnerX) {
+				if (x < runnerPos.x) {
 					++x;
 				}					
 
 				//guard right to runner
-				else if (x > runnerX) {
+				else if (x > runnerPos.x) {
 					--x;
 				}					
 			}
@@ -129,12 +124,12 @@ void Enemy::findPath() {
 		}
 
 		//scan for a path ignoring walls is a success
-		if (x == runnerX) {
-			if (pos.x < runnerX) {
+		if (x == runnerPos.x) {
+			if (pos.x < runnerPos.x) {
 				dPos.x = actualSpeed;
 				dPos.y = 0;
 			}
-			else if (pos.x > runnerX) {
+			else if (pos.x > runnerPos.x) {
 				dPos.x = -actualSpeed;
 				dPos.y = 0;
 			}
@@ -155,11 +150,11 @@ void Enemy::findPath() {
 }
 
 void Enemy::scanFloor() {
-	int startX = curX;
-	//int startY = curY;
+	int startX = current.x;
+	//int startY = current.y;
 
-	int x = curX;
-	int y = curY;
+	int x = current.x;
+	int y = current.y;
 
 	bestPath = 0;
 	bestRating = 255;
@@ -282,8 +277,8 @@ void Enemy::scanFloor() {
 }
 
 void Enemy::scanDown(int x, int curPath) {
-	int y = curY;
-	int runnerY = gameContext->getPlayer()->curY;
+	int y = current.y;
+	int runnerY = gameContext->getPlayer()->current.y;
 
 	LayoutBlock belowCheckable = gameContext->getLayout()[x][y - 1];
 
@@ -320,7 +315,7 @@ void Enemy::scanDown(int x, int curPath) {
 	int curRating = 255;
 
 	if (y == runnerY) {
-		curRating = std::abs(curX - x);				// update best rating and direct.
+		curRating = std::abs(current.x - x);				// update best rating and direct.
 	}		
 	else if (y < runnerY) {
 		curRating = runnerY - y + 200;			// position below runner
@@ -336,8 +331,8 @@ void Enemy::scanDown(int x, int curPath) {
 }
 
 void Enemy::scanUp(int x, int curPath) {
-	int y = curY;
-	int runnerY = gameContext->getPlayer()->curY;
+	int y = current.y;
+	int runnerY = gameContext->getPlayer()->current.y;
 
 	while (y < 18 && gameContext->getLayout()[x][y] == LayoutBlock::ladder) {
 		++y;
@@ -368,7 +363,7 @@ void Enemy::scanUp(int x, int curPath) {
 	int curRating = 255;
 
 	if (y == runnerY) {
-		curRating = std::abs(curX - x);			// update best rating and direct.
+		curRating = std::abs(current.x - x);			// update best rating and direct.
 	}		
 	else if (y < runnerY) {
 		curRating = runnerY - y + 200;		// position below runner   
@@ -436,18 +431,18 @@ void Enemy::animate() {
 
 void Enemy::startingToFall() {
 	//falling back to pit, when enemy did not come out from it!
-	if (pos.x == curX) {
+	if (pos.x == current.x) {
 		//std::cout << "\n exiting stf";
 		state = EnemyState::falling;
 		return;
 	}
 
 	//falling from edge left->right
-	else if (pos.x < curX) {
+	else if (pos.x < current.x) {
 		direction = Direction::right;
 
-		if (pos.x + actualSpeed > curX) {
-			dPos.x = curX - pos.x;
+		if (pos.x + actualSpeed > current.x) {
+			dPos.x = current.x - pos.x;
 			state = EnemyState::falling;
 		}
 		else {
@@ -458,8 +453,8 @@ void Enemy::startingToFall() {
 	else  {
 		direction = Direction::left;
 
-		if (pos.x - actualSpeed < curX) {
-			dPos.x = curX - pos.x;
+		if (pos.x - actualSpeed < current.x) {
+			dPos.x = current.x - pos.x;
 			state = EnemyState::falling;
 		}
 		else {
@@ -482,7 +477,7 @@ void Enemy::ladderTransformation() {
 	}*/
 
 	//you can move on a ladder 1.5 unit vertically, middle block only covers the bottom 2/3 of the ladder, tophalfladder covers the upper 2/3 of ladder
-	LayoutBlock topHalfOfLadder = gameContext->getLayout()[curX][int(pos.y)];
+	LayoutBlock topHalfOfLadder = gameContext->getLayout()[current.x][int(pos.y)];
 
 	if (dPos.y > 0 && middle != LayoutBlock::ladder && topHalfOfLadder != LayoutBlock::ladder) {
 		dPos.y = 0;
@@ -524,38 +519,38 @@ void Enemy::ladderTransformation() {
 
 	//adjust character to middle! (used by everyone)
 	if (middle == LayoutBlock::ladder || downBlock == LayoutBlock::ladder) {
-		if (dPos.x != 0 && pos.y != curY) {
+		if (dPos.x != 0 && pos.y != current.y) {
 			dPos.x = 0;
-			if (pos.y > curY) {
-				if (pos.y - actualSpeed < curY) {
-					dPos.y = curY - pos.y;
+			if (pos.y > current.y) {
+				if (pos.y - actualSpeed < current.y) {
+					dPos.y = current.y - pos.y;
 				}
 				else {
 					dPos.y = -actualSpeed;
 				}
 			}
-			else if (pos.y < curY) {
-				if (pos.y + actualSpeed > curY) {
-					dPos.y = curY - pos.y;
+			else if (pos.y < current.y) {
+				if (pos.y + actualSpeed > current.y) {
+					dPos.y = current.y - pos.y;
 				}
 				else {
 					dPos.y = actualSpeed;
 				}
 			}
 		}
-		else if (dPos.y != 0 && pos.x != curX) {
+		else if (dPos.y != 0 && pos.x != current.x) {
 			dPos.y = 0;
-			if (pos.x > curX) {
-				if (pos.x - actualSpeed < curX) {
-					dPos.x = curX - pos.x;
+			if (pos.x > current.x) {
+				if (pos.x - actualSpeed < current.x) {
+					dPos.x = current.x - pos.x;
 				}
 				else {
 					dPos.x = -actualSpeed;
 				}
 			}
-			else if (pos.x < curX) {
-				if (pos.x + actualSpeed > curX) {
-					dPos.x = curX - pos.x;
+			else if (pos.x < current.x) {
+				if (pos.x + actualSpeed > current.x) {
+					dPos.x = current.x - pos.x;
 				}
 				else {
 					dPos.x = actualSpeed;
@@ -582,14 +577,14 @@ void Enemy::checkCollisionWithOthers() {
 				//stop if enemy is coming out from hole
 				if (checkPit) {
 					if (enemy->state == EnemyState::pitting && enemy->pitState == PitState::climbing) {
-						dPos.x = curX - pos.x;
+						dPos.x = current.x - pos.x;
 						break;
 					}
 				}
 
 				//when going to same ladder from different sides, who goes from right to left, stop!
-				if (-directionX == enemy->directionX) {
-					if (directionX == -1) {
+				if (-directionHelper.x == enemy->directionHelper.x) {
+					if (directionHelper.x == -1) {
 						dPos.x = 0;
 					}
 				}
@@ -597,7 +592,7 @@ void Enemy::checkCollisionWithOthers() {
 				else {
 					float enemyDiff = enemy->pos.x - pos.x;
 					short enemyDirectionX = (enemyDiff > 0) - (enemyDiff < 0);
-					if (enemyDirectionX == directionX) {
+					if (enemyDirectionX == directionHelper.x) {
 						dPos.x = 0;
 					}
 				}
@@ -606,8 +601,8 @@ void Enemy::checkCollisionWithOthers() {
 			//check Y collision
 			if (dPos.y != 0 && std::abs(enemy->pos.y - (pos.y + dPos.y)) < 1.0f && std::abs(pos.x - enemy->pos.x) < 1.0f) {
 				//when exiting the same ladder from different sides, who goes from up to down, stop!
-				if (-directionY == enemy->directionY) {
-					if (directionY == -1) {
+				if (-directionHelper.y == enemy->directionHelper.y) {
+					if (directionHelper.y == -1) {
 						dPos.y = 0;
 					}	
 				}
@@ -615,7 +610,7 @@ void Enemy::checkCollisionWithOthers() {
 				else {
 					float enemyDiff = enemy->pos.y - pos.y;
 					short enemyDirectionY = (enemyDiff > 0) - (enemyDiff < 0);
-					if (enemyDirectionY == directionY) {
+					if (enemyDirectionY == directionHelper.y) {
 						dPos.y = 0;
 					}
 				}
@@ -627,27 +622,27 @@ void Enemy::checkCollisionWithOthers() {
 void Enemy::checkCollisionsWithEnvironment() {	
 	if (dPos.x != 0) {
 		short directionX = (dPos.x > 0) - (dPos.x < 0);
-		int nextX = curX + directionX;
-		LayoutBlock nextXBlock = gameContext->getLayout()[nextX][curY];
+		int nextX = current.x + directionX;
+		LayoutBlock nextXBlock = gameContext->getLayout()[nextX][current.y];
 
 		if ((nextXBlock == LayoutBlock::brick || nextXBlock == LayoutBlock::concrete || nextXBlock == LayoutBlock::trapDoor) && std::abs(nextX - pos.x - dPos.x) < 1.0f) {
-			dPos.x = curX - pos.x;
+			dPos.x = current.x - pos.x;
 		}
 	}	
 
 	if (dPos.y != 0) {
 		short directionY = (dPos.y > 0) - (dPos.y < 0);
-		int nextY = curY + directionY;
-		LayoutBlock nextYBlock = gameContext->getLayout()[curX][nextY];
+		int nextY = current.y + directionY;
+		LayoutBlock nextYBlock = gameContext->getLayout()[current.x][nextY];
 
 		if (dPos.y > 0) {
 			if ((nextYBlock == LayoutBlock::brick || nextYBlock == LayoutBlock::concrete || nextYBlock == LayoutBlock::trapDoor) && std::abs(nextY - pos.y - dPos.y) < 1.0f) {
-				dPos.y = curY - pos.y;
+				dPos.y = current.y - pos.y;
 			}
 		}
 		else {
 			if ((nextYBlock == LayoutBlock::brick || nextYBlock == LayoutBlock::concrete) && std::abs(nextY - pos.y - dPos.y) < 1.0f) {
-				dPos.y = curY - pos.y;
+				dPos.y = current.y - pos.y;
 			}
 		}
 	}	
@@ -656,14 +651,14 @@ void Enemy::checkCollisionsWithEnvironment() {
 void Enemy::freeRun() {
 	ladderTransformation();
 
-	directionX = (dPos.x > 0) - (dPos.x < 0);
-	directionY = (dPos.y > 0) - (dPos.y < 0);
+	directionHelper.x = (dPos.x > 0) - (dPos.x < 0);
+	directionHelper.y = (dPos.y > 0) - (dPos.y < 0);
 
 	checkCollisionWithOthers();
 	checkCollisionsWithEnvironment();
 
 	int nextY = int(pos.y + 0.5 + dPos.y);
-	LayoutBlock nextYBlock = gameContext->getLayout()[curX][nextY];
+	LayoutBlock nextYBlock = gameContext->getLayout()[current.x][nextY];
 
 	//fall from ladder to empty, pole or trapDoor
 	if (dPos.y < 0 && middle == LayoutBlock::ladder && (nextYBlock == LayoutBlock::empty || nextYBlock == LayoutBlock::pole || nextYBlock == LayoutBlock::trapDoor)) {
@@ -673,11 +668,11 @@ void Enemy::freeRun() {
 
 	//fall from pole
 	if (dPos.y < 0 && middle == LayoutBlock::pole && (downBlock == LayoutBlock::empty || downBlock == LayoutBlock::pole || downBlock == LayoutBlock::trapDoor)) {
-		if (enemyChecker(curX, curY - 1)) {
+		if (enemyChecker(current.x, current.y - 1)) {
 			dPos.y = 0;
 		}
 		else {
-			pos.x = curX;
+			pos.x = current.x;
 			dPos.x = 0;
 			initiateFallingStart();
 			return;
@@ -691,11 +686,11 @@ void Enemy::freeRun() {
 
 	for (auto& enemy : gameContext->getEnemies()) {
 		if (enemy.get() != this) {
-			if (enemy->curX == curX && enemy->curY == curY - 1) {
+			if (enemy->current.x == current.x && enemy->current.y == current.y - 1) {
 				enemyUnder = true;
 			}
 
-			if (directionX != 0 && enemy->curX == nextX && enemy->curY == curY - 1) {
+			if (directionHelper.x != 0 && enemy->current.x == nextX && enemy->current.y == current.y - 1) {
 				enemyNextUnder = true;
 			}
 		}
@@ -707,9 +702,9 @@ void Enemy::freeRun() {
 		return;
 	}
 	
-	LayoutBlock nextXBlock = gameContext->getLayout()[nextX][curY];
+	LayoutBlock nextXBlock = gameContext->getLayout()[nextX][current.y];
 	//used to check next block for starting to fall
-	LayoutBlock nextUnderBlock = gameContext->getLayout()[nextX][curY - 1];
+	LayoutBlock nextUnderBlock = gameContext->getLayout()[nextX][current.y - 1];
 
 	//falling from the edge of a block (brick, concrete, enemy, ladder)
 	if (dPos.x != 0 && nextXBlock == LayoutBlock::empty && (nextUnderBlock == LayoutBlock::empty || nextUnderBlock == LayoutBlock::trapDoor || nextUnderBlock == LayoutBlock::pole) && !enemyNextUnder) {
@@ -718,7 +713,7 @@ void Enemy::freeRun() {
 	}
 
 	//if some probem arised and character is stuck in air, unstuck it!
-	if (pos.x != curX && pos.y != curY) {
+	if (pos.x != current.x && pos.y != current.y) {
 		bool correct = true;
 
 		for (auto& enemy : gameContext->getEnemies()) {
@@ -740,7 +735,7 @@ void Enemy::freeRun() {
 }
 
 void Enemy::initiateFallingStart() {
-	/*if (pos.x > curX) {
+	/*if (pos.x > current.x) {
 		direction = left;
 	}
 	else {
@@ -756,8 +751,8 @@ void Enemy::initiateFallingStop() {
 }
 
 bool Enemy::checkHole() {
-	if (gameContext->getLayout()[curX][curY] == LayoutBlock::empty && gameContext->getBricks()[curX][curY] && dPos.x == 0 && pos.y > curY) {
-		this->holeBrick = gameContext->getBricks()[curX][curY].get();
+	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::empty && gameContext->getBricks()[current.x][current.y] && dPos.x == 0 && pos.y > current.y) {
+		this->holeBrick = gameContext->getBricks()[current.x][current.y].get();
 		return true;
 	}
 
@@ -777,7 +772,7 @@ void Enemy::falling() {
 	//falling into pit from falling
 	int nextY = int(pos.y + dPos.y);
 
-	LayoutBlock blockUnderFallingEnemy = gameContext->getLayout()[curX][nextY];
+	LayoutBlock blockUnderFallingEnemy = gameContext->getLayout()[current.x][nextY];
 	//Falling to brick, concrete, ladder, enemy
 	if (blockUnderFallingEnemy == LayoutBlock::brick || blockUnderFallingEnemy == LayoutBlock::concrete || blockUnderFallingEnemy == LayoutBlock::ladder) {
 		initiateFallingStop();
@@ -787,7 +782,7 @@ void Enemy::falling() {
 	//falling onto enemy!
 	for (auto& enemy : gameContext->getEnemies()) {
 		if (enemy.get() != this) {
-			if (curX == enemy->curX && enemy->pos.y < pos.y && std::abs((pos.y + dPos.y) - enemy->pos.y) < 1.0f && gameContext->getLayout()[enemy->curX][enemy->curY] != LayoutBlock::pole) {
+			if (current.x == enemy->current.x && enemy->pos.y < pos.y && std::abs((pos.y + dPos.y) - enemy->pos.y) < 1.0f && gameContext->getLayout()[enemy->current.x][enemy->current.y] != LayoutBlock::pole) {
 				initiateFallingStop();
 				return;
 			}
@@ -795,7 +790,7 @@ void Enemy::falling() {
 	}
 
 	//falling to pole
-	if (gameContext->getLayout()[curX][curY] == LayoutBlock::pole && pos.y + dPos.y <= curY && pos.y > curY) {
+	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::pole && pos.y + dPos.y <= current.y && pos.y > current.y) {
 		initiateFallingStop();
 		return;
 	}
@@ -1053,7 +1048,7 @@ void Enemy::climbing() {
 			{
 				if (dPos.x < 0) {
 					//if (holepos.x - 1.55f < enemies[i]->pos.x && enemies[i]->pos.x < holepos.x && int(enemies[i]->pos.y + 0.5) == holepos.y + 1) {
-					if (pos.x - 1 < enemy->pos.x && enemy->pos.x < pos.x && enemy->curY == brickPosition.y + 1) {
+					if (pos.x - 1 < enemy->pos.x && enemy->pos.x < pos.x && enemy->current.y == brickPosition.y + 1) {
 						//std::cout << "\n falling back from left to right, because enemy is above!";
 						pitState = PitState::fallingToPit;
 						return;
@@ -1061,7 +1056,7 @@ void Enemy::climbing() {
 				}
 				else if (dPos.x > 0) {
 					//if (holepos.x < enemies[i]->pos.x && enemies[i]->pos.x < holepos.x + 1.55 && int(enemies[i]->pos.y + 0.5) == holepos.y + 1) {
-					if (pos.x < enemy->pos.x && enemy->pos.x < pos.x + 1 && enemy->curY == brickPosition.y + 1) {
+					if (pos.x < enemy->pos.x && enemy->pos.x < pos.x + 1 && enemy->current.y == brickPosition.y + 1) {
 						//std::cout << "\n falling back from right to left, because enemy is above!";
 						pitState = PitState::fallingToPit;
 						return;
@@ -1104,13 +1099,13 @@ void Enemy::animateFreeRun() {
 		animateOnLadder();
 	}
 	//on pole
-	else if (middle == LayoutBlock::pole && (pos.x - prevPos.x != 0 || pos.y - prevPos.y != 0) && curY == pos.y) {
+	else if (middle == LayoutBlock::pole && (pos.x - prevPos.x != 0 || pos.y - prevPos.y != 0) && current.y == pos.y) {
 		animateOnPole();
 	}
 }
 
 void Enemy::animateDying() {
-	textureRef = textureMap.death + int(4 * (gameTime - dieTimer)) % 4;
+	*texturePointer = textureMap.death + int(4 * (gameTime - dieTimer)) % 4;
 }
 
 void Enemy::animateDigging() {
@@ -1121,28 +1116,28 @@ void Enemy::animateFalling() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	textureRef = textureMap.falling + timeFactor;
+	*texturePointer = textureMap.falling + timeFactor;
 }
 
 void Enemy::animateGoing() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	textureRef = textureMap.going + timeFactor;
+	*texturePointer = textureMap.going + timeFactor;
 }
 
 void Enemy::animateOnLadder() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	textureRef = textureMap.ladder + timeFactor;
+	*texturePointer = textureMap.ladder + timeFactor;
 }
 
 void Enemy::animateOnPole() {
 	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
 	int timeFactor = int(factor * gameTime) % 4;
 
-	textureRef = textureMap.pole + timeFactor;
+	*texturePointer = textureMap.pole + timeFactor;
 }
 
 void Enemy::animatePitting() {
@@ -1156,7 +1151,7 @@ void Enemy::animatePitting() {
 			animateOnLadder();
 		}
 		else {
-			textureRef = textureMap.falling;
+			*texturePointer = textureMap.falling;
 		}
 			
 		break;
@@ -1204,10 +1199,4 @@ void Enemy::checkGoldDrop() {
 			}
 		}
 	}
-}
-
-
-void Enemy::setGameContext(std::shared_ptr<GameContext> gameContext)
-{
-	this->gameContext = gameContext;
 }

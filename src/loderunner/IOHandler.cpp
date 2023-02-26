@@ -12,8 +12,8 @@ namespace IOHandler {
 	unsigned int startingLevel = 1;
 	unsigned int recordingHeight;
 	
-	extern float enemySpeed = 0.0f;
-	extern float playerSpeed = 0.0f;
+	float enemySpeed = 0.415f;
+	float playerSpeed = 0.9f;
 
 #ifdef ANDROID_VERSION
 

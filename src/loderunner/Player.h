@@ -20,13 +20,11 @@ private:
 	void falling() override;
 	virtual bool checkHole() override;
 
-	//unsigned int killCounter = 0;
-
 	//Animating
 	inline void animateFreeRun() override;
 	inline void animateDigging() override;
-	inline void animateDying() override;
-	inline void animateFalling() override;
+	//inline void animateDying() override;
+	//inline void animateFalling() override;
 	inline void animateGoing() override;
 	inline void animateOnLadder() override;
 	inline void animateOnPole() override;

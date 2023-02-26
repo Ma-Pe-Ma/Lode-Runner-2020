@@ -1,4 +1,3 @@
-
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTexturePos;
 
@@ -7,9 +6,9 @@ flat out int instanceID;
 
 uniform vec2 gPos[864];
 
-const vec2 charSize = vec2(6.0 / 140, -1.0 / 14);
+const vec2 charSize = vec2(6.0 / 140.0, -1.0 / 14.0);
 
-void main() {		
+void main() {
 	vec2 pos = aPos + charSize * gPos[gl_InstanceID];
 	
 	instanceID = gl_InstanceID;

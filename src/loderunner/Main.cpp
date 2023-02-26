@@ -198,6 +198,7 @@ int main(int argc, char**argv) {
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop((em_callback_func) update, 60, 1);
 #else
+
 	//game loop
 	while (!glfwWindowShouldClose(GLHelper::window)) {
 		std::chrono::duration<double, std::milli> work_time = std::chrono::system_clock::now() - prevFrameStart;
