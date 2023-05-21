@@ -14,8 +14,6 @@ private:
 	std::shared_ptr<Text> scoreText;
 	std::shared_ptr<Text> hiscore;
 
-	void saveCurrentLevel();
-
 	void setupRenderingManager();
 public:
 	void start() override;

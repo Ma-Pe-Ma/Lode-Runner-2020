@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "Enemy.h"
+class IOContext;
 
 class Player final : public Enemy {
 private:
@@ -33,6 +34,8 @@ private:
 	inline void checkGoldDrop() override {};
 
 	virtual void checkCollisionWithOthers() override {}
+
+	std::shared_ptr<IOContext> ioContext;
 public:
 	void releaseFromDigging() override;
 
@@ -47,6 +50,8 @@ public:
 		positionPointer[0] = pos.x;
 		positionPointer[1] = pos.y;
 	}
+
+	void setIOContext(std::shared_ptr<IOContext> ioContext) { this->ioContext = ioContext; }
 };
 
 #endif

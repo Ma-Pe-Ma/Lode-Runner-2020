@@ -1,9 +1,8 @@
 #include "States/MainMenu.h"
 #include "States/StateContext.h"
 
-#include "Audio.h"
-
-#include "IOHandler.h"
+#include "Audio/Audio.h"
+#include "Audio/AudioFile.h"
 
 void MainMenu::start() {
 	stateContext->menuCursor = 0;
@@ -21,30 +20,30 @@ void MainMenu::start() {
 
 void MainMenu::update(float currentFrame) {
 	//main menu music cyclically playing!
-	if (Audio::sfx[5].getPlayStatus() == AudioStatus::stopped) {
-		Audio::sfx[5].playPause();
+	if (stateContext->getAudio()->getAudioFileByID(5)->getPlayStatus() == AudioStatus::stopped) {
+		stateContext->getAudio()->getAudioFileByID(5)->playPause();
 	}
 
 	int& menuCursor = stateContext->menuCursor;
 
 	//changing gamemode
-	if (IOHandler::down.simple()) {
+	if (stateContext->getIOContext()->getDownButton().simple()) {
 		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
 	}
 
-	if (IOHandler::up.simple()) {
+	if (stateContext->getIOContext()->getUpButton().simple()) {
 		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
 	}
 
-	if (IOHandler::gameVersion == 1) {
+	if (stateContext->getGameConfiguration()->getGameVersion() == 1) {
 		menuCursor = 0;
 	}
 
-	renderingManager->drawMainMenu(menuCursor, IOHandler::gameVersion);
+	stateContext->getRenderingManager()->drawMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
 
 	//choosing selected gamemode
-	if (IOHandler::enter.simple()) {
-		Audio::sfx[5].stopAndRewind();
+	if (stateContext->getIOContext()->getEnterButton().simple()) {
+		stateContext->getAudio()->getAudioFileByID(5)->stopAndRewind();
 
 		switch (menuCursor) {
 			//single player
@@ -62,5 +61,5 @@ void MainMenu::update(float currentFrame) {
 }
 
 void MainMenu::end() {
-	Audio::sfx[5].stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(5)->stopAndRewind();
 }

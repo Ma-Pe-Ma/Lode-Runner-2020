@@ -146,12 +146,10 @@ I know that there are parts that are still badly implemented those parts will be
 </p>
 
 ## Future tasks for this project:
-- Remake collision detection between enemies
+- Fine tune collision detection between enemies
 - Make browser/wasm port playable on mobile
-- Remake Android port by using the default cmake project instead of defining a custom one for it
-- Rewrite code to follow a C++ style guide, cleanup badly written parts (eg. IOHandler)
-- Cleanup audio handling class
-- Further FFMPEG optimization
+- Rewrite level loading part
+- Fix broken video recording + Android versions (remake this port by using the default cmake project instead of defining a custom one for it)
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Add demo scene + bonus fruits
 

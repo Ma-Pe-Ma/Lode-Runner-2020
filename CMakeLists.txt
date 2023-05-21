@@ -9,18 +9,18 @@ set(CMAKE_CXX_STANDARD 17)
 
 project("LodeRunner")
 
+#set(BUILD_SHARED_LIBS TRUE)
+message("COMPILER: ${CMAKE_CXX_COMPILER}")
+
 # define executable and add src/loderunner source files
 add_executable(LodeRunner
-	"src/loderunner/Audio.cpp"
 	"src/loderunner/Brick.cpp"
 	"src/loderunner/Button.cpp"
 	"src/loderunner/Enemy.cpp"
 	"src/loderunner/GameContext.cpp"
 	"src/loderunner/GameTime.cpp"
-	"src/loderunner/IOHandler.cpp"
 	"src/loderunner/Main.cpp"
-	"src/loderunner/Player.cpp"
-	"src/loderunner/Rendering/GLHelper.cpp"
+	"src/loderunner/Player.cpp"	
 	"src/loderunner/Rendering/Text.cpp"
 
 	"src/loderunner/States/GameOver.cpp"
@@ -38,6 +38,11 @@ add_executable(LodeRunner
 	"src/loderunner/GameStates/GameState.cpp"
 	"src/loderunner/GameStates/Pause.cpp"
 	"src/loderunner/GameStates/Play.cpp"
+
+	"src/loderunner/iocontext/GlfwIOContext.cpp"
+	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
+
+	"src/loderunner/Audio/Audio.cpp"
 
 	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
 	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"
@@ -72,14 +77,22 @@ target_link_libraries(LodeRunner PRIVATE
 )
 
 if(EMSCRIPTEN)
+	# deprecated
+	#[[string(ASCII 27 Esc)
+	set(ColourReset "${Esc}[m")
+	set(ColourBold "${Esc}[1m")
+	set(BoldRed "${Esc}[1;31m")
+	set(Red "${Esc}[31m")
+	#message(WARNING "${BoldRed} WARNING: Do not forget to specify the location of the page for the cookies!${ColourReset}")]]
+
 	# generate html file
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
 	
 	# configure opengl context + pthreads
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sLLD_REPORT_UNDEFINED\
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sLLD_REPORT_UNDEFINED \
 		-s USE_GLFW=3 -sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2 \
-		-pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=4 -sALLOW_MEMORY_GROWTH
-		-lopenal
+		-pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=4 -sALLOW_MEMORY_GROWTH \
+		-lopenal 
 		"
 	)
 

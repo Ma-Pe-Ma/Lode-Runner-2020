@@ -4,7 +4,8 @@
 #include "Gold.h"
 
 #include "GameTime.h"
-#include "Audio.h"
+#include "Audio/Audio.h"
+#include "Audio/AudioFile.h"
 
 Brick::Brick(Vector2DInt position) {
 	this->position = position;
@@ -34,8 +35,8 @@ bool Brick::initiateDig() {
 		brickState = BrickState::digging;
 		timer = GameTime::getGameTime();
 
-		Audio::sfx[1].stopAndRewind();
-		Audio::sfx[1].playPause();
+		gameContext->getAudio()->getAudioFileByID(1)->stopAndRewind();
+		gameContext->getAudio()->getAudioFileByID(1)->playPause();
 		gameContext->setRandomDebris(rand() % 3);
 
 		return true;
@@ -61,8 +62,8 @@ void Brick::digging(float gameTime) {
 		*pointerToTexture = 1 + timeFactor;
 
 		if (gameContext->checkDigPrevention(position.x, position.y)) {
-			Audio::sfx[2].playPause();
-			Audio::sfx[1].stopAndRewind();
+			gameContext->getAudio()->getAudioFileByID(2)->playPause();
+			gameContext->getAudio()->getAudioFileByID(1)->stopAndRewind();
 			gameContext->notifyPlayerAboutDigEnd();
 			gameContext->getLayout()[position.x][position.y] = LayoutBlock::brick;
 			brickState = BrickState::original;

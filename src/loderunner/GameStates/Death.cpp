@@ -5,18 +5,20 @@
 #include "States/StateContext.h"
 #include "Gold.h"
 
+#include "Audio/AudioFile.h"
+
 void Death::start() {	
-	Audio::sfx[7].stopAndRewind();
-	Audio::sfx[17].stopAndRewind();
-	Audio::sfx[3].stopAndRewind();
-	Audio::sfx[3].playPause();
+	gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
+	gameContext->getAudio()->getAudioFileByID(3)->stopAndRewind();
+	gameContext->getAudio()->getAudioFileByID(3)->playPause();
 	timer = GameTime::getCurrentFrame();
 }
 
 void Death::update(float) {
 	gamePlay->getPlay()->drawScene();
 	
-	float deathLength = Audio::sfx[3].lengthInSec();
+	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
 
 	if (GameTime::getCurrentFrame() - timer < deathLength) {
 		gameContext->handlePlayerDying();

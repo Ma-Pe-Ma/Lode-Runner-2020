@@ -18,7 +18,6 @@ class Play : public GameState {
 private:		
 	void handleNonControlButtons();
 
-	std::shared_ptr<RenderingManager> renderingManager;
 	std::shared_ptr<Text> timeText;
 
 public:
@@ -27,19 +26,11 @@ public:
 	void start() override;
 	void update(float) override;
 	void end() override;
-	//void generateFinishingLadders();
-	//short getHighestLadder();
 
 	void loadLevel(unsigned int);
 	void transitionToDeath();
 	void transitionToOutro(short, short, short);
 	void clearContainers();
-	//void setLadders(int, std::vector<Vector2DInt>);
-
-	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-	{
-		this->renderingManager = renderingManager;
-	}
 
 	void setGameContext(std::shared_ptr<GameContext> gameContext) override
 	{

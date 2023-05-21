@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include <memory>
 #include <vector>
+#include <tuple>
 
 #include "../Brick.h"
 #include "../Trapdoor.h"
@@ -20,7 +21,9 @@
 #include <map>
 
 #include "Text.h"
-#include "GLHelper.h"
+
+#include "../iocontext/IOContext.h"
+#
 
 class GameContext;
 
@@ -28,6 +31,7 @@ class GameContext;
 
 class RenderingManager {
 	std::shared_ptr<GameContext> gameContext;
+	std::shared_ptr<IOContext> ioContext;
 
 	float levelVertices[16] = {
 		-1.0f,			-1.0f,
@@ -175,11 +179,12 @@ class RenderingManager {
 	std::string assetFolder;
 
 public:
-	RenderingManager(std::string assetFolder, std::string mainCover) {
+	RenderingManager(std::string assetFolder, std::string mainCover, std::shared_ptr<IOContext> ioContext) {
 		Text::initCharMap();
 		this->assetFolder = assetFolder;
+		this->ioContext = ioContext;
 
-		glViewport(GLHelper::viewPortX, GLHelper::viewPortY, GLHelper::viewPortWidth, GLHelper::viewPortHeight);
+		glViewport(std::get<0>(ioContext->getViewPortPosition()), std::get<1>(ioContext->getViewPortPosition()), std::get<0>(ioContext->getViewPortSize()), std::get<1>(ioContext->getViewPortSize()));
 
 		glDepthFunc(GL_LEQUAL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -537,7 +542,7 @@ public:
 	void loadTexture(unsigned int textureID, unsigned int& textureContainer, std::string path, bool ignoreBlack = false)
 	{
 		glActiveTexture(GL_TEXTURE0 + textureID);
-		textureContainer = GLHelper::loadTexture(path.c_str(), ignoreBlack);
+		textureContainer = ioContext->loadTexture(path.c_str());
 		glBindTexture(GL_TEXTURE_2D, textureContainer);
 	}
 

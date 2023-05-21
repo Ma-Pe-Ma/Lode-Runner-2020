@@ -5,10 +5,13 @@ class Player;
 class Enemy;
 class Brick;
 class Gold;
-class RenderingManager;
 class Trapdoor;
 
 class Play;
+
+class Audio;
+class RenderingManager;
+class IOContext;
 
 #include "Enums/LayoutBlock.h"
 #include "Structs/Vector2DInt.h"
@@ -16,10 +19,15 @@ class Play;
 #include <memory>
 #include <vector>
 
+#include "iocontext/GameConfiguration.h"
+
 #include <iostream>
 
 class GameContext {
 	std::shared_ptr<RenderingManager> renderingManager;
+	std::shared_ptr<GameConfiguration> gameConfiguration;
+	std::shared_ptr<Audio> audio;
+	std::shared_ptr<IOContext> ioContext;
 
 	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
@@ -40,15 +48,23 @@ class GameContext {
 
 	int randomDebris = 0;
 
-	float enemySpeed = 0.415f;
-	float playerSpeed = 0.9f;
-
 	int* pointerToDebrisTexture;
 	int* pointerToDebrisLocation;
 
 	Play* play;
+
 public:
 	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager) { this->renderingManager = renderingManager; }
+	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
+
+	void setGameConfiguration(std::shared_ptr<GameConfiguration> gameConfiguration) { this->gameConfiguration = gameConfiguration; }
+	std::shared_ptr<GameConfiguration> getGameConfiguration() { return this->gameConfiguration; }
+
+	void setAudio(std::shared_ptr<Audio> audio) { this->audio = audio; }
+	std::shared_ptr<Audio> getAudio() { return this->audio; }
+
+	void setIOContext(std::shared_ptr<IOContext> ioContext) { this->ioContext = ioContext; }
+	std::shared_ptr<IOContext> getIOContext() { return this->ioContext; }
 
 	void setBrickList(std::vector<std::shared_ptr<Brick>> brickList) { this->brickList = brickList;	};
 	void setTrapdoorList(std::vector<std::shared_ptr<Trapdoor>> trapdoorList) { this->trapdoorList = trapdoorList; }
@@ -81,12 +97,6 @@ public:
 	void setHighestLadder(int highestLadder) { this->highestLadder = highestLadder; }
 	int getHighestLadder() { return this->highestLadder; }
 
-	void setEnemySpeed(float enemySpeed) { this->enemySpeed = enemySpeed; }
-	float getEnemySpeed() { return this->enemySpeed; }
-
-	void setPlayerSpeed(float playerSpeed) { this->playerSpeed = playerSpeed; }
-	float getPlayerSpeed() { return this->playerSpeed; }
-
 	int getKillCounter() { return killCounter; }
 	void incrementKillCounter() { this->killCounter++; }
 
@@ -98,9 +108,6 @@ public:
 
 	void setRandomDebris(int randomDebris) { this->randomDebris = randomDebris; }
 	int getRandomDebris() { return this->randomDebris; }
-
-	float* getEnemySpeedPointer() { return &enemySpeed; }
-	float* getPlayerSpeedPointer() { return &playerSpeed; }
 
 	void setPlayState(Play* play) { this->play = play; }
 
