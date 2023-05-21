@@ -8,6 +8,7 @@
 
 //#include "Generator.h"
 #include "GameTime.h"
+#include "Audio/AudioFile.h"
 
 Play::Play() {
 
@@ -17,16 +18,16 @@ void Play::start() {
 	//player->SetIdleTime();
 	GameTime::setSessionStartTime();
 
-	if (Audio::sfx[4].getPlayStatus() == AudioStatus::playing) {
-		Audio::sfx[4].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(4)->getPlayStatus() == AudioStatus::playing) {
+		gameContext->getAudio()->getAudioFileByID(4)->playPause();
 	}
 
-	if (Audio::sfx[1].getPlayStatus() == AudioStatus::playing) {
-		Audio::sfx[1].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(1)->getPlayStatus() == AudioStatus::playing) {
+		gameContext->getAudio()->getAudioFileByID(1)->playPause();
 	}
 
-	if (Audio::sfx[17].getPlayStatus() == AudioStatus::playing) {
-		Audio::sfx[17].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(17)->getPlayStatus() == AudioStatus::playing) {
+		gameContext->getAudio()->getAudioFileByID(17)->playPause();
 	}
 }
 
@@ -34,8 +35,8 @@ void Play::update(float currentFrame) {
 	GameTime::update(currentFrame);
 
 	//play gameplay music cyclically
-	if (Audio::sfx[7].getPlayStatus() != AudioStatus::playing) {
-		Audio::sfx[7].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(7)->getPlayStatus() != AudioStatus::playing) {
+		gameContext->getAudio()->getAudioFileByID(7)->playPause();
 	}
 
 	gameContext->run();	
@@ -55,31 +56,31 @@ void Play::end() {
 }
 
 void Play::handleNonControlButtons() {
-	if (IOHandler::enter.simple()) {
-		Audio::sfx[7].playPause();
+	if (gameContext->getIOContext()->getEnterButton().simple()) {
+		gameContext->getAudio()->getAudioFileByID(7)->playPause();
 
-		if (Audio::sfx[4].getPlayStatus() == AudioStatus::playing) {
-			Audio::sfx[4].playPause();
+		if (gameContext->getAudio()->getAudioFileByID(4)->getPlayStatus() == AudioStatus::playing) {
+			gameContext->getAudio()->getAudioFileByID(4)->playPause();
 		}
 
-		if (Audio::sfx[1].getPlayStatus() == AudioStatus::playing) {
-			Audio::sfx[1].playPause();
+		if (gameContext->getAudio()->getAudioFileByID(1)->getPlayStatus() == AudioStatus::playing) {
+			gameContext->getAudio()->getAudioFileByID(1)->playPause();
 		}
 
-		if (Audio::sfx[17].getPlayStatus() == AudioStatus::playing) {
-			Audio::sfx[17].playPause();
+		if (gameContext->getAudio()->getAudioFileByID(17)->getPlayStatus() == AudioStatus::playing) {
+			gameContext->getAudio()->getAudioFileByID(17)->playPause();
 		}
 
-		Audio::sfx[14].playPause();
+		gameContext->getAudio()->getAudioFileByID(14)->playPause();
 
 		gamePlay->transitionToAtEndOfFrame(gamePlay->getPause());
 	}
 
 	//levelselect with space
-	if (IOHandler::space.simple()) {
-		Audio::sfx[17].stopAndRewind();
-		Audio::sfx[4].stopAndRewind();
-		Audio::sfx[7].stopAndRewind();
+	if (gameContext->getIOContext()->getSpaceButton().simple()) {
+		gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
+		gameContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
+		gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
 
 		if (gamePlay->getStateContext()->menuCursor < 2) {
 			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());
@@ -98,8 +99,8 @@ void Play::drawScene() {
 	float gameTime = GameTime::getGameTime();
 	int ladderFactor = int(gameTime) % 4;
 	ladderFactor = ladderFactor == 3 ? 1 : ladderFactor;
-	renderingManager->setLadderFlashFactor(ladderFactor);
-	renderingManager->render();
+	gameContext->getRenderingManager()->setLadderFlashFactor(ladderFactor);
+	gameContext->getRenderingManager()->render();
 }
 
 void Play::transitionToDeath() {
@@ -108,7 +109,7 @@ void Play::transitionToDeath() {
 
 void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
 	gamePlay->getStateContext()->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
-	gamePlay->getStateContext()->getOutro()->setRenderingManager(renderingManager);
+	//gamePlay->getStateContext()->getOutro()->setRenderingManager(renderingManager);
 	gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getOutro());
 }
 
@@ -144,8 +145,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 	std::vector<std::tuple<int, int>> ladderList;
 	std::vector<std::tuple<int, int>> finishingLadderList;	
 
-	std::shared_ptr<Player> player = nullptr;
-	
+	std::shared_ptr<Player> player = nullptr;	
 
 	levelNumber = levelNumber < 1 ? 1 : levelNumber;
 	levelNumber = levelNumber > 150 ? 150 : levelNumber;
@@ -161,11 +161,11 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 #ifndef ANDROID_VERSION
 	std::fstream levelFile;
-	levelFile.open(IOHandler::levelFileName);
+	levelFile.open(gameContext->getGameConfiguration()->getLevelFileName());
 	while (getline(levelFile, row)) {
 #else
 	std::vector<uint8_t> data;
-	if (!ndk_helper::JNIHelper::GetInstance()->ReadFile(levelFileName.c_str(), &data)) {
+	if (!ndk_helper::JNIHelper::GetInstance()->ReadFile(gameConfiguration->getLevelFileName().c_str(), &data)) {
 		Helper::log("Can't read file!" + levelFileName);
 		LOGI("Can not open a file:%s", levelFileName.c_str());
 		return;
@@ -261,7 +261,8 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 						player = std::make_shared<Player>(float(i), float(17 - rowCounter));
 						player->setGameContext(gameContext);
-						player->setCharSpeed(gameContext->getPlayerSpeed());
+						player->setCharSpeed(gameContext->getGameConfiguration()->getPlayerSpeed());
+						player->setIOContext(gameContext->getIOContext());
 					}
 
 					else if (row[i] == '0') {							//guards
@@ -269,7 +270,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 						std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(float(i), float(17 - rowCounter));
 						enemy->setGameContext(gameContext);
-						enemy->setCharSpeed(gameContext->getEnemySpeed());	
+						enemy->setCharSpeed(gameContext->getGameConfiguration()->getEnemySpeed());	
 
 						enemyList.push_back(enemy);
 					}
@@ -313,7 +314,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 #endif
 	//my level ending conditions are different than the original, in most levels it's OK apart from this:
 	//original conditions check if player is at the highest block or not
-	if (gamePlay->getStateContext()->level[gamePlay->getStateContext()->playerNr] == 115 && IOHandler::gameVersion == 0) {
+	if (gamePlay->getStateContext()->level[gamePlay->getStateContext()->playerNr] == 115 && gameContext->getGameConfiguration()->getGameVersion() == 0) {
 		highestLadder--;
 	}
 
@@ -326,24 +327,24 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 	gameContext->setHighestLadder(highestLadder);
 
-	renderingManager->setGameContext(gameContext);
-	gameContext->setRenderingManager(renderingManager);
+	//gameContext->getRenderingManager()->setGameContext(gameContext);
+	//gameContext->setRenderingManager(renderingManager);
 
-	renderingManager->clearRenderableObjects();
-	renderingManager->setPoleList(poleList);
-	renderingManager->setConcreteList(concreteList);
-	renderingManager->setBrickList(brickList);
-	renderingManager->setTrapdoorList(trapDoorList);
-	renderingManager->setLadderList(ladderList);
-	renderingManager->setFinishingLadderList(finishingLadderList);
-	renderingManager->setGoldList(goldList);
-	renderingManager->initializeLevelLayout();
+	gameContext->getRenderingManager()->clearRenderableObjects();
+	gameContext->getRenderingManager()->setPoleList(poleList);
+	gameContext->getRenderingManager()->setConcreteList(concreteList);
+	gameContext->getRenderingManager()->setBrickList(brickList);
+	gameContext->getRenderingManager()->setTrapdoorList(trapDoorList);
+	gameContext->getRenderingManager()->setLadderList(ladderList);
+	gameContext->getRenderingManager()->setFinishingLadderList(finishingLadderList);
+	gameContext->getRenderingManager()->setGoldList(goldList);
+	gameContext->getRenderingManager()->initializeLevelLayout();
 
-	renderingManager->setEnemyList(enemyList);
-	renderingManager->initializeEnemies();
+	gameContext->getRenderingManager()->setEnemyList(enemyList);
+	gameContext->getRenderingManager()->initializeEnemies();
 
-	renderingManager->setTextList(textList);
-	renderingManager->initializeCharacters();
+	gameContext->getRenderingManager()->setTextList(textList);
+	gameContext->getRenderingManager()->initializeCharacters();
 
 	enemyList.erase(enemyList.end() - 1);
 	gameContext->setEnemies(enemyList);

@@ -1,13 +1,14 @@
 #include "States/GamePlay.h"
 #include "States/StateContext.h"
 
-#include "Audio.h"
+#include "Audio/Audio.h"
+#include "Audio/AudioFile.h"
+
 #include "Enemy.h"
 #include "Gold.h"
 #include "GameTime.h"
 
 #include "GameContext.h"
-
 
 GamePlay::GamePlay() {
 	begin = new Begin();	
@@ -30,7 +31,7 @@ void GamePlay::setGameContext(std::shared_ptr<GameContext> gameContext)
 	this->gameContext = gameContext;
 	begin->setGameContext(gameContext);
 	play->setGameContext(gameContext);
-	play->setGameContext(gameContext);
+	pause->setGameContext(gameContext);
 	death->setGameContext(gameContext);
 }
 
@@ -62,8 +63,8 @@ void GamePlay::update(float currentFrame) {
 }
 
 void GamePlay::end() {
-	Audio::sfx[4].stopAndRewind();
-	Audio::sfx[7].stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
 }
 
 void GamePlay::checkTransitionAtEndofFrame()
@@ -73,11 +74,4 @@ void GamePlay::checkTransitionAtEndofFrame()
 		transitionTo(transitionableAtEndOfFrame);
 		transitionableAtEndOfFrame = nullptr;
 	}
-}
-
-void GamePlay::setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-{
-	State::setRenderingManager(renderingManager);
-
-	play->setRenderingManager(renderingManager);
 }

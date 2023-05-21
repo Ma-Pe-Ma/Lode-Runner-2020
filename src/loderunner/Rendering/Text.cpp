@@ -62,9 +62,7 @@ void Text::initPointers()
 		positionPointer[2 * index + 0] = xPos;
 		positionPointer[2 * index + 1] = yPos;
 
-		auto mapped = characterMap[*iterator];
-
-		texturePointer[index] = mapped;
+		texturePointer[index] = characterMap[*iterator];
 	}
 }
 

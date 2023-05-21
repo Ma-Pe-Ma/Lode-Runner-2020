@@ -2,55 +2,55 @@
 #include "States/StateContext.h"
 
 #include <string>
-#include "Audio.h"
+#include "Audio/AudioFile.h"
 
 void Select::start() {
-	renderingManager->clearRenderableObjects();
+	stateContext->getRenderingManager()->clearRenderableObjects();
 
 	std::vector<std::shared_ptr<Text>> textList;
 	textList.push_back(levelText);
 
-	renderingManager->setTextList(textList);
-	renderingManager->initializeCharacters();
+	stateContext->getRenderingManager()->setTextList(textList);
+	stateContext->getRenderingManager()->initializeCharacters();
 	updateLevelNr(stateContext->level[stateContext->playerNr]);
 }
 
 void Select::update(float currentFrame) {
 	int& levelNr = stateContext->level[stateContext->playerNr];
 
-	if (IOHandler::leftButton.simple()) {
+	if (stateContext->getIOContext()->getLeftButton().simple()) {
 		setNewValidLevel(--levelNr);
 		updateLevelNr(levelNr);
-		Audio::sfx[16].stopAndRewind();
-		Audio::sfx[16].playPause();
+		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(16)->playPause();
 	}
 
-	if (IOHandler::rightButton.simple()) {
+	if (stateContext->getIOContext()->getRightButton().simple()) {
 		setNewValidLevel(++levelNr);
 		updateLevelNr(levelNr);
-		Audio::sfx[16].stopAndRewind();
-		Audio::sfx[16].playPause();
+		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(16)->playPause();
 	}
 
-	if (IOHandler::up.simple()) {
+	if (stateContext->getIOContext()->getUpButton().simple()) {
 		setNewValidLevel(levelNr += 10);
 		updateLevelNr(levelNr);
-		Audio::sfx[16].stopAndRewind();
-		Audio::sfx[16].playPause();
+		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(16)->playPause();
 	}
 
-	if (IOHandler::down.simple()) {
+	if (stateContext->getIOContext()->getDownButton().simple()) {
 		setNewValidLevel(levelNr -= 10);
 		updateLevelNr(levelNr);
-		Audio::sfx[16].stopAndRewind();
-		Audio::sfx[16].playPause();
+		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(16)->playPause();
 	}
 
-	if (IOHandler::enter.simple()) {
+	if (stateContext->getIOContext()->getEnterButton().simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 	}
 
-	renderingManager->render();
+	stateContext->getRenderingManager()->render();
 }
 
 void Select::end() {
@@ -59,7 +59,7 @@ void Select::end() {
 
 void Select::setNewValidLevel(int& newLevel)
 {
-	int maxLevelNumber = IOHandler::gameVersion == 0 ? 150 : 51;
+	int maxLevelNumber = stateContext->getGameConfiguration()->getGameVersion() ? 150 : 51;
 	newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
 	newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
 }

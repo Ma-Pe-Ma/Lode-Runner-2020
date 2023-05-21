@@ -1,11 +1,15 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "Audio.h"
+#include "Audio/Audio.h"
 
 #include <memory>
 
 class GameContext;
+class GameConfiguration;
+class IOContext;
+class Audio;
+
 class GamePlay;
 
 class GameState {
@@ -16,11 +20,11 @@ protected:
 	std::shared_ptr<GameContext> gameContext;
 
 public:
-	void initialize(GamePlay*);
 	void setGamePlay(GamePlay*);
 	virtual void start() = 0;
 	virtual void update(float) = 0;
 	virtual void end() = 0;
+
 	virtual void setGameContext(std::shared_ptr<GameContext>);
 };
 #endif // !GAMESTATE_H

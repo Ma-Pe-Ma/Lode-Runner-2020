@@ -4,8 +4,7 @@
 
 #include "GameTime.h"
 #include "GameStates/Play.h"
-#include "IOHandler.h"
-#include "Audio.h"
+#include "Audio/AudioFile.h"
 
 #include <cmath>
 
@@ -805,7 +804,7 @@ void Enemy::die() {
 	if (carriedGold) {
 		carriedGold.reset();
 		if (!gameContext->enemyCarriesGold() && gameContext->getUncollectedGoldSize() == 0) {
-			Audio::sfx[4].playPause();
+			gameContext->getAudio()->getAudioFileByID(4)->playPause();
 			gameContext->generateFinishingLadders();
 		}
 	}

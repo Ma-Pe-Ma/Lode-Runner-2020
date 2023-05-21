@@ -7,7 +7,6 @@
 #include "Brick.h"
 #include "Trapdoor.h"
 #include "GameStates/Play.h"
-#include "IOHandler.h"
 
 #include "Rendering/RenderingManager.h"
 

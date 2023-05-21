@@ -33,8 +33,6 @@ public:
 
 	void transitionToAtEndOfFrame(GameState*, bool start = true, bool end = true);
 
-	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager) override;
-
 	void checkTransitionAtEndofFrame();
 
 	void setGameContext(std::shared_ptr<GameContext> gameContext);

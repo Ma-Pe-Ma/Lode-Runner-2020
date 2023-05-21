@@ -1,7 +1,9 @@
 #include "Player.h"
 #include "GameStates/Play.h"
 #include "GameTime.h"
-#include "IOHandler.h"
+#include "iocontext/IOContext.h"
+
+#include "Audio/AudioFile.h"
 
 Player::Player(float x, float y) : Enemy(x, y) {
 	this->textureMap = {28, 52, 48, 36, 40, 26};
@@ -14,23 +16,23 @@ void Player::setCharSpeed(float charSpeed) {
 void Player::findPath() {
 	actualSpeed = charSpeed * GameTime::getSpeed();
 
-	if (IOHandler::rightButton.continuous() && IOHandler::leftButton.continuous()) {
+	if (ioContext->getRightButton().continuous() && ioContext->getLeftButton().continuous()) {
 		dPos.x = 0;
 	}
-	else if (IOHandler::rightButton.continuous()) {
+	else if (ioContext->getRightButton().continuous()) {
 		dPos.x = actualSpeed;
 	}
-	else if (IOHandler::leftButton.continuous()) {
+	else if (ioContext->getLeftButton().continuous()) {
 		dPos.x = -actualSpeed;
 	}
 
-	if (IOHandler::up.continuous() && IOHandler::down.continuous()) {
+	if (ioContext->getUpButton().continuous() && ioContext->getDownButton().continuous()) {
 		dPos.y = 0;
 	}
-	else if (IOHandler::up.continuous()) {
+	else if (ioContext->getUpButton().continuous()) {
 		dPos.y = actualSpeed;
 	}
-	else if (IOHandler::down.continuous()) {
+	else if (ioContext->getDownButton().continuous()) {
 		dPos.y = -actualSpeed;
 	}
 
@@ -44,7 +46,7 @@ void Player::findPath() {
 
 void Player::freeRun() {
 	//Check digging input
-	if (IOHandler::leftDigButton.impulse()) {
+	if (ioContext->getLeftDigButton().impulse()) {
 		if (gameContext->getBricks()[current.x - 1][current.y - 1] && gameContext->getBricks()[current.x - 1][current.y -1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
@@ -55,7 +57,7 @@ void Player::freeRun() {
 		}
 	}
 	
-	if (IOHandler::rightDigButton.impulse()) {
+	if (ioContext->getRightDigButton().impulse()) {
 		if (gameContext->getBricks()[current.x + 1][current.y - 1] && gameContext->getBricks()[current.x + 1][current.y - 1]->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
@@ -71,12 +73,12 @@ void Player::freeRun() {
 
 void Player::initiateFallingStart() {
 	Enemy::initiateFallingStart();
-	Audio::sfx[17].playPause();
+	gameContext->getAudio()->getAudioFileByID(17)->playPause();
 }
 
 void Player::initiateFallingStop() {
 	Enemy::initiateFallingStop();
-	Audio::sfx[17].stopAndRewind();
+	gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
 }
 
 void Player::falling() {
@@ -169,8 +171,8 @@ void Player::animateDigging() {
 void Player::animateGoing() {
 	Enemy::animateGoing();
 
-	if (Audio::sfx[9 + going[0]].getPlayStatus() == AudioStatus::stopped) {
-		Audio::sfx[10 - going[0]].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(9 + going[0])->getPlayStatus() == AudioStatus::stopped) {
+		gameContext->getAudio()->getAudioFileByID(10 - going[0])->playPause();
 		going[0] = 1 - going[0];
 	}
 }
@@ -178,8 +180,8 @@ void Player::animateGoing() {
 void Player::animateOnLadder() {
 	Enemy::animateOnLadder();
 
-	if (Audio::sfx[11 + going[1]].getPlayStatus() == AudioStatus::stopped) {
-		Audio::sfx[12 - going[1]].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(11 + going[1])->getPlayStatus() == AudioStatus::stopped) {
+		gameContext->getAudio()->getAudioFileByID(12 - going[1])->playPause();
 		going[1] = 1 - going[1];
 	}
 }
@@ -187,24 +189,24 @@ void Player::animateOnLadder() {
 void Player::animateOnPole() {
 	Enemy::animateOnPole();
 
-	if (Audio::sfx[15 + going[2]].getPlayStatus() == AudioStatus::stopped) {
-		Audio::sfx[16 - going[2]].playPause();
+	if (gameContext->getAudio()->getAudioFileByID(15 + going[2])->getPlayStatus() == AudioStatus::stopped) {
+		gameContext->getAudio()->getAudioFileByID(16 - going[2])->playPause();
 		going[2] = 1 - going[2];
 	}	
 }
 
 void Player::checkGoldCollect() {
 	if ((carriedGold = gameContext->goldCollectChecker(pos.x, pos.y))) {
-		if (Audio::sfx[0].getPlayStatus() == AudioStatus::playing) {
-			Audio::sfx[0].stopAndRewind();
+		if (gameContext->getAudio()->getAudioFileByID(0)->getPlayStatus() == AudioStatus::playing) {
+			gameContext->getAudio()->getAudioFileByID(0)->stopAndRewind();
 		}
 
-		Audio::sfx[0].playPause();
+		gameContext->getAudio()->getAudioFileByID(0)->playPause();
 		gameContext->addGoldToCollectedList(carriedGold);
 
 		//if every gold is collected draw the ladders which are needed to finish the level
 		if (!gameContext->enemyCarriesGold() && gameContext->getUncollectedGoldSize() == 0) {
-			Audio::sfx[4].playPause();
+			gameContext->getAudio()->getAudioFileByID(4)->playPause();
 			gameContext->generateFinishingLadders();
 		}
 	}
@@ -224,7 +226,7 @@ void Player::die() {
 }
 
 void Player::dying() {
-	float deathLength = Audio::sfx[3].lengthInSec();
+	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
 	int timeFactor = ((int) (9 * (GameTime::getCurrentFrame() - dieTimer) / deathLength)) % 9;
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
 

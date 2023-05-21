@@ -2,13 +2,17 @@
 #define STATE_H
 
 class StateContext;
+
 class RenderingManager;
+class IOContext;
+class GameConfiguration;
+class Audio;
+
 #include <memory>
 
 class State {
 protected:
 	float timer = 0;
-	std::shared_ptr<RenderingManager> renderingManager;
 
 	StateContext* stateContext;
 public:	
@@ -22,11 +26,6 @@ public:
 	StateContext* getStateContext()
 	{
 		return this->stateContext;
-	}
-
-	virtual void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
-	{
-		this->renderingManager = renderingManager;
 	}
 };
 

@@ -11,12 +11,9 @@
 #include "GameOver.h"
 #include "Generator.h"
 
-#include "IOHandler.h"
-
 class StateContext {
 private:
 	State* currentState;
-	//void transitionTo(State*);
 	void transitionTo(State*, bool start = true, bool end = true);
 
 	State* transitionableAtEndOfFrame = nullptr;
@@ -28,12 +25,18 @@ private:
 	Outro* outro;
 	GameOver* gameOver;
 	Generator* generator;
-public:	
 
+	std::shared_ptr<RenderingManager> renderingManager;
+	std::shared_ptr<IOContext> ioContext;
+	std::shared_ptr<GameConfiguration> gameConfiguration;
+	std::shared_ptr<Audio> audio;
+
+public:	
 	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
 	void checkTransitionAtEndofFrame();
 
 	StateContext();
+	void initialize();
 	
 	void update(float);
 
@@ -46,7 +49,15 @@ public:
 	int playerNr = 0;
 	int highScore = 0;
 
+	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
+	std::shared_ptr<IOContext> getIOContext() { return this->ioContext; }
+	std::shared_ptr<GameConfiguration> getGameConfiguration() { return this->gameConfiguration; }
+	std::shared_ptr<Audio> getAudio() { return this->audio; }
+
 	void setRenderingManager(std::shared_ptr<RenderingManager>);
+	void setIOContext(std::shared_ptr<IOContext>);
+	void setGameConfiguration(std::shared_ptr<GameConfiguration>);
+	void setAudio(std::shared_ptr<Audio>);
 
 	void setMainMenu(MainMenu* mainMenu)
 	{
@@ -117,7 +128,6 @@ public:
 	{
 		return this->generator;
 	}
-
 };
 
 #endif

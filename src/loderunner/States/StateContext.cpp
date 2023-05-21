@@ -1,5 +1,5 @@
 #include "States/StateContext.h"
-
+#include "iocontext/IOContext.h"
 
 StateContext::StateContext() {
     this->mainMenu = new MainMenu();
@@ -22,23 +22,35 @@ StateContext::StateContext() {
 
     this->generator = new Generator();
     this->generator->setStateContext(this);
+}
 
+void StateContext::initialize()
+{
     currentState = mainMenu;
     transitionTo(mainMenu);
-
-    level[0] = IOHandler::startingLevel;
-    level[1] = IOHandler::startingLevel;
 }
 
 void StateContext::setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)
 {
-    this->mainMenu->setRenderingManager(renderingManager);
-    this->intro->setRenderingManager(renderingManager);
-    this->gamePlay->setRenderingManager(renderingManager);
-    this->select->setRenderingManager(renderingManager);
-    this->outro->setRenderingManager(renderingManager);
-    this->gameOver->setRenderingManager(renderingManager);
-    this->generator->setRenderingManager(renderingManager);
+    this->renderingManager = renderingManager;    
+}
+
+void StateContext::setIOContext(std::shared_ptr<IOContext> ioContext)
+{
+    this->ioContext = ioContext;
+}
+
+void StateContext::setAudio(std::shared_ptr<Audio> audio)
+{
+    this->audio = audio;
+}
+
+void StateContext::setGameConfiguration(std::shared_ptr<GameConfiguration> gameConfiguration)
+{
+    level[0] = gameConfiguration->getStartingLevel();
+    level[1] = gameConfiguration->getStartingLevel();
+
+    this->gameConfiguration = gameConfiguration;
 }
 
 void StateContext::transitionTo(State* newState, bool start, bool end) {

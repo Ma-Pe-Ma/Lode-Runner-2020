@@ -1,5 +1,5 @@
 #include "States/Generator.h"
-#include "Audio.h"
+#include "Audio/AudioFile.h"
 #include "Enemy.h"
 #include "Gold.h"
 #include "Player.h"
@@ -59,78 +59,78 @@ Generator::Generator() {
 }
 
 void Generator::start() {
-	renderingManager->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
+	stateContext->getRenderingManager()->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
 
 	getStateContext()->getGamePlay()->getPlay()->clearContainers();
 }
 
 void Generator::update(float currentFrame) {
-	if (IOHandler::rightButton.simple()) {
+	if (stateContext->getIOContext()->getRightButton().simple()) {
 		if (++geX > 28) {
 			geX = 28;
 		}
 		else {
 			texture[geX - 1][geY] = textureMap[gen[geX - 1][geY]];
-			Audio::sfx[9].stopAndRewind();
-			Audio::sfx[9].playPause();
+			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
+			stateContext->getAudio()->getAudioFileByID(9)->playPause();
 		}
 	}
 
-	if (IOHandler::leftButton.simple()) {
+	if (stateContext->getIOContext()->getLeftButton().simple()) {
 		if (--geX < 1) {
 			geX = 1;
 		}
 		else {
 			texture[geX + 1][geY] = textureMap[gen[geX + 1][geY]];
-			Audio::sfx[9].stopAndRewind();
-			Audio::sfx[9].playPause();
+			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
+			stateContext->getAudio()->getAudioFileByID(9)->playPause();
 		}
 	}
 
-	if (IOHandler::up.simple()) {
+	if (stateContext->getIOContext()->getUpButton().simple()) {
 		if (++geY > 16) {
 			geY = 16;
 		}
 		else {
 			texture[geX][geY - 1] = textureMap[gen[geX][geY - 1]];
-			Audio::sfx[9].stopAndRewind();
-			Audio::sfx[9].playPause();
+			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
+			stateContext->getAudio()->getAudioFileByID(9)->playPause();
 		}
 	}
 
-	if (IOHandler::down.simple()) {
+	if (stateContext->getIOContext()->getDownButton().simple()) {
 		if (--geY < 1) {
 			geY = 1;
 		}
 		else {
 			texture[geX][geY + 1] = textureMap[gen[geX][geY + 1]];
-			Audio::sfx[9].stopAndRewind();
-			Audio::sfx[9].playPause();
+			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
+			stateContext->getAudio()->getAudioFileByID(9)->playPause();
 		}
 	}
 
 	//chaning element upwards
-	if (IOHandler::rightDigButton.simple()) {
+	if (stateContext->getIOContext()->getRightDigButton().simple()) {
 		if (++gen[geX][geY] > 9) {
 			gen[geX][geY] = 0;	
 		}
 
 		texture[geX][geY] = textureMap[gen[geX][geY]];
 
-		Audio::sfx[10].stopAndRewind();
-		Audio::sfx[10].playPause();
+		stateContext->getAudio()->getAudioFileByID(10)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(10)->playPause();
 	}
 
-	//chaning element IOHandler::downwards
-	if (IOHandler::leftDigButton.simple()) {
+	//chaning element stateContext->getIOContext()->downwards
+	if (stateContext->getIOContext()->getLeftDigButton().simple()) {
 		if (--gen[geX][geY] < 0) {
 			gen[geX][geY] = 9;
 		}
 
 		texture[geX][geY] = textureMap[gen[geX][geY]];
 
-		Audio::sfx[10].stopAndRewind();
-		Audio::sfx[10].playPause();
+		stateContext->getAudio()->getAudioFileByID(10)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(10)->playPause();
 	}
 
 	//yellow cursor block
@@ -141,9 +141,9 @@ void Generator::update(float currentFrame) {
 		texture[geX][geY] = textureMap[gen[geX][geY]];
 	}
 	
-	renderingManager->renderGenerator();
+	stateContext->getRenderingManager()->renderGenerator();
 
-	if (IOHandler::enter.simple()) {
+	if (stateContext->getIOContext()->getEnterButton().simple()) {
 		texture[geX][geY] = textureMap[gen[geX][geY]];
 
 		generateLevel();
@@ -219,14 +219,15 @@ void Generator::generateLevel()
 			else if (gen[i][j] == 8) {
 				std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(pos.x, pos.y);
 				enemy->setGameContext(gameContext);
-				enemy->setCharSpeed(gameContext->getEnemySpeed());
+				enemy->setCharSpeed(stateContext->getGameConfiguration()->getEnemySpeed());
 				enemyList.push_back(enemy);
 			}
 			else if (gen[i][j] == 9) {
 				if (player == nullptr) {
 					player = std::make_shared<Player>(pos.x, pos.y);
 					player->setGameContext(gameContext);
-					player->setCharSpeed(gameContext->getPlayerSpeed());
+					player->setCharSpeed(stateContext->getGameConfiguration()->getPlayerSpeed());
+					player->setIOContext(gameContext->getIOContext());
 				}
 			}
 
@@ -247,7 +248,7 @@ void Generator::generateLevel()
 
 					player = std::make_shared<Player>(pos.x, pos.y);
 					player->setGameContext(gameContext);
-					player->setCharSpeed(gameContext->getPlayerSpeed());
+					player->setCharSpeed(stateContext->getGameConfiguration()->getPlayerSpeed());
 					break;
 				}
 			}
@@ -267,24 +268,24 @@ void Generator::generateLevel()
 
 		gameContext->setHighestLadder(highestLadder);
 
-		renderingManager->setGameContext(gameContext);
-		gameContext->setRenderingManager(renderingManager);
+		//stateContext->getRenderingManager()->setGameContext(gameContext);
+		//gameContext->setRenderingManager(renderingManager);
 
-		renderingManager->clearRenderableObjects();
-		renderingManager->setPoleList(poleList);
-		renderingManager->setConcreteList(concreteList);
-		renderingManager->setBrickList(brickList);
-		renderingManager->setTrapdoorList(trapDoorList);
-		renderingManager->setLadderList(ladderList);
-		renderingManager->setFinishingLadderList(finishingLadderList);
-		renderingManager->setGoldList(goldList);
-		renderingManager->initializeLevelLayout();
+		stateContext->getRenderingManager()->clearRenderableObjects();
+		stateContext->getRenderingManager()->setPoleList(poleList);
+		stateContext->getRenderingManager()->setConcreteList(concreteList);
+		stateContext->getRenderingManager()->setBrickList(brickList);
+		stateContext->getRenderingManager()->setTrapdoorList(trapDoorList);
+		stateContext->getRenderingManager()->setLadderList(ladderList);
+		stateContext->getRenderingManager()->setFinishingLadderList(finishingLadderList);
+		stateContext->getRenderingManager()->setGoldList(goldList);
+		stateContext->getRenderingManager()->initializeLevelLayout();
 
-		renderingManager->setEnemyList(enemyList);
-		renderingManager->initializeEnemies();
+		stateContext->getRenderingManager()->setEnemyList(enemyList);
+		stateContext->getRenderingManager()->initializeEnemies();
 
-		renderingManager->setTextList(textList);
-		renderingManager->initializeCharacters();
+		stateContext->getRenderingManager()->setTextList(textList);
+		stateContext->getRenderingManager()->initializeCharacters();
 
 		enemyList.erase(enemyList.end() - 1);
 		gameContext->setEnemies(enemyList);

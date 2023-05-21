@@ -1,5 +1,5 @@
 #include "States/Outro.h"
-#include "Audio.h"
+#include "Audio/AudioFile.h"
 #include "GameTime.h"
 #include "States/StateContext.h"
 
@@ -15,7 +15,7 @@ void Outro::setScoreParameters(short killCounter, short goldCounter, short fruit
 
 void Outro::setupRenderingManager()
 {
-	renderingManager->clearRenderableObjects();
+	stateContext->getRenderingManager()->clearRenderableObjects();
 
 	//add bricks
 	std::vector<std::shared_ptr<Brick>> brickList;
@@ -48,18 +48,18 @@ void Outro::setupRenderingManager()
 	textList.push_back(enemyPoints);
 	textList.push_back(totalPoints);
 
-	renderingManager->setBrickList(brickList);
-	renderingManager->setLadderList(ladderList);
-	renderingManager->setGoldList(goldList);
+	stateContext->getRenderingManager()->setBrickList(brickList);
+	stateContext->getRenderingManager()->setLadderList(ladderList);
+	stateContext->getRenderingManager()->setGoldList(goldList);
 
-	renderingManager->setEnemyList(enemyList);
+	stateContext->getRenderingManager()->setEnemyList(enemyList);
 
-	renderingManager->setTextList(textList);
+	stateContext->getRenderingManager()->setTextList(textList);
 
-	renderingManager->initializeLevelLayout();
-	renderingManager->initializeEnemies();
+	stateContext->getRenderingManager()->initializeLevelLayout();
+	stateContext->getRenderingManager()->initializeEnemies();
 
-	renderingManager->initializeCharacters();
+	stateContext->getRenderingManager()->initializeCharacters();
 }
 
 void Outro::start() {
@@ -69,7 +69,7 @@ void Outro::start() {
 
 	setupRenderingManager();
 
-	Audio::sfx[13].playPause();
+	stateContext->getAudio()->getAudioFileByID(13)->playPause();
 
 	int& playerLife = stateContext->playerLife[stateContext->playerNr];
 	playerLife = ++playerLife > 9 ? 9 : playerLife;
@@ -88,8 +88,8 @@ void Outro::update(float currentFrame) {
 	int timeFactor = int(2 * currentFrame) % 4;
 	timeFactor = timeFactor == 3 ? 1 : timeFactor;
 	
-	renderingManager->setLadderFlashFactor(timeFactor);
-	renderingManager->render();
+	stateContext->getRenderingManager()->setLadderFlashFactor(timeFactor);
+	stateContext->getRenderingManager()->render();
 
 	//runner climbs ladder
 	if (this->player->getPos().y < 3.0f) {
@@ -112,7 +112,7 @@ void Outro::update(float currentFrame) {
 		this->player->setTexture(44 + timeFactor);
 	}
 
-	if (GameTime::getCurrentFrame() - timer > Audio::sfx[13].lengthInSec() || IOHandler::enter.simple()) {
+	if (GameTime::getCurrentFrame() - timer > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getEnterButton().simple()) {
 		if (stateContext->menuCursor < 2) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 		}
@@ -123,6 +123,6 @@ void Outro::update(float currentFrame) {
 }
 
 void Outro::end() {
-	Audio::sfx[7].stopAndRewind();
-	Audio::sfx[13].stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(13)->stopAndRewind();
 }

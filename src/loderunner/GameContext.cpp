@@ -1,8 +1,6 @@
 #include "GameContext.h"
 #include "GameTime.h"
 
-#include "IOHandler.h"
-
 #include "Rendering/RenderingManager.h"
 
 #include "Player.h"
@@ -10,14 +8,12 @@
 
 #include "GameStates/Play.h"
 
-#include "IOHandler.h"
-
 void GameContext::run() {
 	float gameTime = GameTime::getGameTime();
 
 #ifndef RELEASE_VERSION
-	enemies[0]->setDPos(IOHandler::debugPos[0]);
-	enemies[1]->setDPos(IOHandler::debugPos[1]);
+	//enemies[0]->setDPos(ioContext->debugPos[0]);
+	//enemies[1]->setDPos(ioContext->debugPos[1]);
 #endif // !RELEASE_VERSION
 
 	player->handle();
@@ -27,8 +23,8 @@ void GameContext::run() {
 	}
 
 #ifndef RELEASE_VERSION
-	IOHandler::debugPos[0] = { 0.0f, 0.0f };
-	IOHandler::debugPos[1] = { 0.0f, 0.0f };
+	//ioContext->debugPos[0] = { 0.0f, 0.0f };
+	//ioContext->debugPos[1] = { 0.0f, 0.0f };
 #endif
 
 	for (auto brick : brickList)
