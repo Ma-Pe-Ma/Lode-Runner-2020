@@ -35,6 +35,7 @@
 #include "GameTime.h"
 
 inline void handleImGuiConfigurer();
+inline void finalizeImguiWindow();
 inline void update();
 
 std::chrono::system_clock::time_point prevFrameStart = std::chrono::system_clock::now();
@@ -134,6 +135,13 @@ int main(int argc, char**argv) {
 	return 0;
 }
 
+
+#if defined __EMSCRIPTEN__
+bool showImguiWindow = true;
+#else 
+bool showImguiWindow = false;
+#endif
+
 void update() {	
 	GameTime::calculateTimeValues(glfwGetTime());
 	
@@ -142,36 +150,23 @@ void update() {
 
 	glfwIOContext->processInput();	
 
-	stateContext->update(GameTime::getCurrentFrame());
-	glfwIOContext->handleScreenRecording();
-
 	handleImGuiConfigurer();
+
+	stateContext->update(GameTime::getCurrentFrame());
+	glfwIOContext->handleScreenRecording();	
+
+	finalizeImguiWindow();
 
 	glfwSwapBuffers(glfwIOContext->getWindow());
 	glfwPollEvents();
 }
 
-void setCorrectLevel() {
-	int max = gameConfiguration->getGameVersion() == 0 ? 150 : 51;
-
-	stateContext->level[0] = stateContext->level[0] > max ? max : stateContext->level[0];
-	stateContext->level[0] = stateContext->level[0] < 1 ? 1 : stateContext->level[0];
-
-	stateContext->level[1] = stateContext->level[0];
-}
-
-void handleImGuiConfigurer() {
-#if defined __EMSCRIPTEN__
-	static bool windowOpen = true;
-#else 
-	static bool windowOpen = false;
-#endif
-	
+void handleImGuiConfigurer() {	
 	if (glfwIOContext->getConfigButton().simple()) {
-		windowOpen = !windowOpen;
+		showImguiWindow = !showImguiWindow;
 	}
 
-	if (windowOpen) {
+	if (showImguiWindow) {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 
@@ -187,14 +182,14 @@ void handleImGuiConfigurer() {
 		ImGui::SetNextWindowPos(ImVec2(std::get<0>(glfwIOContext->getScreenSize()) / 25, std::get<0>(glfwIOContext->getScreenSize()) / 25), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(windowSize);
 
-		ImGui::Begin("Lode Runner - configurer", &windowOpen, ImGuiWindowFlags_NoResize);
+		ImGui::Begin("Lode Runner - configurer", &showImguiWindow, ImGuiWindowFlags_NoResize);
 
 		ImGui::Text("Game version");
 
 		if (ImGui::RadioButton("Original", gameConfiguration->getGameVersionPointer(), 0)) {
 			gameConfiguration->setGameVersion(0);
 			glfwIOContext->saveConfig("levelset", "0");
-			setCorrectLevel();
+			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
 		}
 
 		ImGui::SameLine();
@@ -202,13 +197,13 @@ void handleImGuiConfigurer() {
 			stateContext->menuCursor = 0;
 			gameConfiguration->setGameVersion(1);
 			glfwIOContext->saveConfig("levelset", "1");
-			setCorrectLevel();
+			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
 		}
 
 		ImGui::PushItemWidth(std::get<0>(glfwIOContext->getScreenSize()) / 20);
 
 		if (ImGui::InputInt("Level", &stateContext->level[0], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
-			setCorrectLevel();
+			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
 		}
 
 		if (ImGui::SliderFloat("Player speed", gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {
@@ -232,13 +227,19 @@ void handleImGuiConfigurer() {
 		ImGui::Text("\tw - right dig");
 		ImGui::Text("\tspace - level select");
 		ImGui::Text("\tenter - pause");
-		ImGui::Text("\tc - show this window");
+		ImGui::Text("\tc - show/hide this window");
 #endif
 
 		ImGui::PopItemWidth();
 
 		ImGui::End();
+	}
+}
 
+void finalizeImguiWindow()
+{
+	if (showImguiWindow)
+	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}

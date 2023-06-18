@@ -57,6 +57,8 @@ public:
 
 	GLFWwindow* getWindow() { return this->window; }
 
+	void loadLevel(std::string, std::function<bool(std::string)>) override;
+
 	virtual void saveConfig(std::string key, std::string value) override;
 
 #ifdef VIDEO_RECORDING

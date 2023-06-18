@@ -272,9 +272,12 @@ int GlfwIOContext::getIntByKey(std::string key, int defaultValue) {
 		try {
 			return std::stoi(value);
 		}
-		catch (std::invalid_argument e) {
-			
+		catch (std::invalid_argument& e) {
+
 		}
+		catch (std::out_of_range& e) {
+			
+		}		
 	}
 
 	return defaultValue;
@@ -472,6 +475,22 @@ void GlfwIOContext::saveConfig(std::string modifiableKey, std::string modifiable
 
 	remove("config.txt");
 	rename("config_temp.txt", "config.txt");
+}
+
+void GlfwIOContext::loadLevel(std::string fileName, std::function<bool(std::string)> lineProcessor)
+{
+	std::string row;
+
+	std::fstream levelFile;
+	levelFile.open(fileName);
+	while (std::getline(levelFile, row, '\n')) {
+		if (lineProcessor(row))
+		{
+			break;
+		}
+	}
+
+	levelFile.close();
 }
 
 #ifdef VIDEO_RECORDING

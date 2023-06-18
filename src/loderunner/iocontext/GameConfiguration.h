@@ -25,7 +25,9 @@ public:
 
 	int getGameVersion() { return this->gameVersion; }
 	void setGameVersion(int gameVersion) { 
-		this->gameVersion = gameVersion;		
+		gameVersion = gameVersion > 1 ? 1 : gameVersion;
+		gameVersion = gameVersion < 0 ? 0 : gameVersion;
+		this->gameVersion = gameVersion;
 
 		switch (this->gameVersion) {
 		case 0:
@@ -76,6 +78,12 @@ public:
 		}
 		
 		return "Texture/MainMenu.png";
+	}
+
+	void validateLevel(int& newLevel) {
+		int maxLevelNumber = gameVersion == 0 ? 150 : 51;
+		newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
+		newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
 	}
 };
 

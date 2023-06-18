@@ -181,7 +181,7 @@ void Generator::generateLevel()
 	std::shared_ptr<Player> player = nullptr;
 
 	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 17; j++) {
+		for (int j = 0; j < 18; j++) {
 			layout[i][j] = layoutMap[gen[i][j]];
 
 			Vector2DInt pos = { i, j };
@@ -249,6 +249,7 @@ void Generator::generateLevel()
 					player = std::make_shared<Player>(pos.x, pos.y);
 					player->setGameContext(gameContext);
 					player->setCharSpeed(stateContext->getGameConfiguration()->getPlayerSpeed());
+					player->setIOContext(gameContext->getIOContext());
 					break;
 				}
 			}

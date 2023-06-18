@@ -10,10 +10,6 @@
 #include "GameTime.h"
 #include "Audio/AudioFile.h"
 
-Play::Play() {
-
-}
-
 void Play::start() {
 	//player->SetIdleTime();
 	GameTime::setSessionStartTime();
@@ -109,7 +105,6 @@ void Play::transitionToDeath() {
 
 void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
 	gamePlay->getStateContext()->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
-	//gamePlay->getStateContext()->getOutro()->setRenderingManager(renderingManager);
 	gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getOutro());
 }
 
@@ -125,15 +120,16 @@ void Play::loadLevel(unsigned int levelNumber) {
 	for (int i = 0; i < 30; i++) {
 		layout[i] = new LayoutBlock[18]{};
 		bricks[i] = new std::shared_ptr<Brick>[18];
-		//bricks[i] = new Brick*[18];
-		//trapdoors[i] = new Trapdoor*[18];
 		trapdoors[i] = new std::shared_ptr<Trapdoor>[18];
+
+		//bricks[i] = new Brick*[18];
+		//trapdoors[i] = new Trapdoor*[18];		
 
 		//for (int j = 0; j < 18; j++)
 		//{
 			//bricks[i][j] = nullptr;
 		//}
-	}	
+	}
 
 	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapDoorList;
@@ -143,48 +139,25 @@ void Play::loadLevel(unsigned int levelNumber) {
 	std::vector<std::tuple<int, int>> poleList;
 	std::vector<std::tuple<int, int>> concreteList;
 	std::vector<std::tuple<int, int>> ladderList;
-	std::vector<std::tuple<int, int>> finishingLadderList;	
+	std::vector<std::tuple<int, int>> finishingLadderList;
 
-	std::shared_ptr<Player> player = nullptr;	
+	std::shared_ptr<Player> player = nullptr;
 
 	levelNumber = levelNumber < 1 ? 1 : levelNumber;
 	levelNumber = levelNumber > 150 ? 150 : levelNumber;
 
 	std::string levelName = std::to_string(levelNumber);
-	levelName.insert(0, 3 - levelName.length(), '0');
-	levelName = "Level " + levelName;
+	levelName = "Level " + levelName.insert(0, 3 - levelName.length(), '0');
 
 	std::string row;
 	bool foundLevel = false;
 	//reading level into the layout matrix
 	int rowCounter = 0;
 
-#ifndef ANDROID_VERSION
-	std::fstream levelFile;
-	levelFile.open(gameContext->getGameConfiguration()->getLevelFileName());
-	while (getline(levelFile, row)) {
-#else
-	std::vector<uint8_t> data;
-	if (!ndk_helper::JNIHelper::GetInstance()->ReadFile(gameConfiguration->getLevelFileName().c_str(), &data)) {
-		Helper::log("Can't read file!" + levelFileName);
-		LOGI("Can not open a file:%s", levelFileName.c_str());
-		return;
-	}
+	std::shared_ptr<IOContext> ioContext = gamePlay->getStateContext()->getIOContext();
+	const std::string levelFileName = gameContext->getGameConfiguration()->getLevelFileName();
 
-	const GLchar* source = (GLchar*)&data[0];
-	std::string test1(source);
-
-	std::stringstream test;
-	test << test1;
-	std::string segment;
-	std::vector<std::string> rows;
-
-	while (std::getline(test, segment, '\n')) {
-		rows.push_back(segment);
-	}
-
-	for (auto row : rows) {
-#endif
+	ioContext->loadLevel(levelFileName, [&](std::string row) -> bool {
 		if (foundLevel) {
 			//filling last row with empty blocks
 			if (rowCounter == 0) {
@@ -201,8 +174,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 			}
 			else {
 				for (int i = 0; i < 30; i++) {
-					//bricks[i][17 - rowCounter].reset();
-					//trapdoors[i][17 - rowCounter].reset();
 					//level elements
 					if (row[i] == '#') {
 						Vector2DInt pos;
@@ -216,14 +187,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 						brickList.push_back(newBrick);
 						bricks[i][17 - rowCounter] = newBrick;
-
-						//bricks[i][17 - rowCounter] = new Brick(pos);
-						//bricks[i][17 - rowCounter]->setGameContext(gameContext);
-
-						//brickList.push_back(bricks[i][17 - rowCounter]);
-
-						//std::shared_ptr<Brick> brick = std::make_shared<Brick>(bricks[i][17 - rowCounter]);
-
 					}
 					else if (row[i] == '@' || row[i] == '"') {
 						layout[i][17 - rowCounter] = LayoutBlock::concrete;
@@ -270,7 +233,7 @@ void Play::loadLevel(unsigned int levelNumber) {
 
 						std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(float(i), float(17 - rowCounter));
 						enemy->setGameContext(gameContext);
-						enemy->setCharSpeed(gameContext->getGameConfiguration()->getEnemySpeed());	
+						enemy->setCharSpeed(gameContext->getGameConfiguration()->getEnemySpeed());
 
 						enemyList.push_back(enemy);
 					}
@@ -296,8 +259,8 @@ void Play::loadLevel(unsigned int levelNumber) {
 						layout[i][0] = LayoutBlock::concrete;
 					}
 
-					foundLevel = false;
-					break;
+					//stop the reading process as the level is loaded
+					return true;
 				}
 			}
 		}
@@ -307,11 +270,10 @@ void Play::loadLevel(unsigned int levelNumber) {
 				foundLevel = true;
 			}
 		}
-	}
 
-#ifndef ANDROID_VERSION
-	levelFile.close();
-#endif
+		return false;
+	});
+
 	//my level ending conditions are different than the original, in most levels it's OK apart from this:
 	//original conditions check if player is at the highest block or not
 	if (gamePlay->getStateContext()->level[gamePlay->getStateContext()->playerNr] == 115 && gameContext->getGameConfiguration()->getGameVersion() == 0) {
@@ -326,9 +288,6 @@ void Play::loadLevel(unsigned int levelNumber) {
 	enemyList.insert(enemyList.end(), player);
 
 	gameContext->setHighestLadder(highestLadder);
-
-	//gameContext->getRenderingManager()->setGameContext(gameContext);
-	//gameContext->setRenderingManager(renderingManager);
 
 	gameContext->getRenderingManager()->clearRenderableObjects();
 	gameContext->getRenderingManager()->setPoleList(poleList);
