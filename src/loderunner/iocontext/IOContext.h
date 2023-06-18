@@ -5,6 +5,7 @@
 #include <tuple>
 #include <memory>
 #include <string>
+#include <functional>
 
 class GameConfiguration;
 
@@ -27,6 +28,8 @@ public:
 	virtual void loadConfig(std::shared_ptr<GameConfiguration>) = 0;
 
 	virtual void initialize() = 0;
+
+	virtual void loadLevel(std::string, std::function<bool(std::string)>) = 0;
 
 	std::tuple<unsigned int, unsigned int> getScreenSize() { return this->screenSize; }
 	std::tuple<unsigned int, unsigned int> getScreenPosition() { return this->screenPosition; }

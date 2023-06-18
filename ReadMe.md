@@ -122,13 +122,13 @@ To play with this version you just have to set it in the imgui configurer, edit 
 Your graphics card has to support OpenGL 4.6 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
 
 ## Developer Notes
-This was my first complex project since I started programming. My earlier efforts were limited to calculate/solve math problems.
-
-I tested the game, I completed much of it but much of the code was rewritten so an other deep testing is needed.
+This was my first complex project since I started programming. My earlier efforts were limited to calculating/solving math problems.
 
 This was a good starting project as I learned a lot about programming and designing code while making it.
 
-I know that there are parts that are still badly implemented those parts will be fixed up sporadically as those are not high priorieties for me right now.
+The project has been restructured numerous times since then and there are only a few parts left which could have been implemented better but cleaning them up may not worth the effort now.
+
+But altogether I'm satisfied with the result.
 
 ## Screenshots
 
@@ -148,7 +148,6 @@ I know that there are parts that are still badly implemented those parts will be
 ## Future tasks for this project:
 - Fine tune collision detection between enemies
 - Make browser/wasm port playable on mobile
-- Rewrite level loading part
 - Fix broken video recording + Android versions (remake this port by using the default cmake project instead of defining a custom one for it)
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Add demo scene + bonus fruits

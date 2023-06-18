@@ -23,7 +23,6 @@
 #include "Text.h"
 
 #include "../iocontext/IOContext.h"
-#
 
 class GameContext;
 
@@ -33,7 +32,7 @@ class RenderingManager {
 	std::shared_ptr<GameContext> gameContext;
 	std::shared_ptr<IOContext> ioContext;
 
-	float levelVertices[16] = {
+	const float levelVertices[16] = {
 		-1.0f,			-1.0f,
 		-14.0f / 15,	-1.0f,
 		-14.0f / 15,	-8.0f / 9,
@@ -45,7 +44,7 @@ class RenderingManager {
 		0.0f,			1.0f
 	};
 
-	float enemyVertices[16] = {
+	const float enemyVertices[16] = {
 		-1.0f,			-1.0f,
 		-14.0f / 15,	-1.0f,
 		-14.0f / 15,	-8.0f / 9,
@@ -57,7 +56,7 @@ class RenderingManager {
 		0.0f,			1.0f / 5
 	};
 
-	float characterVertices[16] = {
+	const float characterVertices[16] = {
 		-96.0f / 140,	26.0f / 28,
 		-90.0f / 140,	26.0f / 28,
 		-90.0f / 140,	28.0f / 28,
@@ -69,7 +68,7 @@ class RenderingManager {
 		0.0f,			1.0f - 0.001f,
 	};
 
-	float mainVertices[16] = {
+	const float mainVertices[16] = {
 		-1.0f, -1.0f,
 		 1.0f, -1.0f,
 		 1.0f, 1.0f,
@@ -80,7 +79,7 @@ class RenderingManager {
 		0.0f, 1.0f,
 	};
 
-	unsigned int indices[6] = {
+	const unsigned int indices[6] = {
 		0,1,2,
 		0,2,3
 	};
@@ -97,7 +96,7 @@ class RenderingManager {
 	Shader* characterShader;
 	Shader* mainShader;
 
-#ifdef  USE_DYNAMIC_ARRAY
+#ifdef USE_DYNAMIC_ARRAY
 	int* levelTextureIDs = nullptr;
 	int* levelDrawables = nullptr;
 #else
@@ -125,7 +124,7 @@ class RenderingManager {
 	int ladderSize = 0;
 	int finishingLadderSize = 0;
 
-#ifdef  USE_DYNAMIC_ARRAY
+#ifdef USE_DYNAMIC_ARRAY
 	float* enemyDrawables = nullptr;
 	int* enemyTextureIDs = nullptr;
 	int* enemyDirections = nullptr;
@@ -154,7 +153,7 @@ class RenderingManager {
 	int* generatorDrawables;
 	int* generatorTextures;
 
-	void initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, float* vertices)
+	void initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, const float* vertices)
 	{
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);

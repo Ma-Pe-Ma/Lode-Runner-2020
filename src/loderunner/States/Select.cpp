@@ -12,38 +12,26 @@ void Select::start() {
 
 	stateContext->getRenderingManager()->setTextList(textList);
 	stateContext->getRenderingManager()->initializeCharacters();
-	updateLevelNr(stateContext->level[stateContext->playerNr]);
+	levelText->changeContent("STAGE " + std::to_string(stateContext->level[stateContext->playerNr]).insert(0, 3 - std::to_string(stateContext->level[stateContext->playerNr]).length(), '0'));
 }
 
 void Select::update(float currentFrame) {
 	int& levelNr = stateContext->level[stateContext->playerNr];
 
 	if (stateContext->getIOContext()->getLeftButton().simple()) {
-		setNewValidLevel(--levelNr);
-		updateLevelNr(levelNr);
-		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(16)->playPause();
+		changeLevelNumber(--levelNr);
 	}
 
 	if (stateContext->getIOContext()->getRightButton().simple()) {
-		setNewValidLevel(++levelNr);
-		updateLevelNr(levelNr);
-		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(16)->playPause();
+		changeLevelNumber(++levelNr);
 	}
 
 	if (stateContext->getIOContext()->getUpButton().simple()) {
-		setNewValidLevel(levelNr += 10);
-		updateLevelNr(levelNr);
-		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(16)->playPause();
+		changeLevelNumber(levelNr += 10);
 	}
 
 	if (stateContext->getIOContext()->getDownButton().simple()) {
-		setNewValidLevel(levelNr -= 10);
-		updateLevelNr(levelNr);
-		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(16)->playPause();
+		changeLevelNumber(levelNr -= 10);
 	}
 
 	if (stateContext->getIOContext()->getEnterButton().simple()) {
@@ -57,17 +45,11 @@ void Select::end() {
 
 }
 
-void Select::setNewValidLevel(int& newLevel)
+void Select::changeLevelNumber(int& levelNr)
 {
-	int maxLevelNumber = stateContext->getGameConfiguration()->getGameVersion() ? 150 : 51;
-	newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
-	newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
-}
+	stateContext->getGameConfiguration()->validateLevel(levelNr);
+	levelText->changeContent("STAGE " + std::to_string(levelNr).insert(0, 3 - std::to_string(levelNr).length(), '0'));
 
-void Select::updateLevelNr(int levelNr)
-{
-	std::string levelNumber = std::to_string(levelNr);
-	levelNumber.insert(0, 3 - levelNumber.length(), '0');
-
-	levelText->changeContent("STAGE " + levelNumber);
+	stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+	stateContext->getAudio()->getAudioFileByID(16)->playPause();
 }

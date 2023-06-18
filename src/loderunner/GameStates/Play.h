@@ -21,7 +21,7 @@ private:
 	std::shared_ptr<Text> timeText;
 
 public:
-	Play();
+	Play() {}
 	void drawScene();
 	void start() override;
 	void update(float) override;

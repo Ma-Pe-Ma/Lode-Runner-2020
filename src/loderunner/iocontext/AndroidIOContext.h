@@ -95,6 +95,30 @@ public:
 
 		glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
 	}
+
+	void loadLevel(std::string levelFileName, std::function<bool(std::string)> lineProcessor) override
+	{
+		std::vector<uint8_t> data;
+		if (!ndk_helper::JNIHelper::GetInstance()->ReadFile(levelFileName.c_str(), &data)) {
+			Helper::log("Can't read file!" + levelFileName);
+			LOGI("Can not open a file:%s", levelFileName.c_str());
+			return;
+		}
+
+		const GLchar* source = (GLchar*)&data[0];
+		std::string test1(source);
+
+		std::stringstream test;
+		test << test1;
+		std::string row;
+
+		while (std::getline(test, row, '\n')) {
+			if (lineProcessor(row))
+			{
+				break;
+			}
+		}
+	}
 };
 
 #endif
