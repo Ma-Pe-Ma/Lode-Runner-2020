@@ -86,6 +86,6 @@ void Intro::end() {
 	stateContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
 
 	if (stateContext->menuCursor < 2) {
-		stateContext->getGamePlay()->getPlay()->loadLevel(stateContext->level[stateContext->playerNr]);
+		stateContext->getGamePlay()->getGameContext()->loadLevel(stateContext->level[stateContext->playerNr]);
 	}
 }

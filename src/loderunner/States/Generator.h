@@ -19,14 +19,20 @@ private:
 
 	short geX = 1;
 	short geY = 16;
-	std::map<int, int> textureMap;
-	std::map<int, LayoutBlock> layoutMap;
-
-	void generateLevel();
+	const std::map<int, int> textureMap = {
+		{0, 17},
+		{1, 0},
+		{2, 6},
+		{3, 12},
+		{4, 18},
+		{5, 24},
+		{6, 30},
+		{7, 36},
+		{8, 42},
+		{9, 48},
+	};
 
 	std::shared_ptr<GameContext> gameContext;
-
-	std::shared_ptr<Text> timeText;
 public:
 	Generator();
 	void start() override;

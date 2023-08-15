@@ -17,9 +17,6 @@ class Text;
 class Play : public GameState {
 private:		
 	void handleNonControlButtons();
-
-	std::shared_ptr<Text> timeText;
-
 public:
 	Play() {}
 	void drawScene();
@@ -27,10 +24,8 @@ public:
 	void update(float) override;
 	void end() override;
 
-	void loadLevel(unsigned int);
 	void transitionToDeath();
 	void transitionToOutro(short, short, short);
-	void clearContainers();
 
 	void setGameContext(std::shared_ptr<GameContext> gameContext) override
 	{
@@ -41,11 +36,6 @@ public:
 	std::shared_ptr<GameContext> getGameContext()
 	{
 		return this->gameContext;
-	}
-
-	void setTimeText(std::shared_ptr<Text> timeText)
-	{
-		this->timeText = timeText;
 	}
 };
 

@@ -36,18 +36,13 @@ void Player::findPath() {
 		dPos.y = -actualSpeed;
 	}
 
-	//check if runner dies by enemy
-	for (auto& enemy : gameContext->getEnemies()) {
-		if (std::abs(enemy->getPos().x - pos.x) < 0.5f && std::abs(enemy->getPos().y - pos.y) < 0.5f) {
-			die();
-		}
-	}
+	gameContext->checkPlayerDeathByEnemy();
 }
 
 void Player::freeRun() {
 	//Check digging input
 	if (ioContext->getLeftDigButton().impulse()) {
-		if (gameContext->getBricks()[current.x - 1][current.y - 1] && gameContext->getBricks()[current.x - 1][current.y -1]->initiateDig()) {
+		if (gameContext->getBrickByCoordinates(current.x - 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x - 1, current.y -1)->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -58,7 +53,7 @@ void Player::freeRun() {
 	}
 	
 	if (ioContext->getRightDigButton().impulse()) {
-		if (gameContext->getBricks()[current.x + 1][current.y - 1] && gameContext->getBricks()[current.x + 1][current.y - 1]->initiateDig()) {
+		if (gameContext->getBrickByCoordinates(current.x + 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x + 1, current.y - 1)->initiateDig()) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -82,8 +77,8 @@ void Player::initiateFallingStop() {
 }
 
 void Player::falling() {
-	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::trapDoor) {
-		gameContext->getTrapdoors()[current.x][current.y]->setRevealed();
+	if (gameContext->getLayoutElement(current.x, current.y) == LayoutBlock::trapDoor) {
+		gameContext->getTrapdoorByCoordinate(current.x, current.y)->setRevealed();
 	}
 
 	Enemy::falling();

@@ -75,8 +75,8 @@ void Enemy::determineNearbyObjects() {
 	current.x = int(pos.x + 0.5);
 	current.y = int(pos.y + 0.5);
 
-	middle = gameContext->getLayout()[current.x][current.y];
-	downBlock = gameContext->getLayout()[current.x][current.y - 1];
+	middle = gameContext->getLayoutElement(current.x, current.y);
+	downBlock = gameContext->getLayoutElement(current.x, current.y - 1);
 }
 
 //-----------------------------------------------------------
@@ -99,12 +99,12 @@ void Enemy::findPath() {
 	if (y == runnerPos.y && gameContext->getPlayer()->state != EnemyState::falling) {
 		while (x != runnerPos.x) {
 			//std::cout << "\n x != runnerx";
-			LayoutBlock checkable = gameContext->getLayout()[x][y];
-			LayoutBlock belowCheckable = gameContext->getLayout()[x][y - 1];
+			LayoutBlock checkable = gameContext->getLayoutElement(x, y);
+			LayoutBlock belowCheckable = gameContext->getLayoutElement(x, y - 1);
 
 			bool checkGold = gameContext->goldChecker(x, y - 1);
 
-			if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole || /*belowCheckable == LayoutBlock::brick ||*/ gameContext->getBricks()[x][y - 1] || belowCheckable == LayoutBlock::concrete
+			if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole || /*belowCheckable == LayoutBlock::brick ||*/ gameContext->getBrickByCoordinates(x, y - 1) || belowCheckable == LayoutBlock::concrete
 				|| belowCheckable == LayoutBlock::ladder	|| enemyChecker(x, y - 1) || belowCheckable == LayoutBlock::pole || checkGold) {
 
 				//guard left to runner
@@ -159,14 +159,14 @@ void Enemy::scanFloor() {
 	bestRating = 255;
 
 	while (x > 0) {                                    //get left end first
-		LayoutBlock checkable = gameContext->getLayout()[x - 1][y];
-		LayoutBlock belowCheckable = gameContext->getLayout()[x - 1][y - 1];
+		LayoutBlock checkable = gameContext->getLayoutElement(x - 1, y);
+		LayoutBlock belowCheckable = gameContext->getLayoutElement(x - 1, y - 1);
 
 		if (checkable == LayoutBlock::brick || checkable == LayoutBlock::concrete) {
 			break;
 		}
 
-		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick*/	|| gameContext->getBricks()[x - 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick*/	|| gameContext->getBrickByCoordinates(x - 1, y - 1) || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			--x;
 		}		
 		else {
@@ -180,13 +180,13 @@ void Enemy::scanFloor() {
 
 	x = startX;
 	while (x < 29) {									// get right end next
-		LayoutBlock checkable = gameContext->getLayout()[x + 1][y];;
-		LayoutBlock belowCheckable = gameContext->getLayout()[x + 1][y - 1];
+		LayoutBlock checkable = gameContext->getLayoutElement(x + 1, y);;
+		LayoutBlock belowCheckable = gameContext->getLayoutElement(x + 1, y - 1);
 
 		if (checkable == LayoutBlock::brick || checkable == LayoutBlock::concrete) {
 			break;
 		}			
-		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick */ || gameContext->getBricks()[x + 1][y - 1] || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
+		if (checkable == LayoutBlock::ladder || checkable == LayoutBlock::pole /*|| belowCheckable == brick */ || gameContext->getBrickByCoordinates(x + 1, y - 1) || belowCheckable == LayoutBlock::concrete || belowCheckable == LayoutBlock::ladder) {
 			++x;
 		}			
 		else {                                         // go on right anyway
@@ -198,8 +198,8 @@ void Enemy::scanFloor() {
 	int rightEnd = x;
 
 	x = startX;
-	LayoutBlock checkable = gameContext->getLayout()[x][y];
-	LayoutBlock belowCheckable = gameContext->getLayout()[x][y - 1];
+	LayoutBlock checkable = gameContext->getLayoutElement(x, y);
+	LayoutBlock belowCheckable = gameContext->getLayoutElement(x, y - 1);
 
 	//the possible directions (+0: stay), this numbers are the second arguments of the scandown and scanup functions (for the best path)
 	//	1: left
@@ -207,7 +207,7 @@ void Enemy::scanFloor() {
 	//  3: up
 	//  4: down
 
-	if (/*belowCheckable != brick &&*/ !gameContext->getBricks()[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+	if (/*belowCheckable != brick &&*/ !gameContext->getBrickByCoordinates(x, y - 1) && belowCheckable != LayoutBlock::concrete) {
 		scanDown(x, 4);
 	}		
 	if (checkable == LayoutBlock::ladder) {
@@ -229,10 +229,10 @@ void Enemy::scanFloor() {
 			}				
 		}
 
-		checkable = gameContext->getLayout()[x][y];
-		belowCheckable = gameContext->getLayout()[x][y - 1];
+		checkable = gameContext->getLayoutElement(x, y);
+		belowCheckable = gameContext->getLayoutElement(x, y - 1);
 
-		if (/*belowCheckable != brick &&*/ !gameContext->getBricks()[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+		if (/*belowCheckable != brick &&*/ !gameContext->getBrickByCoordinates(x, y - 1) && belowCheckable != LayoutBlock::concrete) {
 			scanDown(x, curPath);
 		}
 
@@ -279,18 +279,18 @@ void Enemy::scanDown(int x, int curPath) {
 	int y = current.y;
 	int runnerY = gameContext->getPlayer()->current.y;
 
-	LayoutBlock belowCheckable = gameContext->getLayout()[x][y - 1];
+	LayoutBlock belowCheckable = gameContext->getLayoutElement(x, y - 1);
 
-	while (y > 0 && (belowCheckable = gameContext->getLayout()[x][y - 1]) != LayoutBlock::brick && !gameContext->getBricks()[x][y - 1] && belowCheckable != LayoutBlock::concrete) {
+	while (y > 0 && (belowCheckable = gameContext->getLayoutElement(x, y - 1)) != LayoutBlock::brick && !gameContext->getBrickByCoordinates(x, y - 1) && belowCheckable != LayoutBlock::concrete) {
 		bool checkGold = gameContext->goldChecker(x, y);
 
 		//here is a problem, with champ 19?
-		if (gameContext->getLayout()[x][y] != LayoutBlock::empty || checkGold || gameContext->getBricks()[x][y]) {
+		if (gameContext->getLayoutElement(x, y) != LayoutBlock::empty || checkGold || gameContext->getBrickByCoordinates(x, y)) {
 			if (x > 1) {
-				LayoutBlock leftSideBelow = gameContext->getLayout()[x - 1][y - 1];
-				LayoutBlock leftSide = gameContext->getLayout()[x - 1][y];
+				LayoutBlock leftSideBelow = gameContext->getLayoutElement(x - 1, y - 1);
+				LayoutBlock leftSide = gameContext->getLayoutElement(x - 1, y);
 
-				if (leftSideBelow == LayoutBlock::brick || gameContext->getBricks()[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
+				if (leftSideBelow == LayoutBlock::brick || gameContext->getBrickByCoordinates(x - 1, y - 1) || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -298,10 +298,10 @@ void Enemy::scanDown(int x, int curPath) {
 			}
 
 			if (x < 28) {
-				LayoutBlock rightSideBelow = gameContext->getLayout()[x + 1][y - 1];
-				LayoutBlock rightSide = gameContext->getLayout()[x + 1][y];
+				LayoutBlock rightSideBelow = gameContext->getLayoutElement(x + 1, y - 1);
+				LayoutBlock rightSide = gameContext->getLayoutElement(x + 1, y);
 
-				if (rightSideBelow == LayoutBlock::brick || gameContext->getBricks()[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
+				if (rightSideBelow == LayoutBlock::brick || gameContext->getBrickByCoordinates(x + 1, y - 1) || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 					if (y <= runnerY) {
 						break;
 					}
@@ -333,17 +333,17 @@ void Enemy::scanUp(int x, int curPath) {
 	int y = current.y;
 	int runnerY = gameContext->getPlayer()->current.y;
 
-	while (y < 18 && gameContext->getLayout()[x][y] == LayoutBlock::ladder) {
+	while (y < 18 && gameContext->getLayoutElement(x, y) == LayoutBlock::ladder) {
 		++y;
 
-		LayoutBlock leftSideBelow = gameContext->getLayout()[x - 1][y - 1];
-		LayoutBlock leftSide = gameContext->getLayout()[x - 1][y];
+		LayoutBlock leftSideBelow = gameContext->getLayoutElement(x - 1, y - 1);
+		LayoutBlock leftSide = gameContext->getLayoutElement(x - 1, y);
 
-		LayoutBlock rightSideBelow = gameContext->getLayout()[x + 1][y - 1];
-		LayoutBlock rightSide = gameContext->getLayout()[x + 1][y];
+		LayoutBlock rightSideBelow = gameContext->getLayoutElement(x + 1, y - 1);
+		LayoutBlock rightSide = gameContext->getLayoutElement(x + 1, y);
 
 		if (x > 1) {
-			if (/*leftSideBelow == brick ||*/ gameContext->getBricks()[x - 1][y - 1] || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
+			if (/*leftSideBelow == brick ||*/ gameContext->getBrickByCoordinates(x - 1, y - 1) || leftSideBelow == LayoutBlock::concrete || leftSideBelow == LayoutBlock::ladder || leftSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -351,7 +351,7 @@ void Enemy::scanUp(int x, int curPath) {
 		}
 
 		if (x < 28) {
-			if (/*rightSideBelow == brick ||*/ gameContext->getBricks()[x + 1][y - 1] || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
+			if (/*rightSideBelow == brick ||*/ gameContext->getBrickByCoordinates(x + 1, y - 1) || rightSideBelow == LayoutBlock::concrete || rightSideBelow == LayoutBlock::ladder || rightSide == LayoutBlock::pole) {
 				if (y >= runnerY) {
 					break;
 				}
@@ -476,7 +476,7 @@ void Enemy::ladderTransformation() {
 	}*/
 
 	//you can move on a ladder 1.5 unit vertically, middle block only covers the bottom 2/3 of the ladder, tophalfladder covers the upper 2/3 of ladder
-	LayoutBlock topHalfOfLadder = gameContext->getLayout()[current.x][int(pos.y)];
+	LayoutBlock topHalfOfLadder = gameContext->getLayoutElement(current.x, int(pos.y));
 
 	if (dPos.y > 0 && middle != LayoutBlock::ladder && topHalfOfLadder != LayoutBlock::ladder) {
 		dPos.y = 0;
@@ -622,7 +622,7 @@ void Enemy::checkCollisionsWithEnvironment() {
 	if (dPos.x != 0) {
 		short directionX = (dPos.x > 0) - (dPos.x < 0);
 		int nextX = current.x + directionX;
-		LayoutBlock nextXBlock = gameContext->getLayout()[nextX][current.y];
+		LayoutBlock nextXBlock = gameContext->getLayoutElement(nextX, current.y);
 
 		if ((nextXBlock == LayoutBlock::brick || nextXBlock == LayoutBlock::concrete || nextXBlock == LayoutBlock::trapDoor) && std::abs(nextX - pos.x - dPos.x) < 1.0f) {
 			dPos.x = current.x - pos.x;
@@ -632,7 +632,7 @@ void Enemy::checkCollisionsWithEnvironment() {
 	if (dPos.y != 0) {
 		short directionY = (dPos.y > 0) - (dPos.y < 0);
 		int nextY = current.y + directionY;
-		LayoutBlock nextYBlock = gameContext->getLayout()[current.x][nextY];
+		LayoutBlock nextYBlock = gameContext->getLayoutElement(current.x, nextY);
 
 		if (dPos.y > 0) {
 			if ((nextYBlock == LayoutBlock::brick || nextYBlock == LayoutBlock::concrete || nextYBlock == LayoutBlock::trapDoor) && std::abs(nextY - pos.y - dPos.y) < 1.0f) {
@@ -657,7 +657,7 @@ void Enemy::freeRun() {
 	checkCollisionsWithEnvironment();
 
 	int nextY = int(pos.y + 0.5 + dPos.y);
-	LayoutBlock nextYBlock = gameContext->getLayout()[current.x][nextY];
+	LayoutBlock nextYBlock = gameContext->getLayoutElement(current.x, nextY);
 
 	//fall from ladder to empty, pole or trapDoor
 	if (dPos.y < 0 && middle == LayoutBlock::ladder && (nextYBlock == LayoutBlock::empty || nextYBlock == LayoutBlock::pole || nextYBlock == LayoutBlock::trapDoor)) {
@@ -701,9 +701,9 @@ void Enemy::freeRun() {
 		return;
 	}
 	
-	LayoutBlock nextXBlock = gameContext->getLayout()[nextX][current.y];
+	LayoutBlock nextXBlock = gameContext->getLayoutElement(nextX, current.y);
 	//used to check next block for starting to fall
-	LayoutBlock nextUnderBlock = gameContext->getLayout()[nextX][current.y - 1];
+	LayoutBlock nextUnderBlock = gameContext->getLayoutElement(nextX, current.y - 1);
 
 	//falling from the edge of a block (brick, concrete, enemy, ladder)
 	if (dPos.x != 0 && nextXBlock == LayoutBlock::empty && (nextUnderBlock == LayoutBlock::empty || nextUnderBlock == LayoutBlock::trapDoor || nextUnderBlock == LayoutBlock::pole) && !enemyNextUnder) {
@@ -750,8 +750,8 @@ void Enemy::initiateFallingStop() {
 }
 
 bool Enemy::checkHole() {
-	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::empty && gameContext->getBricks()[current.x][current.y] && dPos.x == 0 && pos.y > current.y) {
-		this->holeBrick = gameContext->getBricks()[current.x][current.y].get();
+	if (gameContext->getLayoutElement(current.x, current.y) == LayoutBlock::empty && gameContext->getBrickByCoordinates(current.x, current.y) && dPos.x == 0 && pos.y > current.y) {
+		this->holeBrick = gameContext->getBrickByCoordinates(current.x, current.y).get();
 		return true;
 	}
 
@@ -771,7 +771,7 @@ void Enemy::falling() {
 	//falling into pit from falling
 	int nextY = int(pos.y + dPos.y);
 
-	LayoutBlock blockUnderFallingEnemy = gameContext->getLayout()[current.x][nextY];
+	LayoutBlock blockUnderFallingEnemy = gameContext->getLayoutElement(current.x, nextY);
 	//Falling to brick, concrete, ladder, enemy
 	if (blockUnderFallingEnemy == LayoutBlock::brick || blockUnderFallingEnemy == LayoutBlock::concrete || blockUnderFallingEnemy == LayoutBlock::ladder) {
 		initiateFallingStop();
@@ -781,7 +781,7 @@ void Enemy::falling() {
 	//falling onto enemy!
 	for (auto& enemy : gameContext->getEnemies()) {
 		if (enemy.get() != this) {
-			if (current.x == enemy->current.x && enemy->pos.y < pos.y && std::abs((pos.y + dPos.y) - enemy->pos.y) < 1.0f && gameContext->getLayout()[enemy->current.x][enemy->current.y] != LayoutBlock::pole) {
+			if (current.x == enemy->current.x && enemy->pos.y < pos.y && std::abs((pos.y + dPos.y) - enemy->pos.y) < 1.0f && gameContext->getLayoutElement(enemy->current.x, enemy->current.y) != LayoutBlock::pole) {
 				initiateFallingStop();
 				return;
 			}
@@ -789,7 +789,7 @@ void Enemy::falling() {
 	}
 
 	//falling to pole
-	if (gameContext->getLayout()[current.x][current.y] == LayoutBlock::pole && pos.y + dPos.y <= current.y && pos.y > current.y) {
+	if (gameContext->getLayoutElement(current.x, current.y) == LayoutBlock::pole && pos.y + dPos.y <= current.y && pos.y > current.y) {
 		initiateFallingStop();
 		return;
 	}
@@ -817,7 +817,7 @@ void Enemy::die() {
 		for (int i = 1; i < 29; i++) {
 			bool checkGold = gameContext->goldChecker(i, vertical);
 
-			if (gameContext->getLayout()[i][vertical] == LayoutBlock::empty && !enemyChecker(i, vertical) && !checkGold && !gameContext->getBricks()[i][vertical]) {
+			if (gameContext->getLayoutElement(i, vertical) == LayoutBlock::empty && !enemyChecker(i, vertical) && !checkGold && !gameContext->getBrickByCoordinates(i, vertical)) {
 				nonEmptyBlocks.push_back(i);
 			}
 		}
@@ -897,12 +897,12 @@ void Enemy::fallingToPit() {
 	}
 
 	//do not fall into if rebuilt
-	if (gameContext->getLayout()[holeBrick->getPosition().x][holeBrick->getPosition().y] == LayoutBlock::brick && std::abs(pos.y - holeBrick->getPosition().y) >= 0.75) {
+	if (gameContext->getLayoutElement(holeBrick->getPosition().x, holeBrick->getPosition().y) == LayoutBlock::brick && std::abs(pos.y - holeBrick->getPosition().y) >= 0.75) {
 		state = EnemyState::freeRun;
 		pitState = PitState::fallingToPit;
 		pos.y = holeBrick->getPosition().y + 1;
 
-		if (gameContext->getLayout()[holeBrick->getPosition().y][holeBrick->getPosition().y + 1] == LayoutBlock::brick) {
+		if (gameContext->getLayoutElement(holeBrick->getPosition().y, holeBrick->getPosition().y + 1) == LayoutBlock::brick) {
 			die();
 		}
 		else {
@@ -1020,14 +1020,14 @@ void Enemy::climbing() {
 		}
 
 		//fall back if the above brick is rebuilt
-		if (gameContext->getLayout()[brickPosition.x][brickPosition.y + 1] == LayoutBlock::brick) {
+		if (gameContext->getLayoutElement(brickPosition.x, brickPosition.y + 1) == LayoutBlock::brick) {
 			pitState = PitState::fallingToPit;
 			return;
 		}
 
 		//fallback if exit block is rebuilt on left
 		if (dPos.x < 0) {
-			if (gameContext->getLayout()[brickPosition.x - 1][brickPosition.y + 1] == LayoutBlock::brick) {
+			if (gameContext->getLayoutElement(brickPosition.x - 1, brickPosition.y + 1) == LayoutBlock::brick) {
 				pitState = PitState::fallingToPit;
 				return;
 			}
@@ -1035,7 +1035,7 @@ void Enemy::climbing() {
 
 		//fallback if exit block is rebuilt on right
 		else if (dPos.x > 0) {
-			if (gameContext->getLayout()[brickPosition.x + 1][brickPosition.y + 1] == LayoutBlock::brick) {
+			if (gameContext->getLayoutElement(brickPosition.x + 1, brickPosition.y + 1) == LayoutBlock::brick) {
 				pitState = PitState::fallingToPit;
 				return;
 			}
@@ -1186,10 +1186,10 @@ void Enemy::checkGoldDrop() {
 		if (int(pos.x + dPos.x + 0.5) != prevX || int(pos.y + dPos.y + 0.5) != prevY) {
 			if (carriedGold->shouldBeReleased()) {
 				bool checkGold = gameContext->goldChecker(prevX, prevY);
-				LayoutBlock prevBlock = gameContext->getLayout()[prevX][prevY];
-				LayoutBlock prevBlockUnder = gameContext->getLayout()[prevX][prevY - 1];
+				LayoutBlock prevBlock = gameContext->getLayoutElement(prevX, prevY);
+				LayoutBlock prevBlockUnder = gameContext->getLayoutElement(prevX, prevY - 1);
 
-				if (prevBlock == LayoutBlock::empty && !gameContext->getBricks()[prevX][prevY] && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
+				if (prevBlock == LayoutBlock::empty && !gameContext->getBrickByCoordinates(prevX, prevY) && !checkGold && (prevBlockUnder == LayoutBlock::brick || prevBlockUnder == LayoutBlock::concrete || prevBlockUnder == LayoutBlock::ladder)) {
 					carriedGold->setPos({ prevX, prevY });
 
 					gameContext->addGoldToUncollectedList(carriedGold);
