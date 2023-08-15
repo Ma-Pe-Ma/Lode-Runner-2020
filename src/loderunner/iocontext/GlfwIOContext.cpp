@@ -349,7 +349,7 @@ void GlfwIOContext::initialize()
 	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(std::get<0>(screenSize), std::get<1>(screenSize), u8"Lode Runner 2020 - Margitai Péter Máté", NULL, NULL);
+	window = glfwCreateWindow(std::get<0>(screenSize), std::get<1>(screenSize), reinterpret_cast<const char*>(u8"Lode Runner 2020 - Margitai Péter Máté"), NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;

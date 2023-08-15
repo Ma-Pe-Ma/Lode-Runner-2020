@@ -29,7 +29,7 @@ void Brick::handle(float gameTime) {
 
 bool Brick::initiateDig() {	
 	int checkGold = gameContext->goldChecker(position.x, position.y + 1);
-	LayoutBlock upBlock = gameContext->getLayout()[position.x][position.y + 1];
+	LayoutBlock upBlock = gameContext->getLayoutElement(position.x, position.y + 1);
 
 	if (brickState == BrickState::original && upBlock == LayoutBlock::empty && !checkGold) {
 		brickState = BrickState::digging;
@@ -51,7 +51,7 @@ void Brick::digging(float gameTime) {
 		*pointerToTexture = 15;
 		timer = gameTime;
 		gameContext->notifyPlayerAboutDigEnd();
-		gameContext->getLayout()[position.x][position.y] = LayoutBlock::empty;
+		gameContext->setLayoutElement(position.x, position.y, LayoutBlock::empty);
 		*(gameContext->getPointerToDebrisTexture()) = 15;
 		gameContext->getPointerToDebrisLocation()[0] = -1;
 		gameContext->getPointerToDebrisLocation()[1] = -1;
@@ -65,7 +65,7 @@ void Brick::digging(float gameTime) {
 			gameContext->getAudio()->getAudioFileByID(2)->playPause();
 			gameContext->getAudio()->getAudioFileByID(1)->stopAndRewind();
 			gameContext->notifyPlayerAboutDigEnd();
-			gameContext->getLayout()[position.x][position.y] = LayoutBlock::brick;
+			gameContext->setLayoutElement(position.x, position.y, LayoutBlock::brick);
 			brickState = BrickState::original;
 			*pointerToTexture = 0;
 			*(gameContext->getPointerToDebrisTexture()) = 15;
@@ -75,7 +75,7 @@ void Brick::digging(float gameTime) {
 		}
 
 		//drawing debris above hole
-		if (gameContext->getLayout()[position.x][position.y + 1] != LayoutBlock::brick) {
+		if (gameContext->getLayoutElement(position.x, position.y + 1) != LayoutBlock::brick) {
 			*(gameContext->getPointerToDebrisTexture()) = gameContext->getRandomDebris() * 6  + 19 + timeFactor;
 			gameContext->getPointerToDebrisLocation()[0] = position.x;
 			gameContext->getPointerToDebrisLocation()[1] = position.y + 1;
@@ -96,7 +96,7 @@ void Brick::building(float gameTime) {
 		*pointerToTexture = 0;
 
 		gameContext->checkDeaths(position.x, position.y);
-		gameContext->getLayout()[position.x][position.y] = LayoutBlock::brick;
+		gameContext->setLayoutElement(position.x, position.y, LayoutBlock::brick);
 	}
 	else {
 		int timeFactor = int(5 * (gameTime - timer) / buildTime) % 5;
@@ -104,7 +104,7 @@ void Brick::building(float gameTime) {
 	}	
 }
 
-void Brick::setGameContext(std::shared_ptr<GameContext> gameContext)
+void Brick::setGameContext(GameContext* gameContext)
 {
 	this->gameContext = gameContext;
 }

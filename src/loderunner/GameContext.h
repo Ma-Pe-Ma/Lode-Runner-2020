@@ -6,6 +6,7 @@ class Enemy;
 class Brick;
 class Gold;
 class Trapdoor;
+class Text;
 
 class Play;
 
@@ -13,15 +14,13 @@ class Audio;
 class RenderingManager;
 class IOContext;
 
-#include "Enums/LayoutBlock.h"
-#include "Structs/Vector2DInt.h"
-
+#include <map>
 #include <memory>
 #include <vector>
 
 #include "iocontext/GameConfiguration.h"
-
-#include <iostream>
+#include "Enums/LayoutBlock.h"
+#include "Structs/Vector2DInt.h"
 
 class GameContext {
 	std::shared_ptr<RenderingManager> renderingManager;
@@ -31,21 +30,22 @@ class GameContext {
 
 	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
-	LayoutBlock** layout;
-	std::shared_ptr<Brick>** bricks = nullptr;
-	std::shared_ptr<Trapdoor>** trapdoors = nullptr;
+	LayoutBlock layout[30][18];
+	//Two dimensional garbage collected arrays
+	std::shared_ptr<std::shared_ptr<std::shared_ptr<Brick>[]>[]> bricks = nullptr;
+	std::shared_ptr<std::shared_ptr<std::shared_ptr<Trapdoor>[]>[]> trapdoors = nullptr;
 
 	std::vector<std::tuple<int, int>> finishingLadders;
-	short highestLadder = 30;
-
-	std::vector<std::shared_ptr<Enemy>> enemies;
-	std::shared_ptr<Player> player;
-
 	std::vector<std::shared_ptr<Gold>> uncollectedGoldList;
 	std::vector<std::shared_ptr<Gold>> collectedGoldList;
 
-	int killCounter = 0;	
+	std::vector<std::shared_ptr<Enemy>> enemies;
+	std::shared_ptr<Player> player;	
 
+	std::shared_ptr<Text> timeText;
+
+	short highestLadder = 30;
+	int killCounter = 0;
 	int randomDebris = 0;
 
 	int* pointerToDebrisTexture;
@@ -53,6 +53,18 @@ class GameContext {
 
 	Play* play;
 
+	const std::map<short, LayoutBlock> generatorLayoutMap = {
+		{0, LayoutBlock::empty},
+		{1, LayoutBlock::brick},
+		{2, LayoutBlock::concrete},
+		{3, LayoutBlock::ladder},
+		{4, LayoutBlock::pole},
+		{5, LayoutBlock::trapDoor},
+		{6, LayoutBlock::empty},
+		{7, LayoutBlock::empty},
+		{8, LayoutBlock::empty},
+		{9, LayoutBlock::empty},
+	};
 public:
 	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager) { this->renderingManager = renderingManager; }
 	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
@@ -69,19 +81,15 @@ public:
 	void setBrickList(std::vector<std::shared_ptr<Brick>> brickList) { this->brickList = brickList;	};
 	void setTrapdoorList(std::vector<std::shared_ptr<Trapdoor>> trapdoorList) { this->trapdoorList = trapdoorList; }
 	
-	void setLayout(LayoutBlock** layout) {	this->layout = layout; }
-	LayoutBlock** getLayout() { return this->layout; }
+	LayoutBlock getLayoutElement(int x, int y) { return this->layout[x][y]; }
+	void setLayoutElement(int x, int y, LayoutBlock newElement) { this->layout[x][y] = newElement; }
 
-	void setBricks(std::shared_ptr<Brick>** bricks) { this->bricks = bricks; }
-	std::shared_ptr<Brick>** getBricks() { return this->bricks; }
+	std::shared_ptr<Brick> getBrickByCoordinates(int x, int y) { return this->bricks[x][y]; }
 
-	void setTrapdoors(std::shared_ptr<Trapdoor>** trapDoors) { this->trapdoors = trapDoors; }
-	std::shared_ptr<Trapdoor>** getTrapdoors() { return this->trapdoors; }
+	std::shared_ptr<Trapdoor> getTrapdoorByCoordinate(int x, int y) { return this->trapdoors[x][y]; }
 
-	void setEnemies(std::vector<std::shared_ptr<Enemy>> enemies) { this->enemies = enemies; }
 	std::vector<std::shared_ptr<Enemy>> getEnemies() { return this->enemies; }
 
-	void setPlayer(std::shared_ptr<Player> player) { this->player = player; }
 	std::shared_ptr<Player> getPlayer() { return this->player; }
 
 	std::vector<std::shared_ptr<Gold>> getUncollectedGoldList() { return this->uncollectedGoldList; }
@@ -94,7 +102,6 @@ public:
 	short getUncollectedGoldSize() { return uncollectedGoldList.size(); }
 
 	void setFinishingLadders(std::vector<std::tuple<int, int>> finishingLadders) { this->finishingLadders = finishingLadders; }
-	void setHighestLadder(int highestLadder) { this->highestLadder = highestLadder; }
 	int getHighestLadder() { return this->highestLadder; }
 
 	int getKillCounter() { return killCounter; }
@@ -117,6 +124,7 @@ public:
 	void notifyPlayerAboutDigEnd();
 
 	void checkDeaths(int, int);
+	void checkPlayerDeathByEnemy();
 	void handlePlayerDying();
 
 	bool enemyCarriesGold();
@@ -132,6 +140,9 @@ public:
 	void transitionToOutro();
 
 	void clearContainers();
+
+	void loadLevel(unsigned int);
+	void generateLevel(short[30][18]);
 };
 
 #endif

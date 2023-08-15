@@ -31,7 +31,7 @@ private:
 
 	int* pointerToTexture;
 
-	std::shared_ptr<GameContext> gameContext;
+	GameContext* gameContext;
 public:
 	Brick(Vector2DInt);
 	void handle(float);
@@ -43,7 +43,7 @@ public:
 		this->pointerToTexture = pointerToTexture;
 	}
 
-	void setGameContext(std::shared_ptr<GameContext> gameContext);
+	void setGameContext(GameContext* gameContext);
 };
 
 #endif // !BRICK_H

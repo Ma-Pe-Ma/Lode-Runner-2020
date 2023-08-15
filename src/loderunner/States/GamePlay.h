@@ -36,6 +36,7 @@ public:
 	void checkTransitionAtEndofFrame();
 
 	void setGameContext(std::shared_ptr<GameContext> gameContext);
+	std::shared_ptr<GameContext> getGameContext() { return this->gameContext; }
 
 	Begin* getBegin()
 	{

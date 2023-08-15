@@ -30,3 +30,5 @@ LR_Paths.props
 # And maybe some readmes
 !/readme.md
 !/readme.txt
+
+imgui.ini

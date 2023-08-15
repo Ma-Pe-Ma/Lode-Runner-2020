@@ -51,7 +51,7 @@ protected:
 	//factor to slow or fasten animationSpeed
 	int animationFactor = 20;
 
-	std::shared_ptr<GameContext> gameContext;
+	GameContext* gameContext;
 
 	void determineNearbyObjects();
 	void ladderTransformation();
@@ -131,7 +131,7 @@ public:
 	virtual void die();
 
 	//Getters and setters
-	void setGameContext(std::shared_ptr<GameContext> gameContext) { this->gameContext = gameContext; }
+	void setGameContext(GameContext* gameContext) { this->gameContext = gameContext; }
 
 	TextureMap getTextureMap() { return this->textureMap; }
 	virtual void setCharSpeed(float charSpeed) { this->charSpeed = charSpeed; }
