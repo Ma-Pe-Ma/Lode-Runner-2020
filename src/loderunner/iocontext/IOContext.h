@@ -1,7 +1,7 @@
 #ifndef IOCONTEXT_H
 #define IOCONTEXT_H
 
-#include "../Button.h"
+#include "Button.h"
 #include <tuple>
 #include <memory>
 #include <string>
@@ -24,8 +24,14 @@ protected:
 
 	std::tuple<unsigned int, unsigned int> viewPortPosition = std::make_tuple(0, 0);
 	std::tuple<unsigned int, unsigned int> viewPortSize = std::make_tuple(1100, 600);
+
+#ifdef VIDEO_RECORDING
+	std::shared_ptr<MultiMedia> media;
+	Button REC;
+#endif
 public:
 	virtual void processInput() = 0;
+	virtual void finalizeFrame() = 0;
 
 	virtual unsigned int loadTexture(char const* path) = 0;
 	virtual void takeScreenShot() = 0;
@@ -95,6 +101,8 @@ public:
 	Button& getLButton() { return lButton; }
 	Button& getIButton() { return iButton; }
 #endif
+	virtual void handleScreenRecording() {}
+	virtual bool shouldClose() = 0;
 };
 
 #endif

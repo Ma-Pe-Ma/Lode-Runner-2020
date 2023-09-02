@@ -60,6 +60,16 @@ void GlfwIOContext::processInput() {
 	kButton.detect(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
 	lButton.detect(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
 #endif
+
+	//TODO
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void GlfwIOContext::finalizeFrame()
+{
+	glfwSwapBuffers(window);
+	glfwPollEvents();
 }
 
 unsigned int GlfwIOContext::loadTexture(char const* path)
@@ -288,6 +298,11 @@ void GlfwIOContext::fullscreenSwitch() {
 	fullScreen = !fullScreen;
 
 	glfwMakeContextCurrent(window);
+}
+
+bool GlfwIOContext::shouldClose()
+{
+	return !glfwWindowShouldClose(window);
 }
 
 void GlfwIOContext::initialize()
