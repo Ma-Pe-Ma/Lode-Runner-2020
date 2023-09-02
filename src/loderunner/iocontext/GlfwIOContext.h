@@ -12,8 +12,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../Structs/Vector2D.h"
-
 #include <string>
 #include <map>
 
@@ -23,7 +21,6 @@
 
 class GlfwIOContext : public IOContext {
 	Button pButton, lAlt;
-	Vector2D debugPos[2];
 
 	void saveImage(unsigned char*);
 	unsigned int findScreenShotCount();
@@ -33,11 +30,6 @@ class GlfwIOContext : public IOContext {
 	bool fullScreen = false;
 	void fullscreenSwitch();
 
-#ifdef VIDEO_RECORDING
-	std::shared_ptr<MultiMedia> media;
-	Button REC;
-#endif
-
 protected:
 	GLFWwindow* window;
 	int getIntByKey(std::string key, int defaultValue);
@@ -45,22 +37,23 @@ protected:
 	std::map<std::string, std::string> configMap;
 
 public:
+	virtual void initialize() override;
+
 	virtual void processInput() override;
+	virtual void finalizeFrame() override;
 
 	unsigned int loadTexture(char const* path) override;
 	void takeScreenShot() override;
 	virtual void loadConfig(std::shared_ptr<GameConfiguration>) override;
-
-	virtual void initialize() override;
-
-	void handleScreenRecording();
-
-	GLFWwindow* getWindow() { return this->window; }
+	virtual void saveConfig(std::string key, std::string value) override;
 
 	void loadLevel(std::string, std::function<bool(std::string)>) override;
 
-	virtual void saveConfig(std::string key, std::string value) override;
+	GLFWwindow* getWindow() { return this->window; }
 
+	virtual bool shouldClose() override;
+
+	void handleScreenRecording();
 #ifdef VIDEO_RECORDING
 	void initializeMultimedia();
 #endif

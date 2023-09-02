@@ -1,7 +1,7 @@
 # Note: in VS you have to set the "currentDir" : "${workspaceRoot}" key-value inside the executable's debug configuration 
 # Without this the dlls and the assets/resources are not found when running the app while developing
 
-# to build emscripten version: emcmake cmake -B./out/build/wasm -G "Ninja"
+# to build emscripten version: emcmake cmake -B./out/build/wasm -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
 cmake_minimum_required (VERSION 3.20)
 
@@ -14,34 +14,35 @@ message("COMPILER: ${CMAKE_CXX_COMPILER}")
 
 # define executable and add src/loderunner source files
 add_executable(LodeRunner
-	"src/loderunner/Brick.cpp"
-	"src/loderunner/Button.cpp"
-	"src/loderunner/Enemy.cpp"
-	"src/loderunner/GameContext.cpp"
 	"src/loderunner/Main.cpp"
-	"src/loderunner/Player.cpp"	
-	"src/loderunner/Rendering/Text.cpp"
+	"src/loderunner/AppContainer.cpp"
+	
+	"src/loderunner/gameplay/Brick.cpp"
+	"src/loderunner/gameplay/Enemy.cpp"
+	"src/loderunner/gameplay/GameContext.cpp"
+	"src/loderunner/gameplay/Player.cpp"
 
-	"src/loderunner/States/GameOver.cpp"
-	"src/loderunner/States/GamePlay.cpp"
-	"src/loderunner/States/Generator.cpp"
-	"src/loderunner/States/Intro.cpp"
-	"src/loderunner/States/MainMenu.cpp"
-	"src/loderunner/States/Outro.cpp"
-	"src/loderunner/States/Select.cpp"
-	"src/loderunner/States/State.cpp"
-	"src/loderunner/States/StateContext.cpp"
+	"src/loderunner/states/GameOver.cpp"
+	"src/loderunner/states/GamePlay.cpp"
+	"src/loderunner/states/Generator.cpp"
+	"src/loderunner/states/Intro.cpp"
+	"src/loderunner/states/MainMenu.cpp"
+	"src/loderunner/states/Outro.cpp"
+	"src/loderunner/states/Select.cpp"
+	"src/loderunner/states/State.cpp"
+	"src/loderunner/states/StateContext.cpp"
 
-	"src/loderunner/GameStates/Begin.cpp"
-	"src/loderunner/GameStates/Death.cpp"
-	"src/loderunner/GameStates/GameState.cpp"
-	"src/loderunner/GameStates/Pause.cpp"
-	"src/loderunner/GameStates/Play.cpp"
+	"src/loderunner/states/gamestates/Begin.cpp"
+	"src/loderunner/states/gamestates/Death.cpp"
+	"src/loderunner/states/gamestates/GameState.cpp"
+	"src/loderunner/states/gamestates/Pause.cpp"
+	"src/loderunner/states/gamestates/Play.cpp"
 
+	"src/loderunner/iocontext/Button.cpp"
 	"src/loderunner/iocontext/GlfwIOContext.cpp"
 	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
-
-	"src/loderunner/Audio/Audio.cpp"
+	"src/loderunner/iocontext/audio/Audio.cpp"	
+	"src/loderunner/iocontext/rendering/Text.cpp"
 
 	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
 	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"

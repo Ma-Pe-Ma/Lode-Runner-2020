@@ -1,9 +1,9 @@
 # Lode Runner 2020
-![](./Launcher/LRTITLE.png)
+![](./Assets/Texture/Logo.png)
 
 ![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
-![browser](https://badgen.net/badge/browser/working/green) ![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Android](https://badgen.net/badge/Android/working/green) ![launcher](https://badgen.net/badge/launcher/working/green)
+![browser](https://badgen.net/badge/browser/working/green) ![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Android](https://badgen.net/badge/Android/working/green)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
@@ -92,7 +92,7 @@ The game uses XInput API for controller handling.
 
 ## Downloading and running built versions
 
-Check out the release section you can find simple and video recording versions (with/without a launcher). Choose the one that you want!
+Check out the release section you can find simple and video recording versions. Choose the one that you want!
 
 Just simply unpack the 7z archive and launch the "Lode Runner.exe". 
 
@@ -101,25 +101,17 @@ For the Android notes please check the [aforementioned ReadMe](./Android/ReadMe.
 ### Configuring the game
 In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
 
-Moreover you can use the provided launcher ("LR-Launcher.exe") to configure and launch the game in a GUI window. (It just simply recreates the config txt acording to the GUI input).
-
-In the release section the name of file tells you which version contains the launcher.
-
-For the notes regarding the launcher please [click here](./Launcher/ReadMe.md)!
-
-<p align="center">
-  <img src="./Screenshots/Launcher.png" width = "500" height="350" />
-</p>
-
 #### ImGUI Configurer
 On the desktop and browser ports a simple imgui configurer dialog is available (which can be shown by pressing the 'C' button).
 Here you can specify the same parameters as in the config file but they cannot be saved.
 
 ### Championship Lode Runner
-To play with this version you just have to set it in the imgui configurer, edit the config file, set it in the launcher or launch the exe with "Championship" argument.
+To play with this version you just have to set the proper option in the imgui configurer or edit the proper line in the config file.
 
 ### Hardware and software requirements
-Your graphics card has to support OpenGL 4.6 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
+The WASM port should run without problems in modern browsers.
+
+For the desktop version your graphics card has to support OpenGL 4.6 to run it. You also need to install Visual Studio x64 redistributables (vc_redist.x64) from [Microsoft's site](https://aka.ms/vs/16/release/vc_redist.x64.exe).
 
 ## Developer Notes
 This was my first complex project since I started programming. My earlier efforts were limited to calculating/solving math problems.
@@ -148,6 +140,7 @@ But altogether I'm satisfied with the result.
 ## Future tasks for this project:
 - Fine tune collision detection between enemies
 - Make browser/wasm port playable on mobile
+- Restructure gameplay logic
 - Fix broken video recording + Android versions (remake this port by using the default cmake project instead of defining a custom one for it)
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Add demo scene + bonus fruits

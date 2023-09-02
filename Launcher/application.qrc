@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/app">
-        <file alias="Title">LRTITLE.png</file>
-		<file alias="Icon">runner.ico</file>
-    </qresource>
-</RCC>
