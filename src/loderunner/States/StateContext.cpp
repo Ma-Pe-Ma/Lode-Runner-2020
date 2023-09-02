@@ -66,8 +66,8 @@ void StateContext::transitionTo(State* newState, bool start, bool end) {
     }
 }
 
-void StateContext::update(float currentFrame) {
-    currentState->update(currentFrame);
+void StateContext::update() {
+    currentState->update();
     checkTransitionAtEndofFrame();
 }
 

@@ -35,13 +35,13 @@ namespace EmscriptenHelper {
 		return a;
 		});
 
-	EM_JS(void, set_cookie, (std::string key, std::string value), {
-			//console.log("Setting cookie: " + UTF8ToString(key) + "=" + UTF8ToString(value) + ";" + "SL: " + window.location.pathname);
-			document.cookie = UTF8ToString(key) + "=" + UTF8ToString(value) + ";path=" + window.location.pathname +";";
+	EM_JS(void, set_cookie, (const char* key, const char* value), {
+			//console.log("Setting cookie: " + UTF8ToString(key) + "=" + UTF8ToString(value) + ";");
+			document.cookie = UTF8ToString(key) + "=" + UTF8ToString(value) + ";path=/;";
 		});
 	
 	EM_JS(char*, get_cookies, (), {
-			//console.log("GETTING cookies: " + document.cookie);
+			//console.log("Getting cookies: " + document.cookie);
 			return stringToNewUTF8(document.cookie);
 		});
 }

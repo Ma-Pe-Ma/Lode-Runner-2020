@@ -18,20 +18,23 @@ void MainMenu::start() {
 	stateContext->playerNr = 0;
 }
 
-void MainMenu::update(float currentFrame) {
+void MainMenu::update() {
 	//main menu music cyclically playing!
-	if (stateContext->getAudio()->getAudioFileByID(5)->getPlayStatus() == AudioStatus::stopped) {
-		stateContext->getAudio()->getAudioFileByID(5)->playPause();
+	auto mainMenuMusic = stateContext->getAudio()->getAudioFileByID(5);
+
+	if (mainMenuMusic ->getPlayStatus() == AudioStatus::stopped) {
+		mainMenuMusic->playPause();
 	}
 
+	auto ioContext = stateContext->getIOContext();
 	int& menuCursor = stateContext->menuCursor;
 
 	//changing gamemode
-	if (stateContext->getIOContext()->getDownButton().simple()) {
+	if (ioContext->getDownButton().simple()) {
 		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
 	}
 
-	if (stateContext->getIOContext()->getUpButton().simple()) {
+	if (ioContext->getUpButton().simple()) {
 		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
 	}
 
@@ -42,8 +45,8 @@ void MainMenu::update(float currentFrame) {
 	stateContext->getRenderingManager()->drawMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
 
 	//choosing selected gamemode
-	if (stateContext->getIOContext()->getEnterButton().simple()) {
-		stateContext->getAudio()->getAudioFileByID(5)->stopAndRewind();
+	if (ioContext->getEnterButton().simple()) {
+		mainMenuMusic->stopAndRewind();
 
 		switch (menuCursor) {
 			//single player

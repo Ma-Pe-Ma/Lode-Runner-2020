@@ -1,6 +1,4 @@
 #include "GameContext.h"
-#include "GameTime.h"
-
 #include "Rendering/RenderingManager.h"
 
 #include "Player.h"
@@ -9,7 +7,12 @@
 #include "GameStates/Play.h"
 
 void GameContext::run() {
-	float gameTime = GameTime::getGameTime();
+	float gameTime = calculateEllapsedTime();
+	float frameDelta = calculateFrameDelta();
+
+	int ladderFactor = int(gameTime) % 4;
+	ladderFactor = ladderFactor == 3 ? 1 : ladderFactor;
+	getRenderingManager()->setLadderFlashFactor(ladderFactor);
 
 	std::string timeValue = std::to_string(gameTime);
 	timeValue = timeValue.substr(0, timeValue.length() - 5);
@@ -20,10 +23,10 @@ void GameContext::run() {
 	//enemies[1]->setDPos(ioContext->debugPos[1]);
 #endif // !RELEASE_VERSION
 
-	player->handle();
+	player->handle(gameTime, frameDelta);
 
 	for (auto& enemy : enemies) {
-		enemy->handle();
+		enemy->handle(gameTime, frameDelta);
 	}
 
 #ifndef RELEASE_VERSION
@@ -341,6 +344,21 @@ void GameContext::loadLevel(unsigned int levelNumber)
 	renderingManager->initializeCharacters();
 
 	enemies.erase(enemies.end() - 1);
+
+#ifndef NDEBUG
+	// Set the first two enemy to controllable when debugging
+	for (auto enemyIt = enemies.begin(); enemyIt != enemies.end(); enemyIt++)
+	{
+		int index = enemyIt - enemies.begin();
+
+		if (index < 2) {
+			(*enemyIt)->setDebugEnemyState(index + 1);
+		}
+		else {
+			break;
+		}
+	}
+#endif
 }
 
 void GameContext::generateLevel(short gen[30][18])
@@ -466,4 +484,35 @@ void GameContext::generateLevel(short gen[30][18])
 
 		enemies.erase(enemies.end() - 1);
 	}
+}
+
+void GameContext::resetSessionLength()
+{
+	previousSessionSum = 0.0f;
+}
+
+void GameContext::setSessionStartTime()
+{
+	sessionStartTime = std::chrono::system_clock::now();
+	previousFrame = sessionStartTime;
+}
+
+void GameContext::setSessionEndTime()
+{
+	std::chrono::duration<float, std::milli> workTime = std::chrono::system_clock::now() - sessionStartTime;
+	previousSessionSum += workTime.count() / 1000;
+}
+
+float GameContext::calculateEllapsedTime()
+{
+	std::chrono::duration<float, std::milli> workTime = std::chrono::system_clock::now() - sessionStartTime;
+	return previousSessionSum + workTime.count() /1000;
+}
+
+float GameContext::calculateFrameDelta()
+{
+	auto currentFrame = std::chrono::system_clock::now();
+	std::chrono::duration<float, std::milli> frameDelta = currentFrame  - previousFrame;
+	previousFrame = currentFrame;
+	return frameDelta.count() / 1000;
 }

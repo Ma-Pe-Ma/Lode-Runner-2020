@@ -12,7 +12,11 @@ class GameConfiguration;
 class IOContext {
 
 protected:
-	Button up, down, leftButton, rightButton, space, enter, leftDigButton, rightDigButton, configButton;
+	Button up, down, leftButton, rightButton, space, enter, leftDigButton, rightDigButton, configButton, pauseButton;
+
+#ifndef NDEBUG
+	Button fButton, gButton, hButton, tButton, jButton, kButton, lButton, iButton;
+#endif
 
 	std::tuple<unsigned int, unsigned int> screenSize = std::make_tuple(1100, 600);
 	std::tuple<unsigned int, unsigned int> screenPosition = std::make_tuple(30, 30);
@@ -71,6 +75,7 @@ public:
 
 	Button& getSpaceButton() { return space; }
 	Button& getEnterButton() { return enter; }
+	Button& getPauseButton() { return pauseButton; }
 
 	Button& getLeftDigButton() { return leftDigButton; }
 	Button& getRightDigButton() { return rightDigButton; }
@@ -78,6 +83,18 @@ public:
 	Button& getConfigButton() { return configButton; }
 
 	virtual void saveConfig(std::string key, std::string value) = 0;
+
+#ifndef NDEBUG
+	Button& getFButton() { return fButton; }
+	Button& getGButton() { return gButton; }
+	Button& getHButton() { return hButton; }
+	Button& getTButton() { return tButton; }
+
+	Button& getJButton() { return jButton; }
+	Button& getKButton() { return kButton; }
+	Button& getLButton() { return lButton; }
+	Button& getIButton() { return iButton; }
+#endif
 };
 
 #endif

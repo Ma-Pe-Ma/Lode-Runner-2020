@@ -81,7 +81,7 @@ The game uses XInput API for controller handling.
 	arrows		left stick	    moving/change game mode at main menu
 	q		LB/LT		    dig to the left
 	w		RB/RT		    dig to the right
-	enter		start		    pause, skip intro/outro
+	esc/enter	start		    pause, skip intro/outro
 	space		back		    change level during gameplay (just like in the original)
 	
 	p		-		    take screenshot

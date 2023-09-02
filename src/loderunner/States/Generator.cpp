@@ -34,79 +34,85 @@ void Generator::start() {
 	stateContext->getRenderingManager()->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
 
 	getStateContext()->getGamePlay()->getGameContext()->clearContainers();
+	startTimePoint = std::chrono::system_clock::now();
 }
 
-void Generator::update(float currentFrame) {
-	if (stateContext->getIOContext()->getRightButton().simple()) {
+void Generator::update() {
+	auto ioContext = stateContext->getIOContext();
+	auto audio = stateContext->getAudio();
+	auto itemChangeSoundFile = audio->getAudioFileByID(9);
+	auto cursorSoundFile = audio->getAudioFileByID(10);
+
+	if (ioContext->getRightButton().simple()) {
 		if (++geX > 28) {
 			geX = 28;
 		}
 		else {
 			texture[geX - 1][geY] = textureMap.at(gen[geX - 1][geY]);
-			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
-			stateContext->getAudio()->getAudioFileByID(9)->playPause();
+			itemChangeSoundFile->stopAndRewind();
+			itemChangeSoundFile->playPause();
 		}
 	}
 
-	if (stateContext->getIOContext()->getLeftButton().simple()) {
+	if (ioContext->getLeftButton().simple()) {
 		if (--geX < 1) {
 			geX = 1;
 		}
 		else {
 			texture[geX + 1][geY] = textureMap.at(gen[geX + 1][geY]);
-			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
-			stateContext->getAudio()->getAudioFileByID(9)->playPause();
+			itemChangeSoundFile->stopAndRewind();
+			itemChangeSoundFile->playPause();
 		}
 	}
 
-	if (stateContext->getIOContext()->getUpButton().simple()) {
+	if (ioContext->getUpButton().simple()) {
 		if (++geY > 16) {
 			geY = 16;
 		}
 		else {
 			texture[geX][geY - 1] = textureMap.at(gen[geX][geY - 1]);
-			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
-			stateContext->getAudio()->getAudioFileByID(9)->playPause();
+			itemChangeSoundFile->stopAndRewind();
+			itemChangeSoundFile->playPause();
 		}
 	}
 
-	if (stateContext->getIOContext()->getDownButton().simple()) {
+	if (ioContext->getDownButton().simple()) {
 		if (--geY < 1) {
 			geY = 1;
 		}
 		else {
 			texture[geX][geY + 1] = textureMap.at(gen[geX][geY + 1]);
-			stateContext->getAudio()->getAudioFileByID(9)->stopAndRewind();
-			stateContext->getAudio()->getAudioFileByID(9)->playPause();
+			itemChangeSoundFile->stopAndRewind();
+			itemChangeSoundFile->playPause();
 		}
 	}
 
 	//chaning element upwards
-	if (stateContext->getIOContext()->getRightDigButton().simple()) {
+	if (ioContext->getRightDigButton().simple()) {
 		if (++gen[geX][geY] > 9) {
 			gen[geX][geY] = 0;	
 		}
 
 		texture[geX][geY] = textureMap.at(gen[geX][geY]);
 
-		stateContext->getAudio()->getAudioFileByID(10)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(10)->playPause();
+		cursorSoundFile->stopAndRewind();
+		cursorSoundFile->playPause();
 	}
 
-	//chaning element stateContext->getIOContext()->downwards
-	if (stateContext->getIOContext()->getLeftDigButton().simple()) {
+	//chaning element ioContext->downwards
+	if (ioContext->getLeftDigButton().simple()) {
 		if (--gen[geX][geY] < 0) {
 			gen[geX][geY] = 9;
 		}
 
 		texture[geX][geY] = textureMap.at(gen[geX][geY]);
 
-		stateContext->getAudio()->getAudioFileByID(10)->stopAndRewind();
-		stateContext->getAudio()->getAudioFileByID(10)->playPause();
+		cursorSoundFile->stopAndRewind();
+		cursorSoundFile->playPause();
 	}
 
 	//yellow cursor block
-	if (int(3 * currentFrame) % 2) {
+	if (int(3 * calculateEllapsedTime()) % 2) {
 		texture[geX][geY] = 54;
 	}
 	else {
@@ -115,11 +121,15 @@ void Generator::update(float currentFrame) {
 	
 	stateContext->getRenderingManager()->renderGenerator();
 
-	if (stateContext->getIOContext()->getEnterButton().simple()) {
+	if (ioContext->getEnterButton().simple()) {
 		texture[geX][geY] = textureMap.at(gen[geX][geY]);
 
 		gameContext->generateLevel(gen);
 		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
+	}
+
+	if (ioContext->getPauseButton().simple()) {
+		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 }
 

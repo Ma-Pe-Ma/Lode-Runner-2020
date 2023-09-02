@@ -10,19 +10,28 @@ void Pause::start() {
 	
 }
 
-void Pause::update(float) {
-	if (gameContext->getIOContext()->getEnterButton().simple()) {
-		gameContext->getAudio()->getAudioFileByID(7)->playPause();		
-		gameContext->getAudio()->getAudioFileByID(14)->playPause();
+void Pause::update() {
+	auto ioContext = gameContext->getIOContext();
+
+	if (ioContext->getEnterButton().simple() || ioContext->getPauseButton().simple()) {
+		auto audio = gameContext->getAudio();
+
+		for (auto id : std::vector<int>{ 7, 14 })
+		{
+			audio->getAudioFileByID(id)->playPause();
+		}
 
 		gamePlay->transitionToAtEndOfFrame(gamePlay->getPlay());
 	}
 
 	//levelselect with space
-	if (gameContext->getIOContext()->getSpaceButton().simple()) {
-		gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	if (ioContext->getSpaceButton().simple()) {
+		auto audio = gameContext->getAudio();
+
+		for (auto id : std::vector<int>{ 4, 7, 14 })
+		{
+			audio->getAudioFileByID(id)->stopAndRewind();
+		}
 
 		if (gamePlay->getStateContext()->menuCursor < 2) {
 			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());

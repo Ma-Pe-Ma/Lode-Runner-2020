@@ -17,7 +17,7 @@ private:
 	void setupRenderingManager();
 public:
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 };
 

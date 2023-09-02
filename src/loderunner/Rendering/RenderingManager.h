@@ -12,13 +12,12 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include <map>
 
 #include "../Brick.h"
 #include "../Trapdoor.h"
 #include "../Enemy.h"
 #include "../Gold.h"
-
-#include <map>
 
 #include "Text.h"
 
@@ -178,7 +177,7 @@ class RenderingManager {
 	std::string assetFolder;
 
 public:
-	RenderingManager(std::string assetFolder, std::string mainCover, std::shared_ptr<IOContext> ioContext) {
+	RenderingManager(std::string assetFolder, std::shared_ptr<IOContext> ioContext) {
 		Text::initCharMap();
 		this->assetFolder = assetFolder;
 		this->ioContext = ioContext;
@@ -209,7 +208,7 @@ public:
 		loadTexture(0, enemyTexture, assetFolder + "Texture/NES - Lode Runner - Characters.png", true);
 		loadTexture(1, levelTexture, assetFolder + "Texture/NES - Lode Runner - Tileset.png", true);
 		loadTexture(2, characterTexture, assetFolder + "Texture/ABC.png");
-		loadTexture(3, originalMainTexture, assetFolder + mainCover);
+		loadTexture(3, originalMainTexture, assetFolder + "Texture/MainMenu.png");
 		loadTexture(4, championshipMainTexture, assetFolder + "Texture//Championship.png");
 
 		mainShader->use();

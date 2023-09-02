@@ -1,40 +1,49 @@
 #include "GameStates/Death.h"
 #include "Enemy.h"
 #include "States/GamePlay.h"
-#include "GameTime.h"
 #include "States/StateContext.h"
 #include "Gold.h"
 
 #include "Audio/AudioFile.h"
+#include "Player.h"
 
 void Death::start() {	
-	gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
-	gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
-	gameContext->getAudio()->getAudioFileByID(3)->stopAndRewind();
-	gameContext->getAudio()->getAudioFileByID(3)->playPause();
-	timer = GameTime::getCurrentFrame();
+	auto audio = gameContext->getAudio();
+
+	for (auto id : std::vector<int>{ 3, 7, 17 })
+	{
+		audio->getAudioFileByID(id)->stopAndRewind();
+	}
+
+	audio->getAudioFileByID(3)->playPause();
+
+	startTimePoint = std::chrono::system_clock::now();
 }
 
-void Death::update(float) {
+void Death::update() {
 	gamePlay->getPlay()->drawScene();
-	
-	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
 
-	if (GameTime::getCurrentFrame() - timer < deathLength) {
+	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
+	float ellapsedTime = calculateEllapsedTime();
+
+	if (ellapsedTime < deathLength) {
+		gameContext->getPlayer()->setGameTime(calculateEllapsedTime());
 		gameContext->handlePlayerDying();
 	}
 	else {
-		if (gamePlay->getStateContext()->menuCursor < 2) {
-			if (--gamePlay->getStateContext()->playerLife[gamePlay->getStateContext()->playerNr] != 0) {
-				gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getIntro());
-				gamePlay->getStateContext()->playerNr = gamePlay->getStateContext()->menuCursor == 1 ? 1 - gamePlay->getStateContext()->playerNr : gamePlay->getStateContext()->playerNr;
+		auto stateContext = gamePlay->getStateContext();
+
+		if (stateContext->menuCursor < 2) {
+			if (--stateContext->playerLife[stateContext->playerNr] != 0) {
+				stateContext->playerNr = stateContext->menuCursor == 1 ? 1 - stateContext->playerNr : stateContext->playerNr;
+				stateContext->transitionToAtEndOfFrame(stateContext->getIntro());				
 			}
 			else {
-				gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGameOver());
+				stateContext->transitionToAtEndOfFrame(stateContext->getGameOver());
 			}
 		}
 		else {
-			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGenerator());
+			stateContext->transitionToAtEndOfFrame(stateContext->getGenerator());
 		}
 	}
 }

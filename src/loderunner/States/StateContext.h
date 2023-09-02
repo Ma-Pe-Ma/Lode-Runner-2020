@@ -38,7 +38,7 @@ public:
 	StateContext();
 	void initialize();
 	
-	void update(float);
+	void update();
 
 	//cursor of the menu
 	int menuCursor = 0;

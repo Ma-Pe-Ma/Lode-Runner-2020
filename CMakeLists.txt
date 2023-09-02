@@ -18,7 +18,6 @@ add_executable(LodeRunner
 	"src/loderunner/Button.cpp"
 	"src/loderunner/Enemy.cpp"
 	"src/loderunner/GameContext.cpp"
-	"src/loderunner/GameTime.cpp"
 	"src/loderunner/Main.cpp"
 	"src/loderunner/Player.cpp"	
 	"src/loderunner/Rendering/Text.cpp"

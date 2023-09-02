@@ -35,7 +35,7 @@ private:
 public:
 	Brick(Vector2DInt);
 	void handle(float);
-	bool initiateDig();
+	bool initiateDig(float);
 	Vector2DInt getPosition() { return position; }
 
 	void setTexturePointer(int* pointerToTexture)

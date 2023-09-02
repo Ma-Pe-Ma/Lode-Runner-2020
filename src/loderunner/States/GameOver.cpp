@@ -1,11 +1,10 @@
 #include "States/GameOver.h"
-#include "GameTime.h"
 #include "Audio/AudioFile.h"
 #include "States/StateContext.h"
 
 void GameOver::start() {
 	playerNameText = std::make_shared<Text>(Text("PLAYER " + std::to_string(stateContext->playerNr + 1), { 12.5, 6.0 }));
-	timer = GameTime::getCurrentFrame();
+	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(6)->playPause();
 
 	setupRenderingManager();
@@ -23,10 +22,12 @@ void GameOver::setupRenderingManager() {
 	stateContext->getRenderingManager()->initializeCharacters();
 }
 
-void GameOver::update(float currentFrame) {
+void GameOver::update() {
 	stateContext->getRenderingManager()->render();
 
-	if (GameTime::getCurrentFrame() - timer > stateContext->getAudio()->getAudioFileByID(6)->lengthInSec()) {
+	float ellapsedTime = calculateEllapsedTime();
+
+	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(6)->lengthInSec()) {
 		if (stateContext->menuCursor == 0) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 		}

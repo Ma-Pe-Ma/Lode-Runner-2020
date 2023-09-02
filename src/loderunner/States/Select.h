@@ -12,7 +12,7 @@ class Select : public State {
 	const std::shared_ptr<Text> levelText = std::make_shared<Text>(Text("STAGE    ", { 8,12 }));
 public:
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 };
 

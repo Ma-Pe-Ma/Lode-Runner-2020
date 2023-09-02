@@ -1,6 +1,5 @@
 #include "States/Outro.h"
 #include "Audio/AudioFile.h"
-#include "GameTime.h"
 #include "States/StateContext.h"
 
 #include "Rendering/RenderingManager.h"
@@ -81,38 +80,46 @@ void Outro::start() {
 	playerScore += enemyScore + goldScore;
 	stateContext->highScore = playerScore > stateContext->highScore ? playerScore : stateContext->highScore;
 
-	timer = GameTime::getCurrentFrame();
+	startTimePoint = std::chrono::system_clock::now();
+	previousFrame = startTimePoint;
 }
 
-void Outro::update(float currentFrame) {
-	int timeFactor = int(2 * currentFrame) % 4;
+void Outro::update() {
+	float ellapsedTime = calculateEllapsedTime();
+
+	auto currentFrame = std::chrono::system_clock::now();
+	std::chrono::duration<float, std::milli> frameDeltaDuration = std::chrono::system_clock::now() - previousFrame;
+	float frameDelta = frameDeltaDuration.count() / 1000;
+	previousFrame = currentFrame;
+
+	int timeFactor = int(2 * ellapsedTime) % 4;
 	timeFactor = timeFactor == 3 ? 1 : timeFactor;
-	
+
 	stateContext->getRenderingManager()->setLadderFlashFactor(timeFactor);
 	stateContext->getRenderingManager()->render();
 
 	//runner climbs ladder
 	if (this->player->getPos().y < 3.0f) {
 		
-		if (this->player->getPos().y + GameTime::getSpeed() * 0.1f >= 3.0f) {
+		if (this->player->getPos().y + frameDelta * 0.5f >= 3.0f) {
 			this->player->setPosition({ this->player->getPos().x, 3.0f});
 		}
 		else {
-			this->player->setPosition({ this->player->getPos().x, this->player->getPos().y + GameTime::getSpeed() * 0.1f });
+			this->player->setPosition({ this->player->getPos().x, this->player->getPos().y + frameDelta * 0.5f });
 		}
 		
-		int timeFactor = ((currentFrame - timer) * 4);
+		int timeFactor = ellapsedTime * 4;
 		int textureRef = 36 + timeFactor % 4;
 
 		this->player->setTexture(textureRef);
 	}
 	//nail bitting after reaching top of ladder
 	else {
-		int timeFactor = int((currentFrame - timer) * 3) % 4;
+		int timeFactor = int(ellapsedTime * 3) % 4;
 		this->player->setTexture(44 + timeFactor);
 	}
 
-	if (GameTime::getCurrentFrame() - timer > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getEnterButton().simple()) {
+	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getEnterButton().simple()) {
 		if (stateContext->menuCursor < 2) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 		}

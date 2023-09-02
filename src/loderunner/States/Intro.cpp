@@ -4,10 +4,9 @@
 #include "Enemy.h"
 #include "Gold.h"
 #include "Audio/AudioFile.h"
-#include "GameTime.h"
 
 void Intro::start() {
-	timer = GameTime::getCurrentFrame();
+	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(8)->playPause();
 
 	int& level = stateContext->level[stateContext->playerNr];
@@ -64,10 +63,12 @@ void Intro::setupRenderingManager()
 	stateContext->getRenderingManager()->initializeCharacters();
 }
 
-void Intro::update(float currentFrame) {
+void Intro::update() {
 	stateContext->getRenderingManager()->render();
 
-	if (GameTime::getCurrentFrame() - timer < stateContext->getAudio()->getAudioFileByID(8)->lengthInSec()) {
+	float ellapsedTime = calculateEllapsedTime();
+
+	if (ellapsedTime < stateContext->getAudio()->getAudioFileByID(8)->lengthInSec()) {
 		if (stateContext->getIOContext()->getSpaceButton().simple()) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
@@ -82,8 +83,12 @@ void Intro::update(float currentFrame) {
 }
 
 void Intro::end() {
-	stateContext->getAudio()->getAudioFileByID(8)->stopAndRewind();
-	stateContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	auto audio = stateContext->getAudio();
+
+	for (auto id : std::vector<int>{ 7, 8 })
+	{
+		audio->getAudioFileByID(id)->stopAndRewind();
+	}
 
 	if (stateContext->menuCursor < 2) {
 		stateContext->getGamePlay()->getGameContext()->loadLevel(stateContext->level[stateContext->playerNr]);

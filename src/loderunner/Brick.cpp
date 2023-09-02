@@ -3,7 +3,6 @@
 #include "Player.h"
 #include "Gold.h"
 
-#include "GameTime.h"
 #include "Audio/Audio.h"
 #include "Audio/AudioFile.h"
 
@@ -27,13 +26,13 @@ void Brick::handle(float gameTime) {
 	}
 }
 
-bool Brick::initiateDig() {	
+bool Brick::initiateDig(float gameTime) {	
 	int checkGold = gameContext->goldChecker(position.x, position.y + 1);
 	LayoutBlock upBlock = gameContext->getLayoutElement(position.x, position.y + 1);
 
 	if (brickState == BrickState::original && upBlock == LayoutBlock::empty && !checkGold) {
 		brickState = BrickState::digging;
-		timer = GameTime::getGameTime();
+		timer = gameTime;
 
 		gameContext->getAudio()->getAudioFileByID(1)->stopAndRewind();
 		gameContext->getAudio()->getAudioFileByID(1)->playPause();

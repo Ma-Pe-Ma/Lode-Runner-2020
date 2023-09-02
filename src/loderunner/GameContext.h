@@ -17,6 +17,7 @@ class IOContext;
 #include <map>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 #include "iocontext/GameConfiguration.h"
 #include "Enums/LayoutBlock.h"
@@ -65,6 +66,10 @@ class GameContext {
 		{8, LayoutBlock::empty},
 		{9, LayoutBlock::empty},
 	};
+
+	float previousSessionSum = 0;
+	std::chrono::system_clock::time_point sessionStartTime;
+	std::chrono::system_clock::time_point previousFrame;
 public:
 	void setRenderingManager(std::shared_ptr<RenderingManager> renderingManager) { this->renderingManager = renderingManager; }
 	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
@@ -143,6 +148,12 @@ public:
 
 	void loadLevel(unsigned int);
 	void generateLevel(short[30][18]);
+	
+	void resetSessionLength();
+	void setSessionStartTime();
+	void setSessionEndTime();
+	float calculateEllapsedTime();
+	float calculateFrameDelta();
 };
 
 #endif
