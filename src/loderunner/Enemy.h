@@ -49,7 +49,8 @@ private:
 	
 protected:
 	//factor to slow or fasten animationSpeed
-	int animationFactor = 20;
+	int animationFactor = 4;
+	int animationTimeFactor;
 
 	GameContext* gameContext;
 
@@ -90,6 +91,7 @@ protected:
 	virtual void animatePitting();
 	
 	float gameTime;
+	float frameDelta;
 
 	LayoutBlock middle;
 	LayoutBlock downBlock;
@@ -119,11 +121,15 @@ protected:
 	Vector2D dPos;
 	Vector2D prevPos;
 	Vector2D dPrevPos;
+
+#ifndef NDEBUG
+	int debugEnemy = 0;
+#endif
 public:
 	virtual ~Enemy() {}
 	Enemy(float, float);
 
-	void handle();
+	void handle(float, float);
 
 	bool carriesGold() { return carriedGold != nullptr; }
 	void checkDeath(int, int);
@@ -145,6 +151,12 @@ public:
 
 	Vector2D getPos() {	return this->pos; }
 	void setDPos(Vector2D dPos) { this->dPos = dPos; }	
+
+	void setGameTime(float gameTime) { this->gameTime = gameTime; }
+
+#ifndef NDEBUG
+	void setDebugEnemyState(int debugEnemy) { this->debugEnemy = debugEnemy; }
+#endif
 };
 
 #endif // !ENEMY_H

@@ -2,7 +2,6 @@
 #include "Player.h"
 #include "Gold.h"
 
-#include "GameTime.h"
 #include "GameStates/Play.h"
 #include "Audio/AudioFile.h"
 
@@ -23,6 +22,17 @@ Enemy::Enemy(float x, float y) {
 
 void Enemy::checkDeath(int x, int y) {
 	if (std::abs(pos.x - x) < 0.5f && y - 0.5f <= pos.y && pos.y < y + 0.75f) {
+
+		if (state == EnemyState::falling || pitState == PitState::fallingToPit)
+		{
+			if (carriedGold && gameContext->getBrickByCoordinates(x, y + 1) == nullptr)
+			{
+				carriedGold->setPos({ x, y + 1 });
+				gameContext->addGoldToUncollectedList(carriedGold);
+				carriedGold = nullptr;
+			}
+		}
+		
 		die();
 	}
 }
@@ -39,8 +49,10 @@ bool Enemy::enemyChecker(float x, float y) {
 	return false;
 }
 
-void Enemy::handle() {
-	gameTime = GameTime::getGameTime();
+void Enemy::handle(float gameTime, float frameDelta) {
+	this->gameTime = gameTime;
+	this->frameDelta = frameDelta;
+	this->actualSpeed = charSpeed * frameDelta * 5.0f;	
 
 	determineNearbyObjects();
 	findPath();
@@ -88,7 +100,50 @@ void Enemy::findPath() {
 	//golds are in .base 
 	//enemies are in .act and not in base!
 	//if a hole is created then the value of brick in act is emptied, but in the base it is unchanged!
-	actualSpeed = charSpeed * GameTime::getSpeed();
+
+#ifndef NDEBUG
+	if (*gameContext->getGameConfiguration()->getEnemyDebugState()) {
+		auto io = gameContext->getIOContext();
+
+		if (debugEnemy == 1)
+		{
+			if (io->getHButton().continuous()) {
+				dPos.x = actualSpeed;
+			}
+			else if (io->getFButton().continuous()) {
+				dPos.x = -actualSpeed;
+			}
+
+			if (io->getTButton().continuous()) {
+				dPos.y = actualSpeed;
+			}
+			else if (io->getGButton().continuous()) {
+				dPos.y = -actualSpeed;
+			}
+		}
+		else if (debugEnemy == 2)
+		{
+			auto io = gameContext->getIOContext();
+
+			if (io->getLButton().continuous()) {
+				dPos.x = actualSpeed;
+			}
+			else if (io->getJButton().continuous()) {
+				dPos.x = -actualSpeed;
+			}
+
+			if (io->getIButton().continuous()) {
+				dPos.y = actualSpeed;
+			}
+			else if (io->getKButton().continuous()) {
+				dPos.y = -actualSpeed;
+			}
+		}
+
+		return;
+	}
+
+#endif
 
 	int x = current.x;
 	int y = current.y;
@@ -381,8 +436,6 @@ void Enemy::scanUp(int x, int curPath) {
 //--------------------------MOVE-----------------------------
 
 void Enemy::move() {
-	actualSpeed = charSpeed * GameTime::getSpeed();
-
 	switch (state) {
 	case EnemyState::freeRun:
 		freeRun();
@@ -406,6 +459,9 @@ void Enemy::move() {
 }
 
 void Enemy::animate() {
+	int factor = animationFactor * actualSpeed / frameDelta;
+	animationTimeFactor = int(factor * gameTime) % 4;
+
 	switch (state) {
 	case EnemyState::freeRun:
 		animateFreeRun();
@@ -431,6 +487,7 @@ void Enemy::animate() {
 void Enemy::startingToFall() {
 	//falling back to pit, when enemy did not come out from it!
 	if (pos.x == current.x) {
+		dPos.x = 0;
 		//std::cout << "\n exiting stf";
 		state = EnemyState::falling;
 		return;
@@ -480,6 +537,7 @@ void Enemy::ladderTransformation() {
 
 	if (dPos.y > 0 && middle != LayoutBlock::ladder && topHalfOfLadder != LayoutBlock::ladder) {
 		dPos.y = 0;
+		pos.y = int(pos.y + 0.5f);
 	}
 
 	if (dPos.y < 0 && middle != LayoutBlock::ladder && downBlock != LayoutBlock::ladder && middle != LayoutBlock::pole) {
@@ -1112,31 +1170,19 @@ void Enemy::animateDigging() {
 }
 
 void Enemy::animateFalling() {
-	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
-	int timeFactor = int(factor * gameTime) % 4;
-
-	*texturePointer = textureMap.falling + timeFactor;
+	*texturePointer = textureMap.falling + animationTimeFactor;
 }
 
 void Enemy::animateGoing() {
-	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
-	int timeFactor = int(factor * gameTime) % 4;
-
-	*texturePointer = textureMap.going + timeFactor;
+	*texturePointer = textureMap.going + animationTimeFactor;
 }
 
 void Enemy::animateOnLadder() {
-	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
-	int timeFactor = int(factor * gameTime) % 4;
-
-	*texturePointer = textureMap.ladder + timeFactor;
+	*texturePointer = textureMap.ladder + animationTimeFactor;
 }
 
 void Enemy::animateOnPole() {
-	int factor = animationFactor * actualSpeed / GameTime::getSpeed();
-	int timeFactor = int(factor * gameTime) % 4;
-
-	*texturePointer = textureMap.pole + timeFactor;
+	*texturePointer = textureMap.pole + animationTimeFactor;
 }
 
 void Enemy::animatePitting() {

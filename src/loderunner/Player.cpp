@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "GameStates/Play.h"
-#include "GameTime.h"
 #include "iocontext/IOContext.h"
 
 #include "Audio/AudioFile.h"
@@ -14,8 +13,6 @@ void Player::setCharSpeed(float charSpeed) {
 }
 
 void Player::findPath() {
-	actualSpeed = charSpeed * GameTime::getSpeed();
-
 	if (ioContext->getRightButton().continuous() && ioContext->getLeftButton().continuous()) {
 		dPos.x = 0;
 	}
@@ -42,7 +39,7 @@ void Player::findPath() {
 void Player::freeRun() {
 	//Check digging input
 	if (ioContext->getLeftDigButton().impulse()) {
-		if (gameContext->getBrickByCoordinates(current.x - 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x - 1, current.y -1)->initiateDig()) {
+		if (gameContext->getBrickByCoordinates(current.x - 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x - 1, current.y -1)->initiateDig(gameTime)) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -53,7 +50,7 @@ void Player::freeRun() {
 	}
 	
 	if (ioContext->getRightDigButton().impulse()) {
-		if (gameContext->getBrickByCoordinates(current.x + 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x + 1, current.y - 1)->initiateDig()) {
+		if (gameContext->getBrickByCoordinates(current.x + 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x + 1, current.y - 1)->initiateDig(gameTime)) {
 			dPos.x = 0;
 			dPos.y = 0;
 			state = EnemyState::digging;
@@ -84,7 +81,7 @@ void Player::falling() {
 	Enemy::falling();
 
 	if (state != EnemyState::falling) {
-		idleTimeStart = GameTime::getGameTime();
+		idleTimeStart = gameTime;
 	}
 }
 
@@ -216,14 +213,13 @@ void Player::checkGoldCollect() {
 }
 
 void Player::die() {
-	dieTimer = GameTime::getCurrentFrame();
+	gameTime = 0.0f;
 	gameContext->transitionToDeath();
 }
 
 void Player::dying() {
 	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
-	int timeFactor = ((int) (9 * (GameTime::getCurrentFrame() - dieTimer) / deathLength)) % 9;
+	int timeFactor = ((int)(9 * (gameTime - dieTimer) / deathLength)) % 9;
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
-
 	*texturePointer = textureMap.death + timeFactor;
 }

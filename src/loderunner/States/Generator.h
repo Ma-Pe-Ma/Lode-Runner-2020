@@ -36,7 +36,7 @@ private:
 public:
 	Generator();
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 	
 	void setGameContext(std::shared_ptr<GameContext> gameContext)

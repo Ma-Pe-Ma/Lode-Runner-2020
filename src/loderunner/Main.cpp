@@ -32,7 +32,6 @@
 #include "States/StateContext.h"
 
 #include "Player.h"
-#include "GameTime.h"
 
 inline void handleImGuiConfigurer();
 inline void finalizeImguiWindow();
@@ -73,8 +72,6 @@ int main(int argc, char**argv) {
 
 	glfwIOContext->loadConfig(gameConfiguration);
 
-	GameTime::setFPS(gameConfiguration->getFramesPerSec());
-
 	//starting championship mode with command line
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "championship") == 0 || strcmp(argv[i], "Championship") == 0) {
@@ -85,7 +82,7 @@ int main(int argc, char**argv) {
 
 	glfwIOContext->initialize();
 
-	std::shared_ptr<RenderingManager> renderingManager = std::make_shared<RenderingManager>("./Assets/", gameConfiguration->getMainMenuTextureName(), glfwIOContext);	
+	std::shared_ptr<RenderingManager> renderingManager = std::make_shared<RenderingManager>("./Assets/", glfwIOContext);	
 
 	stateContext = std::make_shared<StateContext>();
 	stateContext->setRenderingManager(renderingManager);	
@@ -114,12 +111,12 @@ int main(int argc, char**argv) {
 
 	//game loop
 	while (!glfwWindowShouldClose(glfwIOContext->getWindow())) {
-		std::chrono::duration<double, std::milli> work_time = std::chrono::system_clock::now() - prevFrameStart;
+		std::chrono::duration<double, std::milli> workTime = std::chrono::system_clock::now() - prevFrameStart;
 
-		if (work_time.count() < 1000.0f / GameTime::getFPS()) {
-			std::chrono::duration<double, std::milli> delta_ms(1000.0f / GameTime::getFPS() - work_time.count());
-			auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
-			std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+		if (workTime.count() < 1000.0f / gameConfiguration->getFramesPerSec()) {
+			std::chrono::duration<double, std::milli> deltaMS(1000.0f / gameConfiguration->getFramesPerSec() - workTime.count());
+			auto deltaMSDuration = std::chrono::duration_cast<std::chrono::milliseconds>(deltaMS);
+			std::this_thread::sleep_for(std::chrono::milliseconds(deltaMSDuration.count()));
 		}
 
 		prevFrameStart = std::chrono::system_clock::now();
@@ -135,16 +132,9 @@ int main(int argc, char**argv) {
 	return 0;
 }
 
-
-#if defined __EMSCRIPTEN__
 bool showImguiWindow = true;
-#else 
-bool showImguiWindow = false;
-#endif
 
 void update() {	
-	GameTime::calculateTimeValues(glfwGetTime());
-	
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -152,7 +142,7 @@ void update() {
 
 	handleImGuiConfigurer();
 
-	stateContext->update(GameTime::getCurrentFrame());
+	stateContext->update();
 	glfwIOContext->handleScreenRecording();	
 
 	finalizeImguiWindow();
@@ -174,10 +164,10 @@ void handleImGuiConfigurer() {
 
 		//ImVec2 windowSize = ImVec2(GLHelper::SCR_WIDTH / 8, GLHelper::SCR_HEIGHT / 6);
 		
-#ifdef __EMSCRIPTEN__
-		ImVec2 windowSize = ImVec2(220, 280);
+#ifndef NDEBUG
+		ImVec2 windowSize = ImVec2(220, 310);
 #else
-		ImVec2 windowSize = ImVec2(220, 140);
+		ImVec2 windowSize = ImVec2(220, 280);
 #endif
 		ImGui::SetNextWindowPos(ImVec2(std::get<0>(glfwIOContext->getScreenSize()) / 25, std::get<0>(glfwIOContext->getScreenSize()) / 25), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(windowSize);
@@ -219,16 +209,17 @@ void handleImGuiConfigurer() {
 			}
 		}
 
-#ifdef __EMSCRIPTEN__
+#ifndef NDEBUG	
+		ImGui::Checkbox("Control enemies", gameConfiguration->getEnemyDebugState());		
+#endif
 		ImGui::NewLine();
 		ImGui::Text("Controls:");
 		ImGui::Text("\tarrows - moving");
 		ImGui::Text("\tq - left dig");
 		ImGui::Text("\tw - right dig");
 		ImGui::Text("\tspace - level select");
-		ImGui::Text("\tenter - pause");
+		ImGui::Text("\tesc/enter - pause");
 		ImGui::Text("\tc - show/hide this window");
-#endif
 
 		ImGui::PopItemWidth();
 

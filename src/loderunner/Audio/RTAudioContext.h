@@ -33,8 +33,8 @@ public:
 		try {
 			dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames,
 				[](void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) -> int {
-					RTAudioContext* self = (RTAudioContext*) userData;
-					short* out = (short*)outputBuffer;
+					RTAudioContext* self = static_cast<RTAudioContext*>(userData);
+					short* out = (short*) outputBuffer;
 
 					if (status) {
 						std::cout << "Stream underflow detected!" << std::endl;
@@ -92,6 +92,13 @@ public:
 
 	void terminate() override {
 		dac.closeStream();
+
+		for (int i = 0; i < audioFileNames.size(); i++)
+		{
+			delete[] pcmout[i];
+		}
+
+		delete[] pcmout;
 	}
 };
 

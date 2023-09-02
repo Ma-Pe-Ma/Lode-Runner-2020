@@ -22,7 +22,7 @@ namespace EmscriptenHelper {
 		bool is_mobile();
 
 		char* get_cookies();
-		void set_cookie(std::string, std::string);
+		void set_cookie(const char*, const char*);
 	}
 }
 
@@ -63,12 +63,15 @@ public:
 
 	void loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration) override
 	{
+		const std::string keyPrefix = "LR_";
+
 		std::string cookies = EmscriptenHelper::get_cookies();
 		std::istringstream cookieStream(cookies);
 		std::string keyValuePair;
 
 		while (std::getline(cookieStream, keyValuePair, ';')) {
 			std::string key = keyValuePair.substr(0, keyValuePair.find("="));
+			key = key.substr(key.find(keyPrefix) + keyPrefix.length());
 			key = std::regex_replace(key, std::regex("^ +"), "");
 
 			std::string value = keyValuePair.substr(keyValuePair.find("=") + 1);
@@ -83,7 +86,9 @@ public:
 
 	void saveConfig(std::string key, std::string value) override
 	{
-		EmscriptenHelper::set_cookie(key, value);
+		const std::string keyPrefix = "LR_";
+		key = keyPrefix + key;
+		EmscriptenHelper::set_cookie(key.c_str(), value.c_str());
 	}
 };
 

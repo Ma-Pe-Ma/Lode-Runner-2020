@@ -22,9 +22,11 @@ private:
 	void setupRenderingManager();
 
 	std::shared_ptr<Player> player;
+
+	std::chrono::system_clock::time_point previousFrame;
 public:
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 
 	void setScoreParameters(short, short, short);

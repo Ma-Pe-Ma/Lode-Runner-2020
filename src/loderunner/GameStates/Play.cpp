@@ -5,31 +5,25 @@
 #include "Enemy.h"
 #include "Player.h"
 #include "Gold.h"
-
-//#include "Generator.h"
-#include "GameTime.h"
 #include "Audio/AudioFile.h"
 
+#include <vector>
+
 void Play::start() {
-	//player->SetIdleTime();
-	GameTime::setSessionStartTime();
+	gameContext->setSessionStartTime();
+	auto audio = gameContext->getAudio();
 
-	if (gameContext->getAudio()->getAudioFileByID(4)->getPlayStatus() == AudioStatus::playing) {
-		gameContext->getAudio()->getAudioFileByID(4)->playPause();
-	}
+	for (auto id : std::vector<int>{ 1, 4, 7 })
+	{
+		auto audioFile = audio->getAudioFileByID(id);
 
-	if (gameContext->getAudio()->getAudioFileByID(1)->getPlayStatus() == AudioStatus::playing) {
-		gameContext->getAudio()->getAudioFileByID(1)->playPause();
-	}
-
-	if (gameContext->getAudio()->getAudioFileByID(17)->getPlayStatus() == AudioStatus::playing) {
-		gameContext->getAudio()->getAudioFileByID(17)->playPause();
+		if (audioFile->getPlayStatus() == AudioStatus::playing) {
+			audioFile->playPause();
+		}
 	}
 }
 
-void Play::update(float currentFrame) {
-	GameTime::update(currentFrame);
-
+void Play::update() {
 	//play gameplay music cyclically
 	if (gameContext->getAudio()->getAudioFileByID(7)->getPlayStatus() != AudioStatus::playing) {
 		gameContext->getAudio()->getAudioFileByID(7)->playPause();
@@ -46,50 +40,53 @@ void Play::update(float currentFrame) {
 }
 
 void Play::end() {
-	GameTime::setSessionEndTime();
+	gameContext->setSessionEndTime();
 }
 
 void Play::handleNonControlButtons() {
-	if (gameContext->getIOContext()->getEnterButton().simple()) {
-		gameContext->getAudio()->getAudioFileByID(7)->playPause();
 
-		if (gameContext->getAudio()->getAudioFileByID(4)->getPlayStatus() == AudioStatus::playing) {
-			gameContext->getAudio()->getAudioFileByID(4)->playPause();
+	auto ioContext = gameContext->getIOContext();
+
+	if (ioContext->getEnterButton().simple() || ioContext->getPauseButton().simple()) {
+		auto audio = gameContext->getAudio();
+	
+		for (auto id : std::vector<int>{ 7,14 })
+		{
+			audio->getAudioFileByID(id)->playPause();
+		}		
+
+		for (auto id : std::vector<int>{ 1, 4, 17 })
+		{
+			auto audioFile = audio->getAudioFileByID(id);
+
+			if (audioFile->getPlayStatus() == AudioStatus::playing) {
+				audioFile->playPause();
+			}
 		}
-
-		if (gameContext->getAudio()->getAudioFileByID(1)->getPlayStatus() == AudioStatus::playing) {
-			gameContext->getAudio()->getAudioFileByID(1)->playPause();
-		}
-
-		if (gameContext->getAudio()->getAudioFileByID(17)->getPlayStatus() == AudioStatus::playing) {
-			gameContext->getAudio()->getAudioFileByID(17)->playPause();
-		}
-
-		gameContext->getAudio()->getAudioFileByID(14)->playPause();
 
 		gamePlay->transitionToAtEndOfFrame(gamePlay->getPause());
 	}
 
 	//levelselect with space
-	if (gameContext->getIOContext()->getSpaceButton().simple()) {
-		gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	if (ioContext->getSpaceButton().simple()) {
+		auto audio = gameContext->getAudio();
 
-		if (gamePlay->getStateContext()->menuCursor < 2) {
-			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());
+		for (auto id : std::vector<int>{ 4, 7, 17 })
+		{
+			audio->getAudioFileByID(id)->stopAndRewind();
+		}
+
+		auto stateContext = gamePlay->getStateContext();
+		if (stateContext->menuCursor < 2) {
+			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 		else {
-			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGenerator());
+			stateContext->transitionToAtEndOfFrame(stateContext->getGenerator());
 		}
 	}
 }
 
 void Play::drawScene() {
-	float gameTime = GameTime::getGameTime();
-	int ladderFactor = int(gameTime) % 4;
-	ladderFactor = ladderFactor == 3 ? 1 : ladderFactor;
-	gameContext->getRenderingManager()->setLadderFlashFactor(ladderFactor);
 	gameContext->getRenderingManager()->render();
 }
 
@@ -98,6 +95,7 @@ void Play::transitionToDeath() {
 }
 
 void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
-	gamePlay->getStateContext()->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
-	gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getOutro());
+	auto stateContext = gamePlay->getStateContext();
+	stateContext->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
+	stateContext->transitionToAtEndOfFrame(stateContext->getOutro());
 }

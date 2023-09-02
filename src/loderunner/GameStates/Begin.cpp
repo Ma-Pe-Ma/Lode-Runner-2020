@@ -2,35 +2,38 @@
 #include "States/GamePlay.h"
 
 #include "States/StateContext.h"
-
-#include "../GameTime.h"
-
 #include "Audio/AudioFile.h"
 
 void Begin::start() {
-	startTime = GameTime::getCurrentFrame();
+	startTimePoint = std::chrono::system_clock::now();
 	gameContext->getAudio()->getAudioFileByID(7)->playPause();
-	GameTime::reset();
 }
 
-void Begin::update(float currentFrame) {
+void Begin::update() {
 	gamePlay->getPlay()->drawScene();
 
-	if (currentFrame - startTime > 2.0f) {
-		gamePlay->transitionToAtEndOfFrame(gamePlay->getPlay());
+	float ellapsedTime = calculateEllapsedTime();
+
+	if (ellapsedTime > 2.0f) {
+		Play* play = gamePlay->getPlay();
+		play->getGameContext()->resetSessionLength();
+		gamePlay->transitionToAtEndOfFrame(play);
 	}
 
 	//levelselect with space
-	if (gameContext->getIOContext()->getSpaceButton().simple()) {
-		gameContext->getAudio()->getAudioFileByID(17)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
-		gameContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	else if (gameContext->getIOContext()->getSpaceButton().simple()) {
+		auto audio = gameContext->getAudio();		
+		for (auto id : std::vector<int>{ 4, 7, 17 })
+		{
+			audio->getAudioFileByID(id)->stopAndRewind();
+		}
 
-		if (gamePlay->getStateContext()->menuCursor < 2) {
-			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());
+		auto stateContext = gamePlay->getStateContext();
+		if (stateContext->menuCursor < 2) {
+			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 		else {
-			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getGenerator());
+			stateContext->transitionToAtEndOfFrame(stateContext->getGenerator());
 		}
 	}
 }

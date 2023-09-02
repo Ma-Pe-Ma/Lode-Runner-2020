@@ -4,11 +4,9 @@
 #include "GameState.h"
 
 class Death : public GameState {
-	float timer;
-
 public:
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 };
 

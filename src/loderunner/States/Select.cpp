@@ -15,7 +15,7 @@ void Select::start() {
 	levelText->changeContent("STAGE " + std::to_string(stateContext->level[stateContext->playerNr]).insert(0, 3 - std::to_string(stateContext->level[stateContext->playerNr]).length(), '0'));
 }
 
-void Select::update(float currentFrame) {
+void Select::update() {
 	int& levelNr = stateContext->level[stateContext->playerNr];
 
 	if (stateContext->getIOContext()->getLeftButton().simple()) {

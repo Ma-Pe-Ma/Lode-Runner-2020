@@ -16,11 +16,10 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include "GameTime.h"
-
 void GlfwIOContext::processInput() {
 
 	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+	pauseButton.detect(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
 #ifndef __EMSCRIPTEN__
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
@@ -47,44 +46,19 @@ void GlfwIOContext::processInput() {
 	}
 
 #ifndef NDEBUG
-	float enemySpeed = 0.415f;
-	float speed = GameTime::getSpeed();
-
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
-		debugPos[0].x = -enemySpeed * speed;
-	}
+	fButton.detect(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+	gButton.detect(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+	hButton.detect(glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS);
+	tButton.detect(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
 
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
-		debugPos[0].x = enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-		debugPos[0].y = enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-		debugPos[0].y = -enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-		debugPos[1].x = -enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-		debugPos[1].x = +enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-		debugPos[1].y = +enemySpeed * speed;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-		debugPos[1].y = -enemySpeed * speed;
-	}
+	iButton.detect(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS);
+	jButton.detect(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS);
+	kButton.detect(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
+	lButton.detect(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
 #endif
 }
 
@@ -258,7 +232,6 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
 
 	gameConfiguration->setRecordingHeight(getIntByKey("RecordingHeight", 800));
-	gameConfiguration->setUSCover(getIntByKey("USCOVER", 0));
 	gameConfiguration->setStartingLevel(getIntByKey("levelNr", 1));
 	gameConfiguration->setFramesPerSec(getIntByKey("FPS", 60));
 
@@ -327,7 +300,7 @@ void GlfwIOContext::initialize()
 	glfwInit();
 
 	glfwSetErrorCallback([](int error, const char* description) -> void {
-		std::cout << "\n error: " << error << ", description: " << description;
+		std::cout << "\nGFLW error: " << error << ", description: " << description;
 		std::cout << std::hex << "\n hex: 0x" << error;
 		std::cout << std::dec;
 	});
@@ -379,7 +352,7 @@ void GlfwIOContext::initialize()
 
 	glfwMakeContextCurrent(window);
 
-	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height)  {
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		//std::cout << "\n updating viewport: " << width << ", " << height;
 		auto self = static_cast<GlfwIOContext*>(glfwGetWindowUserPointer(window));
 
@@ -393,6 +366,11 @@ void GlfwIOContext::initialize()
 
 		glViewport(std::get<0>(self->getViewPortPosition()), std::get<1>(self->getViewPortPosition()), std::get<0>(self->getViewPortSize()), std::get<1>(self->getViewPortSize()));
 	});
+
+	glfwSetWindowSizeCallback(window, [](GLFWwindow*, int width, int height) -> void {
+		//std::cout << "WINDOW Resized: " << width << ", height: " << height << std::endl;
+	});
+
 	glfwSetWindowSize(window, std::get<0>(screenSize), std::get<1>(screenSize));
 
 #if !defined __EMSCRIPTEN__

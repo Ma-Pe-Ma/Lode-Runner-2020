@@ -8,13 +8,16 @@ class GameConfiguration {
 	float playerSpeed = 0.9f;
 
 	int gameVersion = 0;
-	bool usCover = false;
 	unsigned int startingLevel = 1;
 	unsigned int recordingHeight = 800;
 
 	std::string levelFileName = "Assets/Level/ChampionshipLevels.txt";
 
 	unsigned int framesPerSec;
+
+#ifndef NDEBUG
+	bool debugEnemy = false;
+#endif
 
 public:
 	float getEnemySpeed() { return this->enemySpeed; }
@@ -57,9 +60,6 @@ public:
 		return &this->playerSpeed;
 	}
 
-	bool getUSCover() { return this->usCover; }
-	void setUSCover(bool usCover) { this->usCover = usCover; }
-
 	unsigned int getStartingLevel() { return this->startingLevel; }
 	void setStartingLevel(unsigned int startingLevel) { this->startingLevel = startingLevel; }
 
@@ -72,19 +72,15 @@ public:
 	unsigned int getFramesPerSec() { return this->framesPerSec; }
 	void setFramesPerSec(unsigned int framesPerSec) { this->framesPerSec = framesPerSec; }
 
-	std::string getMainMenuTextureName() {
-		if (usCover) {
-			return "Texture/MainMenuU.png";
-		}
-		
-		return "Texture/MainMenu.png";
-	}
-
 	void validateLevel(int& newLevel) {
 		int maxLevelNumber = gameVersion == 0 ? 150 : 51;
 		newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
 		newLevel = newLevel > maxLevelNumber ? newLevel - maxLevelNumber : newLevel;
 	}
+
+#ifndef NDEBUG
+	bool* getEnemyDebugState() { return &this->debugEnemy; }
+#endif
 };
 
 #endif

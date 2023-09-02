@@ -6,7 +6,6 @@
 
 #include "Enemy.h"
 #include "Gold.h"
-#include "GameTime.h"
 
 #include "GameContext.h"
 
@@ -56,15 +55,17 @@ void GamePlay::start() {
 	transitionTo(begin);
 }
 
-void GamePlay::update(float currentFrame) {
-	currentGameState->update(currentFrame);
-
+void GamePlay::update() {
+	currentGameState->update();
 	checkTransitionAtEndofFrame();
 }
 
 void GamePlay::end() {
-	stateContext->getAudio()->getAudioFileByID(4)->stopAndRewind();
-	stateContext->getAudio()->getAudioFileByID(7)->stopAndRewind();
+	auto audio = stateContext->getAudio();
+	for (auto id : std::vector<int>{ 4, 7 })
+	{
+		audio->getAudioFileByID(id)->stopAndRewind();
+	}
 }
 
 void GamePlay::checkTransitionAtEndofFrame()

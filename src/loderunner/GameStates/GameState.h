@@ -4,6 +4,7 @@
 #include "Audio/Audio.h"
 
 #include <memory>
+#include <chrono>
 
 class GameContext;
 class GameConfiguration;
@@ -15,14 +16,15 @@ class GamePlay;
 class GameState {
 protected:
 	GamePlay* gamePlay;
-	float startTime = 0;
 
 	std::shared_ptr<GameContext> gameContext;
 
+	std::chrono::system_clock::time_point startTimePoint;
+	float calculateEllapsedTime();	
 public:
 	void setGamePlay(GamePlay*);
 	virtual void start() = 0;
-	virtual void update(float) = 0;
+	virtual void update() = 0;
 	virtual void end() = 0;
 
 	virtual void setGameContext(std::shared_ptr<GameContext>);

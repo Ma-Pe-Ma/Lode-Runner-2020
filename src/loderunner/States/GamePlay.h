@@ -28,7 +28,7 @@ public:
 	GamePlay();
 
 	void start() override;
-	void update(float) override;
+	void update() override;
 	void end() override;
 
 	void transitionToAtEndOfFrame(GameState*, bool start = true, bool end = true);
