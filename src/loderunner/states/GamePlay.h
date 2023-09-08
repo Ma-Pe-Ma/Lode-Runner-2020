@@ -3,10 +3,10 @@
 
 #include "State.h"
 
-#include "GameStates/Begin.h"
-#include "GameStates/Play.h"
-#include "GameStates/Pause.h"
-#include "GameStates/Death.h"
+#include "gamestates/Begin.h"
+#include "gamestates/Play.h"
+#include "gamestates/Pause.h"
+#include "gamestates/Death.h"
 
 class GameContext;
 

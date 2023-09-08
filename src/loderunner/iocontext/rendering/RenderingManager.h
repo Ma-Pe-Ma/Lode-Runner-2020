@@ -23,12 +23,9 @@
 
 #include "iocontext/IOContext.h"
 
-class GameContext;
-
 #define USE_DYNAMIC_ARRAY
 
 class RenderingManager {
-	std::shared_ptr<GameContext> gameContext;
 	std::shared_ptr<IOContext> ioContext;
 
 	const float levelVertices[16] = {
@@ -205,8 +202,8 @@ public:
 		mainShader = new Shader(assetFolder + "/Shaders/main.vs", assetFolder + "/Shaders/main.fs");
 		initializeBufferObjects(mainVAO, mainVBO, mainEBO, mainVertices);
 
-		loadTexture(0, enemyTexture, assetFolder + "Texture/NES - Lode Runner - Characters.png", true);
-		loadTexture(1, levelTexture, assetFolder + "Texture/NES - Lode Runner - Tileset.png", true);
+		loadTexture(0, enemyTexture, assetFolder + "Texture/NES - Lode Runner - Characters.png");
+		loadTexture(1, levelTexture, assetFolder + "Texture/NES - Lode Runner - Tileset.png");
 		loadTexture(2, characterTexture, assetFolder + "Texture/ABC.png");
 		loadTexture(3, originalMainTexture, assetFolder + "Texture/MainMenu.png");
 		loadTexture(4, championshipMainTexture, assetFolder + "Texture//Championship.png");
@@ -283,9 +280,6 @@ public:
 		levelDrawables = new int[levelDrawableSize * 2];
 		levelTextureIDs = new int[levelDrawableSize];
 #endif // USE_DYNAMIC_ARRAY		
-
-		gameContext->setPointerToDebrisTexture(&levelTextureIDs[0]);
-		gameContext->setPointerToDebrisLocation(&levelDrawables[0]);
 
 		for (auto iterator = brickList.begin(); iterator != brickList.end(); iterator++)
 		{
@@ -462,6 +456,9 @@ public:
 
 	void render()
 	{
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		levelShader->use();
 		glBindVertexArray(levelVAO);
 		levelShader->setIntArray("textureID", levelTextureIDs, currentLevelDrawableSize);
@@ -537,7 +534,7 @@ public:
 		}
 	}
 
-	void loadTexture(unsigned int textureID, unsigned int& textureContainer, std::string path, bool ignoreBlack = false)
+	void loadTexture(unsigned int textureID, unsigned int& textureContainer, std::string path)
 	{
 		glActiveTexture(GL_TEXTURE0 + textureID);
 		textureContainer = ioContext->loadTexture(path.c_str());
@@ -554,8 +551,7 @@ public:
 			glClearColor(110.0 / 256, 93.0 / 256, 243.0 / 256, 1.0f);
 		}
 
-		//drawing background
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		mainShader->use();
 		glBindVertexArray(mainVAO);
@@ -571,6 +567,9 @@ public:
 
 	void renderGenerator()
 	{
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		levelShader->use();
 		glBindVertexArray(levelVAO);
 		levelShader->setIntArray("textureID", generatorTextures, 540);
@@ -612,10 +611,8 @@ public:
 		delete mainShader;
 	}
 
-	void setGameContext(std::shared_ptr<GameContext> gameContext)
-	{
-		this->gameContext = gameContext;
-	}
+	int* getPointerToDebrisTexture() { return &this->levelTextureIDs[0]; }
+	int* getPointerToDebrisLocation() { return &this->levelDrawables[0]; }
 };
 
 #endif

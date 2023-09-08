@@ -112,10 +112,7 @@ public:
 	int getKillCounter() { return killCounter; }
 	void incrementKillCounter() { this->killCounter++; }
 
-	void setPointerToDebrisTexture(int* pointerToDebrisTexture) { this->pointerToDebrisTexture = pointerToDebrisTexture; }
 	int* getPointerToDebrisTexture() { return this->pointerToDebrisTexture; }
-
-	void setPointerToDebrisLocation(int* pointerToDebrisLocation) { this->pointerToDebrisLocation = pointerToDebrisLocation; }
 	int* getPointerToDebrisLocation() { return this->pointerToDebrisLocation; }
 
 	void setRandomDebris(int randomDebris) { this->randomDebris = randomDebris; }

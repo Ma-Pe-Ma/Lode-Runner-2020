@@ -1,4 +1,4 @@
-#include "states/gameStates/Death.h"
+#include "states/gamestates/Death.h"
 
 #include "states/GamePlay.h"
 #include "states/StateContext.h"

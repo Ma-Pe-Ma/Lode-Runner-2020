@@ -1,8 +1,8 @@
-#include "States/Intro.h"
+#include "states/Intro.h"
 
 #include "states/StateContext.h"
 
-#include "iocontext/Audio/AudioFile.h"
+#include "iocontext/audio/AudioFile.h"
 
 #include "gameplay/Enemy.h"
 #include "gameplay/Gold.h"

@@ -23,20 +23,24 @@ void Select::update() {
 		changeLevelNumber(--levelNr);
 	}
 
-	if (stateContext->getIOContext()->getRightButton().simple()) {
+	else if (stateContext->getIOContext()->getRightButton().simple()) {
 		changeLevelNumber(++levelNr);
 	}
 
-	if (stateContext->getIOContext()->getUpButton().simple()) {
+	else if (stateContext->getIOContext()->getUpButton().simple()) {
 		changeLevelNumber(levelNr += 10);
 	}
 
-	if (stateContext->getIOContext()->getDownButton().simple()) {
+	else if (stateContext->getIOContext()->getDownButton().simple()) {
 		changeLevelNumber(levelNr -= 10);
 	}
 
-	if (stateContext->getIOContext()->getEnterButton().simple()) {
+	else if (stateContext->getIOContext()->getEnterButton().simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
+	}
+
+	else if (stateContext->getIOContext()->getPauseButton().simple()) {
+		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 
 	stateContext->getRenderingManager()->render();

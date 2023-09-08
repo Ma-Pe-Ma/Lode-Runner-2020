@@ -38,6 +38,7 @@ public:
 	virtual void loadConfig(std::shared_ptr<GameConfiguration>) = 0;
 
 	virtual void initialize() = 0;
+	virtual void terminate() {}
 
 	virtual void loadLevel(std::string, std::function<bool(std::string)>) = 0;
 

@@ -1,4 +1,4 @@
-#include "states/gameStates/Begin.h"
+#include "states/gamestates/Begin.h"
 #include "states/GamePlay.h"
 
 #include "states/StateContext.h"
