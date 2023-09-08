@@ -4,7 +4,7 @@
 #include "State.h"
 #include <map>
 
-#include "gameStates/Play.h"
+#include "gamestates/Play.h"
 
 #include "gameplay/LayoutBlock.h"
 #include "gameplay/Brick.h"

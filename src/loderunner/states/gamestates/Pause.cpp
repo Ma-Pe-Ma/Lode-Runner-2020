@@ -2,8 +2,8 @@
 
 #include "iocontext/audio/AudioFile.h"
 
-#include "States/GamePlay.h"
-#include "States/StateContext.h"
+#include "states/GamePlay.h"
+#include "states/StateContext.h"
 
 #include "gameplay/Enemy.h"
 

@@ -1,4 +1,4 @@
-#include "States/Generator.h"
+#include "states/Generator.h"
 
 #include "iocontext/audio/AudioFile.h"
 #include "states/StateContext.h"

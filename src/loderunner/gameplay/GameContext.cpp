@@ -316,8 +316,9 @@ void GameContext::loadLevel(unsigned int levelNumber)
 	}
 
 	timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
-	std::vector<std::shared_ptr<Text>> textList;
-	textList.push_back(timeText);
+	std::vector<std::shared_ptr<Text>> textList{
+		timeText
+	};
 
 	enemies.insert(enemies.end(), player);
 
@@ -330,6 +331,8 @@ void GameContext::loadLevel(unsigned int levelNumber)
 	renderingManager->setFinishingLadderList(finishingLadders);
 	renderingManager->setGoldList(uncollectedGoldList);
 	renderingManager->initializeLevelLayout();
+	this->pointerToDebrisTexture = renderingManager->getPointerToDebrisTexture();
+	this->pointerToDebrisLocation = renderingManager->getPointerToDebrisLocation();
 
 	renderingManager->setEnemyList(enemies);
 	renderingManager->initializeEnemies();
@@ -469,6 +472,8 @@ void GameContext::generateLevel(short gen[30][18])
 		renderingManager->setFinishingLadderList(finishingLadders);
 		renderingManager->setGoldList(uncollectedGoldList);
 		renderingManager->initializeLevelLayout();
+		this->pointerToDebrisTexture = renderingManager->getPointerToDebrisTexture();
+		this->pointerToDebrisLocation = renderingManager->getPointerToDebrisLocation();
 
 		renderingManager->setEnemyList(enemies);
 		renderingManager->initializeEnemies();

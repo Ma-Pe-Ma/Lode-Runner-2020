@@ -3,21 +3,14 @@
 
 #include "IOContext.h"
 
-#if defined __EMSCRIPTEN__
-#include <GLES3/gl3.h>
-#include <emscripten/emscripten.h>
-#else 
-#include <glad/glad.h>
-#endif
-
-#include <GLFW/glfw3.h>
-
 #include <string>
 #include <map>
 
 #ifdef VIDEO_RECORDING
 #include "MultiMediaRecording/MultiMedia.h"
 #endif
+
+struct GLFWwindow;
 
 class GlfwIOContext : public IOContext {
 	Button pButton, lAlt;
@@ -38,6 +31,7 @@ protected:
 
 public:
 	virtual void initialize() override;
+	virtual void terminate() override;
 
 	virtual void processInput() override;
 	virtual void finalizeFrame() override;
@@ -53,7 +47,7 @@ public:
 
 	virtual bool shouldClose() override;
 
-	void handleScreenRecording();
+	void handleScreenRecording() override;
 #ifdef VIDEO_RECORDING
 	void initializeMultimedia();
 #endif

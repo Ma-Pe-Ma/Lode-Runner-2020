@@ -5,8 +5,17 @@
 #include <string>
 #include <fstream>
 
-#define	 STB_IMAGE_IMPLEMENTATION
-#define  STB_IMAGE_WRITE_IMPLEMENTATION
+#if defined __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#include <GLES3/gl3.h>
+#else 
+#include <glad/glad.h>
+#endif
+
+#include <GLFW/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -60,10 +69,6 @@ void GlfwIOContext::processInput() {
 	kButton.detect(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
 	lButton.detect(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
 #endif
-
-	//TODO
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GlfwIOContext::finalizeFrame()
@@ -97,11 +102,10 @@ unsigned int GlfwIOContext::loadTexture(char const* path)
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-#if !defined __EMSCRIPTEN__
+#if !defined __EMSCRIPTEN__		
 		float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 #endif
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -415,6 +419,11 @@ void GlfwIOContext::initialize()
 	ImGui::StyleColorsDark();
 }
 
+void GlfwIOContext::terminate()
+{
+	glfwTerminate();
+}
+
 void GlfwIOContext::handleScreenRecording()
 {
 	//take a screenshot
@@ -500,6 +509,5 @@ void GlfwIOContext::initializeMultimedia()
 	media->setGLViewPortReferences(&GLHelper::viewPortX, &GLHelper::viewPortY, &GLHelper::viewPortWidth, &GLHelper::viewPortHeight);
 	media->setGenerateName(generateNewVideoName);
 	media->setVideoOutputSizeWanted(0, recordingHeight);
-	//Audio::multiMedia = &media;
 }
 #endif

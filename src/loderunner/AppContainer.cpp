@@ -29,24 +29,20 @@ void AppContainer::initialize()
 
 	renderingManager = std::make_shared<RenderingManager>("./Assets/", ioContext);
 
-	stateContext = std::make_shared<StateContext>();
-	stateContext->setRenderingManager(renderingManager);
-	stateContext->setAudio(audio);
-	stateContext->initialize();
-
 	gameContext = std::make_shared<GameContext>();
 	gameContext->setGameConfiguration(gameConfiguration);
 	gameContext->setRenderingManager(renderingManager);
 	gameContext->setAudio(audio);
 	gameContext->setIOContext(ioContext);
 
-	renderingManager->setGameContext(gameContext);
-
-	stateContext->getGamePlay()->setGameContext(gameContext);
-	stateContext->getGenerator()->setGameContext(gameContext);
-
+	stateContext = std::make_shared<StateContext>();
+	stateContext->setRenderingManager(renderingManager);
+	stateContext->setAudio(audio);
 	stateContext->setIOContext(ioContext);
 	stateContext->setGameConfiguration(gameConfiguration);
+	stateContext->getGamePlay()->setGameContext(gameContext);
+	stateContext->getGenerator()->setGameContext(gameContext);
+	stateContext->initialize();
 }
 
 void AppContainer::update()
@@ -65,8 +61,7 @@ void AppContainer::terminate()
 {
 	audio->terminate();
 	renderingManager->terminate();
-
-	glfwTerminate();
+	ioContext->terminate();	
 }
 
 void AppContainer::handleImGuiConfigurer()
