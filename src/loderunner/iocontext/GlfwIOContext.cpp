@@ -319,9 +319,8 @@ void GlfwIOContext::initialize()
 	glfwInit();
 
 	glfwSetErrorCallback([](int error, const char* description) -> void {
-		std::cout << "\nGFLW error: " << error << ", description: " << description;
-		std::cout << std::hex << "\n hex: 0x" << error;
-		std::cout << std::dec;
+		std::cout << "GFLW error: " << error << ", description: " << description << std::endl;
+		std::cout << std::hex << "Hex: 0x" << error << std::dec << std::endl;
 	});
 
 #if defined __EMSCRIPTEN__
@@ -372,7 +371,7 @@ void GlfwIOContext::initialize()
 	glfwMakeContextCurrent(window);
 
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-		//std::cout << "\n updating viewport: " << width << ", " << height;
+		//std::cout << "Updating viewport: " << width << ", " << height << std::endl;
 		auto self = static_cast<GlfwIOContext*>(glfwGetWindowUserPointer(window));
 
 		self->updateViewPortValues(width, height);
@@ -383,14 +382,12 @@ void GlfwIOContext::initialize()
 		}
 #endif // VIDEO_RECORDING
 
-		glViewport(std::get<0>(self->getViewPortPosition()), std::get<1>(self->getViewPortPosition()), std::get<0>(self->getViewPortSize()), std::get<1>(self->getViewPortSize()));
+		glViewport(std::get<0>(self->viewPortPosition), std::get<1>(self->viewPortPosition), std::get<0>(self->viewPortSize), std::get<1>(self->viewPortSize));
 	});
 
 	glfwSetWindowSizeCallback(window, [](GLFWwindow*, int width, int height) -> void {
 		//std::cout << "WINDOW Resized: " << width << ", height: " << height << std::endl;
 	});
-
-	glfwSetWindowSize(window, std::get<0>(screenSize), std::get<1>(screenSize));
 
 #if !defined __EMSCRIPTEN__
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {

@@ -12,6 +12,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <format>
+#include <regex>
+#include <functional>
 
 class Shader
 {
@@ -20,13 +23,19 @@ public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
 
-    Shader(std::string vertexPath, std::string fragmentPath) : Shader(vertexPath.c_str(), fragmentPath.c_str())
+    std::string vertexPath;
+    std::string fragmentPath;
+
+    Shader(std::string vertexPath, std::string fragmentPath, std::basic_format_args<std::format_context> v, std::basic_format_args<std::format_context> f) : Shader(vertexPath.c_str(), fragmentPath.c_str(), v, f)
     {
 
     }
 
-    Shader(const char* vertexPath, const char* fragmentPath)
+    Shader(const char* vertexPath, const char* fragmentPath, std::basic_format_args<std::format_context> v, std::basic_format_args<std::format_context> f)
     {
+        this->vertexPath = vertexPath;
+        this->fragmentPath = fragmentPath;
+
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -51,7 +60,20 @@ public:
             fShaderFile.close();
             // convert stream into string
             vertexCode = vShaderStream.str();
-            fragmentCode = fShaderStream.str();			
+            fragmentCode = fShaderStream.str();
+
+            const std::function<std::string(std::string)> escapeShaderSource = [](std::string source) -> std::string {
+                source = std::regex_replace(source, std::regex("\\{\\D"), "{{");
+                source = std::regex_replace(source, std::regex("(\\D)\\}"), "$1}}");
+                //source = std::regex_replace(source, std::regex("^\\}"), "}}");
+                return source;
+            };
+            
+            vertexCode = escapeShaderSource(vertexCode);
+            vertexCode = std::vformat(vertexCode, v);
+            
+            fragmentCode = escapeShaderSource(fragmentCode);
+            fragmentCode = std::vformat(fragmentCode, f);
             
             unsigned int vertex, fragment;
 
@@ -161,8 +183,10 @@ private:
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if(!success)
             {
+                std::string paths = vertexPath + "/" + fragmentPath;
+
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << " - " << paths << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
             }
         }
         else
@@ -170,8 +194,10 @@ private:
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if(!success)
             {
+                std::string paths = vertexPath + "/" + fragmentPath;
+
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << " - " << paths << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
             }
         }
     }

@@ -41,8 +41,9 @@ add_executable(LodeRunner
 	"src/loderunner/iocontext/Button.cpp"
 	"src/loderunner/iocontext/GlfwIOContext.cpp"
 	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
-	"src/loderunner/iocontext/audio/Audio.cpp"	
+	"src/loderunner/iocontext/audio/Audio.cpp"
 	"src/loderunner/iocontext/rendering/Text.cpp"
+	"src/loderunner/iocontext/rendering/RenderingManager.cpp"
 
 	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
 	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"
@@ -96,19 +97,26 @@ if(EMSCRIPTEN)
 		"
 	)
 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -fexperimental-library")
+
 	set_target_properties(LodeRunner
 		PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/Assets@/Assets/ "
 	)
 
 	target_compile_options(LodeRunner
 		PUBLIC "-pthread;-sUSE_PTHREADS=1;-sPTHREAD_POOL_SIZE=4;-sALLOW_MEMORY_GROWTH=1;"	
-	)	
+	)
+
+	target_sources(LodeRunner PRIVATE
+		"src/loderunner/iocontext/rendering/EmscriptenRenderingManager.cpp"
+	)
+
 else()
 	add_subdirectory("src/submodules/glfw")
 	add_subdirectory("src/submodules/rtaudio")
 
-	target_sources(LodeRunner
-		PUBLIC "src/submodules/glad.c"
+	target_sources(LodeRunner PUBLIC		
+		"src/submodules/glad.c"
 	)
 
 	target_link_libraries(LodeRunner PRIVATE

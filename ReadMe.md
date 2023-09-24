@@ -138,10 +138,10 @@ But altogether I'm satisfied with the result.
 </p>
 
 ## Future tasks for this project:
-- Fine tune collision detection between enemies
-- Make browser/wasm port playable on mobile
+- Finetune collision detection between enemies
 - Restructure gameplay logic
 - Fix broken video recording + Android versions (remake this port by using the default cmake project instead of defining a custom one for it)
+- Finetune browser/wasm mobile touch touch input
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Add demo scene + bonus fruits
 

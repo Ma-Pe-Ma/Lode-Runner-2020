@@ -11,7 +11,6 @@ uniform vec2 cursorOffsets[2];
 uniform int cursor[2];
 
 void main() {
-	
 	vec2 position = vertexScales[gl_InstanceID] * aPos + vertexOffsets[gl_InstanceID] + float(cursor[gl_InstanceID]) * cursorOffsets[gl_InstanceID];
 	instanceID = gl_InstanceID;
 

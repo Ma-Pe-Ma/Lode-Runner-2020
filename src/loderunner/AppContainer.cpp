@@ -6,9 +6,22 @@
 
 #include "gameplay/Player.h"
 
+#ifdef __EMSCRIPTEN__
+#include "iocontext/EmscriptenIOContext.h"
+#include "iocontext/rendering/EmscriptenRenderingManager.h"
+#else
+#include "iocontext/GlfwIOContext.h"
+#include "iocontext/rendering/RenderingManager.h"
+#endif
+
 void AppContainer::initialize()
 {
 #if defined __EMSCRIPTEN__
+	
+	if (EmscriptenHandler::is_mobile()) {
+		showImguiWindow = false;
+	}
+
 	audio = std::make_shared<OpenALAudio>();
 #else
 	audio = std::make_shared<RTAudioContext>();
@@ -27,7 +40,13 @@ void AppContainer::initialize()
 	ioContext->loadConfig(gameConfiguration);
 	ioContext->initialize();
 
+#ifdef __EMSCRIPTEN__
+	renderingManager = std::make_shared<EmscriptenRenderingManager>("./Assets/", ioContext);
+	(std::static_pointer_cast<EmscriptenIOContext>(ioContext))->setRenderingManager(std::static_pointer_cast<EmscriptenRenderingManager>(renderingManager));
+#else
 	renderingManager = std::make_shared<RenderingManager>("./Assets/", ioContext);
+#endif
+	renderingManager->createShaders();
 
 	gameContext = std::make_shared<GameContext>();
 	gameContext->setGameConfiguration(gameConfiguration);
@@ -67,7 +86,25 @@ void AppContainer::terminate()
 void AppContainer::handleImGuiConfigurer()
 {
 	if (ioContext->getConfigButton().simple()) {
+#ifdef __EMSCRIPTEN__
+		if (EmscriptenHandler::is_mobile()) {
+			int* gameVersion = gameConfiguration->getGameVersionPointer();
+			*gameVersion = !(*gameVersion);
+
+			if (*gameVersion == 1) {
+				stateContext->menuCursor = 0;
+			}
+
+			gameConfiguration->setGameVersion(*gameVersion);
+			ioContext->saveConfig("levelset", std::to_string(*gameVersion));
+			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
+		}
+		else {
+			showImguiWindow = !showImguiWindow;
+		}		
+#else
 		showImguiWindow = !showImguiWindow;
+#endif // __EMSCRIPTEN__
 	}
 
 	if (showImguiWindow) {
@@ -75,8 +112,6 @@ void AppContainer::handleImGuiConfigurer()
 		ImGui_ImplGlfw_NewFrame();
 
 		ImGui::NewFrame();
-
-		//ImVec2 windowSize = ImVec2(GLHelper::SCR_WIDTH / 8, GLHelper::SCR_HEIGHT / 6);
 
 #ifndef NDEBUG
 		ImVec2 windowSize = ImVec2(220, 310);
@@ -106,7 +141,7 @@ void AppContainer::handleImGuiConfigurer()
 
 		ImGui::PushItemWidth(std::get<0>(ioContext->getScreenSize()) / 20);
 
-		if (ImGui::InputInt("Level", &stateContext->level[0], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
+		if (ImGui::InputInt("Level", &stateContext->level[stateContext->playerNr], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
 		}
 

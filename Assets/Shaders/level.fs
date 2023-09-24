@@ -3,7 +3,7 @@ out vec4 FragColor;
 in vec2 aTexCoord;
 flat in int instanceID;
 
-uniform int textureID[540];
+uniform int textureID[{0}];
 uniform sampler2D textureA;
 
 void main() {
