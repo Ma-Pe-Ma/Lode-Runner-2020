@@ -43,7 +43,7 @@ void MainMenu::update() {
 		menuCursor = 0;
 	}
 
-	stateContext->getRenderingManager()->drawMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
+	stateContext->getRenderingManager()->renderMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
 
 	//choosing selected gamemode
 	if (ioContext->getEnterButton().simple()) {

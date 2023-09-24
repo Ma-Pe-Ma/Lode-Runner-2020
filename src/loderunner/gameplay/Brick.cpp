@@ -58,7 +58,7 @@ void Brick::digging(float gameTime) {
 	}
 	else {
 		//growing hole
-		int timeFactor = int(5 * (gameTime - timer) / (destroyTime)) % 5;	
+		int timeFactor = int(5 * (gameTime - timer) / destroyTime) % 5;	
 		*pointerToTexture = 1 + timeFactor;
 
 		if (gameContext->checkDigPrevention(position.x, position.y)) {

@@ -5,7 +5,7 @@ flat in int instanceID;
 
 uniform sampler2D textureA;
 
-uniform int textureID[864];
+uniform int textureID[{0}];
 
 void main() {
 

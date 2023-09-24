@@ -4,7 +4,7 @@ layout (location = 1) in vec2 aTexturePos;
 out vec2 aTexCoord;
 flat out int instanceID;
 
-uniform ivec2 gPos[540];
+uniform ivec2 gPos[{0}];
 vec2 pos;
 
 void main() {

@@ -4,7 +4,7 @@ layout (location = 1) in vec2 aTexturePos;
 out vec2 aTexCoord;
 flat out int instanceID;
 
-uniform vec2 gPos[864];
+uniform vec2 gPos[{0}];
 
 const vec2 charSize = vec2(6.0 / 140.0, -1.0 / 14.0);
 

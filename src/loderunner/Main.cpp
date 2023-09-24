@@ -7,7 +7,7 @@
 
 int main(int argc, char**argv) {
 	AppContainer appContainer;
-	appContainer.initialize();	
+	appContainer.initialize();
 
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop_arg((em_arg_callback_func) [](void* appContainer) -> void {
