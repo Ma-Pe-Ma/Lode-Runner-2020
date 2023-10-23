@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-#include "MultiMediaHelper.h"
-
 #include "Stream.h"
 #include "AudioParameters.h"
 
@@ -16,7 +14,10 @@ extern "C" {
 
 class AudioStream : public Stream {
 private:
-	struct SwrContext* swr_ctx;
+	AudioParameters* inputAudioParameters;
+	AudioParameters* outputAudioParameters;
+
+	SwrContext* swr_ctx;
 
 	//left channel
 	float* l;
@@ -24,9 +25,16 @@ private:
 	float* r;
 
 	int audioSampleCounter = 0;
-
 public:
 	AudioStream(AudioParameters*, AudioParameters*, AVFormatContext*);
+	~AudioStream() {
+		//setting correct duration of the stream
+		//stream->duration = av_rescale_q(next_pts, codecContext->time_base, stream->time_base);
+		freeFrames();
+
+		delete inputAudioParameters;
+		delete outputAudioParameters;
+	}
 	void encodeFrame(float);
 };
 

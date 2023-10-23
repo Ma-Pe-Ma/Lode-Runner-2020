@@ -1,12 +1,12 @@
 #ifndef RTAUDIO_H
 #define RTAUDIO_H
 
-#include "Audio.h"
+#include "AudioContext.h"
 #include "AudioFile.h"
 
 #include <RtAudio.h>
 
-class RTAudioContext : public Audio {
+class RTAudioContext : public AudioContext {
 	char** pcmout;
 	RtAudio dac = RtAudio(SOUND_API);
 	RtAudio::StreamParameters parameters;
@@ -75,7 +75,7 @@ public:
 								self->multiMedia->writeAudioFrame(dataOut);
 							}
 #endif
-							* out++ = dataOut;
+							*out++ = dataOut;
 						}
 					}
 

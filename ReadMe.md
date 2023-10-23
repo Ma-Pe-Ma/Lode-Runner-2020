@@ -140,8 +140,11 @@ But altogether I'm satisfied with the result.
 ## Future tasks for this project:
 - Finetune collision detection between enemies
 - Restructure gameplay logic
-- Fix broken video recording + Android versions (remake this port by using the default cmake project instead of defining a custom one for it)
-- Finetune browser/wasm mobile touch touch input
+- Finetune browser/wasm mobile touch input
+- Improve and polish video recording
+- Fix broken Android version (remake this port by using the default cmake project instead of defining a custom one for it)
+
+Backlog:
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
 - Add demo scene + bonus fruits
 

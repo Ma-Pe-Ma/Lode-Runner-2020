@@ -9,25 +9,26 @@ class VideoParameters {
 private:
 	int width;
 	int height;
-
-	AVCodecID codecID;
 	int bitrate;
-	AVPixelFormat pixelFormat;
 	int streamFrameRate;
-
+	AVCodecID codecID;	
+	AVPixelFormat pixelFormat;
 public:
-	VideoParameters(int, int, AVCodecID, int, AVPixelFormat, int);
+	VideoParameters(int width, int height, int bitrate, int streamFrameRate, AVCodecID codecID, AVPixelFormat pixelFormat) {
+		this->width = width;
+		this->height = height;		
+		this->bitrate = bitrate;
+		this->streamFrameRate = streamFrameRate;
+		this->codecID = codecID;
+		this->pixelFormat = pixelFormat;
+	}
 
 	int getWidth() { return width; }
 	int getHeight() { return height; }
-	AVCodecID getCodecID() { return codecID; }
 	int getBitrate() { return bitrate; }
-	AVPixelFormat getPixelFormat() { return pixelFormat; }
 	int getStreamFrameRate() { return streamFrameRate; }
-	void freeFrames();
-
-	void setWidth(int width) { this->width = width; }
-	void setHeight(int height) { this->height = height;  }
+	AVCodecID getCodecID() { return codecID; }	
+	AVPixelFormat getPixelFormat() { return pixelFormat; }	
 };
 
 #endif

@@ -39,7 +39,7 @@ void Select::update() {
 		stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 	}
 
-	else if (stateContext->getIOContext()->getPauseButton().simple()) {
+	else if (stateContext->getIOContext()->getSelectButton().simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 

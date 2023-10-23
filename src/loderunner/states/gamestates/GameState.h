@@ -1,7 +1,7 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include "iocontext/audio/Audio.h"
+#include "iocontext/audio/AudioContext.h"
 
 #include <memory>
 #include <chrono>
@@ -9,7 +9,7 @@
 class GameContext;
 class GameConfiguration;
 class IOContext;
-class Audio;
+class AudioContext;
 
 class GamePlay;
 

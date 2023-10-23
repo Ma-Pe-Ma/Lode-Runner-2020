@@ -10,7 +10,7 @@ class Text;
 
 class Play;
 
-class Audio;
+class AudioContext;
 class RenderingManager;
 class IOContext;
 
@@ -26,7 +26,7 @@ class IOContext;
 class GameContext {
 	std::shared_ptr<RenderingManager> renderingManager;
 	std::shared_ptr<GameConfiguration> gameConfiguration;
-	std::shared_ptr<Audio> audio;
+	std::shared_ptr<AudioContext> audio;
 	std::shared_ptr<IOContext> ioContext;
 
 	std::vector<std::shared_ptr<Brick>> brickList;
@@ -77,8 +77,8 @@ public:
 	void setGameConfiguration(std::shared_ptr<GameConfiguration> gameConfiguration) { this->gameConfiguration = gameConfiguration; }
 	std::shared_ptr<GameConfiguration> getGameConfiguration() { return this->gameConfiguration; }
 
-	void setAudio(std::shared_ptr<Audio> audio) { this->audio = audio; }
-	std::shared_ptr<Audio> getAudio() { return this->audio; }
+	void setAudio(std::shared_ptr<AudioContext> audio) { this->audio = audio; }
+	std::shared_ptr<AudioContext> getAudio() { return this->audio; }
 
 	void setIOContext(std::shared_ptr<IOContext> ioContext) { this->ioContext = ioContext; }
 	std::shared_ptr<IOContext> getIOContext() { return this->ioContext; }

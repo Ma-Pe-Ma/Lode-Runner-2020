@@ -130,7 +130,7 @@ void Generator::update() {
 		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
 	}
 
-	if (ioContext->getPauseButton().simple()) {
+	if (ioContext->getSelectButton().simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 }

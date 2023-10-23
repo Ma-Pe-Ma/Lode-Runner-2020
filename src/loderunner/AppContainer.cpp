@@ -16,7 +16,7 @@
 
 void AppContainer::initialize()
 {
-#if defined __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
 	
 	if (EmscriptenHandler::is_mobile()) {
 		showImguiWindow = false;
@@ -39,6 +39,10 @@ void AppContainer::initialize()
 
 	ioContext->loadConfig(gameConfiguration);
 	ioContext->initialize();
+
+#ifdef VIDEO_RECORDING
+	ioContext->setAudioContext(audio);
+#endif
 
 #ifdef __EMSCRIPTEN__
 	renderingManager = std::make_shared<EmscriptenRenderingManager>("./Assets/", ioContext);

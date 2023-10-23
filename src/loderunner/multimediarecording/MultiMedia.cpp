@@ -1,168 +1,124 @@
 #include "MultiMediaRecording/MultiMedia.h"
 
-MultiMedia::MultiMedia(AudioParameters* audioParametersIn, AudioParameters* audioParametersOut, VideoParameters* videoParametersIn, VideoParameters* videoParametersOut) {
-	this->audioParametersIn = audioParametersIn;
-	this->audioParametersOut = audioParametersOut;
-	this->videoParametersIn = videoParametersIn;
-	this->videoParametersOut = videoParametersOut;
-}
+std::tuple<unsigned int, unsigned int> MultiMedia::determineOutput(unsigned int inputX, unsigned int inputY, unsigned int wantedOutputX, unsigned int wantedOutputY) {
+	unsigned int outputX, outputY;
 
-void MultiMedia::setGenerateName(std::string (*generateName)()) {
-	this->generateName = generateName;
-}
-
-void MultiMedia::setVideoOutputSizeWanted(unsigned int videoOutputWidthWanted, unsigned int videoOutputHeightWanted) {
-	this->videoOutputHeightWanted = videoOutputHeightWanted;
-}
-
-void MultiMedia::setGLViewPortReferences(unsigned int* viewPortX, unsigned int* viewPortY, unsigned int* viewPortWidth, unsigned int* viewPortHeight) {
-	this->viewPortX = viewPortX;
-	this->viewPortY = viewPortY;
-	this->viewPortWidth = viewPortWidth;
-	this->viewPortHeight = viewPortHeight;
-}
-
-void MultiMedia::initialize() {
-	std::string fileNameString = generateName();
-
-	char* filename = new char[fileNameString.length() + 1];
-	fileNameString.copy(filename, fileNameString.length(), 0);
-	filename[fileNameString.length()] = '\0';
-	//const char *name = sname.c_str();
-
-	std::cout << "\n Recording started: " << fileNameString << " ..." << std::endl;
-
-	int ret = avformat_alloc_output_context2(&(formatContext), av_guess_format("matroska", filename, NULL), NULL, NULL);	
-
-	if (audioParametersOut == nullptr) {
-		audio = nullptr;
+	if (wantedOutputY > inputY) {
+		outputY = inputY;
+		outputX = inputX;
 	}
 	else {
-		audio = new AudioStream(audioParametersIn, audioParametersOut, formatContext);
+		outputY = wantedOutputY;
+		outputX = (unsigned int)((1.0f * inputX / inputY) * wantedOutputY);
+	}
+
+	outputY -= outputY % 2;
+	outputX -= outputX % 2;
+
+	return { outputX, outputY };
+}
+
+void MultiMedia::ffmpegError(int ret) {
+	if (ret < 0) {
+		char buffer[50];
+		size_t bufsize = 50;
+		av_strerror(ret, buffer, bufsize);
+		buffer[bufsize] = '\0';
+		std::cout << "\n Thrown error message: " << buffer << std::endl;
+	}
+}
+
+//mirror image horizontally https://emvlo.wordpress.com/2016/03/10/sws_scale/
+void MultiMedia::mirrorFrameHorizontallyJ420(AVFrame* pFrame) {
+	for (int i = 0; i < 4; i++) {
+		if (i) {
+			pFrame->data[i] += pFrame->linesize[i] * ((pFrame->height >> 1) - 1);
+		}
+		else {
+			pFrame->data[i] += pFrame->linesize[i] * (pFrame->height - 1);
+		}
+
+		pFrame->linesize[i] = -pFrame->linesize[i];
+	}
+}
+
+float MultiMedia::fromShortToFloat(short input) {
+	float ret = ((float)input) / (float)32768;	
+	return std::clamp(ret, -1.0f, 1.0f);
+}
+
+MultiMedia::MultiMedia(std::string fileName, AudioParameters* audioParametersIn, AudioParameters* audioParametersOut, VideoParameters* videoParametersIn, VideoParameters* videoParametersOut, std::function<void(unsigned char*)> readScreenBufferData) {
+	this->fileName = fileName;
+
+	char* rawFileName = new char[this->fileName.length() + 1];
+	this->fileName.copy(rawFileName, this->fileName.length(), 0);
+	rawFileName[this->fileName.length()] = '\0';
+
+	std::cout << "\n Recording started: " << this-> fileName << " ..." << std::endl;
+	int ret = avformat_alloc_output_context2(&formatContext, av_guess_format("matroska", rawFileName, NULL), NULL, NULL);
+
+	if (audioParametersOut == nullptr) {
+		audioStream = nullptr;
+	}
+	else {
+		audioStream = new AudioStream(audioParametersIn, audioParametersOut, formatContext);
 	}
 
 	if (videoParametersOut == nullptr) {
-		video = nullptr;
+		videoStream = nullptr;
 	}
 	else {
-		if (videoOutputHeightWanted > 0) {
-			unsigned int videoOutputHeight;
-			unsigned int videoOutputWidth;
-			if (videoOutputWidthWanted > 0) {
-				videoOutputHeight = videoOutputHeightWanted;
-				videoOutputWidth = videoOutputWidthWanted;
-			}
-			else {
-				MultiMediaHelper::determineOutput(*viewPortWidth, *viewPortHeight, videoOutputWidth, videoOutputHeight, videoOutputHeightWanted);
-			}
-
-			videoParametersOut->setWidth(videoOutputWidth);
-			videoParametersOut->setHeight(videoOutputHeight);
-		}
-
-		video = new VideoStream(videoParametersIn, videoParametersOut, formatContext);
-		video->setGLViewPortReferences(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+		videoStream = new VideoStream(videoParametersIn, videoParametersOut, formatContext);
+		videoStream->setScreenBufferDataReader(readScreenBufferData);
 	}
 
-	ret = avio_open(&formatContext->pb, filename, AVIO_FLAG_WRITE);
+	ret = avio_open(&formatContext->pb, rawFileName, AVIO_FLAG_WRITE);
 
 	if (ret < 0) {
-		MultiMediaHelper::ffmpegError(ret);
+		MultiMedia::ffmpegError(ret);
 		exit(1);
 	}
 
 	ret = avformat_write_header(formatContext, NULL);
 
 	if (ret < 0) {
-		MultiMediaHelper::ffmpegError(ret);
+		MultiMedia::ffmpegError(ret);
 		exit(1);
 	}
-
-	initialized = true;
-	video->setRecordStartTime();
 }
 
-void MultiMedia::closeVideo() {
-	initialized = false;
-	video->firstFrameDeInitialize();
-
+MultiMedia::~MultiMedia() {
 	av_write_trailer(formatContext);
 
-	//setting correct duration of streams
-	//video.audioStream->duration = av_rescale_q(video.audio_next_pts, video.AudioCodecContext->time_base, video.audioStream->time_base);;
-	//video.videoStream->duration = av_rescale_q(video.video_next_pts, video.VideoCodecContext->time_base, video.videoStream->time_base);;
-
-	audio->freeFrames();
-	video->freeFrames();
-
-	delete[] video->buffer;
-	delete video;
-	delete audio;
-
-	/*delete videoParametersIn;
-	delete videoParametersOut;
-
-	delete audioParametersIn;
-	delete audioParametersOut;*/
+	delete videoStream;
+	delete audioStream;
 
 	avio_closep(&formatContext->pb);
 	avformat_free_context(formatContext);
+	//delete formatContext;
 
-	std::cout << "\n Recording ended: " + fileName;
+	std::cout << "Recording ended: " + this->fileName << std::endl;
 }
 
 void MultiMedia::writeVideoFrame() {
-	if (initialized) {
-		video->encodeFrame();
+	videoStream->encodeFrame();
 
-		while (audio->have || video->have) {
-			if (video->have && (!audio->have)) {
-				av_interleaved_write_frame(formatContext, video->packet);
-				video->have = false;
-			}
-			else if (audio->have && video->have && av_compare_ts(video->nextPts, video->codecContext->time_base, audio->nextPts, audio->codecContext->time_base) <= 0) {
-				av_interleaved_write_frame(formatContext, video->packet);
-				video->have = false;
-			}
-			else {
-				av_interleaved_write_frame(formatContext, audio->packet);
-				audio->have = false;
-			}
+	while (audioStream->have || videoStream->have) {
+		if (videoStream->have && !audioStream->have) {
+			av_interleaved_write_frame(formatContext, videoStream->packet);
+			videoStream->have = false;
 		}
-	}
+		else if (audioStream->have && videoStream->have && av_compare_ts(videoStream->nextPts, videoStream->codecContext->time_base, audioStream->nextPts, audioStream->codecContext->time_base) <= 0) {
+			av_interleaved_write_frame(formatContext, videoStream->packet);
+			videoStream->have = false;
+		}
+		else {
+			av_interleaved_write_frame(formatContext, audioStream->packet);
+			audioStream->have = false;
+		}
+	}	
 }
 
 void MultiMedia::writeAudioFrame(short out) {
-	if (recordingState == recording && initialized) {
-		audio->encodeFrame(out);
-	}
-}
-
-void MultiMedia::recordAndControl(bool impulse) {
-	if (recordingState == uninitialized) {
-
-		if (impulse) {
-			initialize();
-			recordingState = recording;
-		}
-	}
-	else if (recordingState == recording) {
-		if (impulse) {
-			recordingState = closing;
-		}
-		else {
-			writeVideoFrame();
-		}
-	}
-
-	if (recordingState == closing) {
-		closeVideo();
-		recordingState = uninitialized;
-	}
-}
-
-void MultiMedia::windowResized() {
-	if (recordingState == recording) {
-		recordingState = closing;
-	}
+	audioStream->encodeFrame(out);
 }

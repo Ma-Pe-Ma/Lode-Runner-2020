@@ -1,14 +1,14 @@
 #ifndef OPENALAUDIO_H
 #define OPENALAUDIO_H
 
-#include "Audio.h"
+#include "AudioContext.h"
 
 #include "OpenALAudioFile.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
 
-class OpenALAudio : public Audio {
+class OpenALAudio : public AudioContext {
 	ALCdevice* device;
 	ALCcontext* openALContext;
 
