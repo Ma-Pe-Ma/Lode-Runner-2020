@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include <optional>
 
 #include "GameConfiguration.h"
 
@@ -45,7 +46,7 @@ private:
 	std::map<int, Button*> buttonMap;
 	//maps button to its current state
 	std::map<Button*, bool> buttonStateMap{
-		{&space, false},
+		{&select, false},
 		{&enter, false},
 		{&leftDigButton, false},
 		{&rightDigButton, false},
@@ -56,6 +57,7 @@ private:
 		//{&configButton, false},
 	};
 	std::map <Button*, std::tuple<int, int, int, int>> sizedPositionMap;
+	//TODO: replace this with optional
 	int analogID = -1;
 
 	int analogCenterX = 0;
@@ -65,6 +67,8 @@ private:
 	std::tuple<Button*, Button*> getAnalogButtonByTouch(int x, int y);
 	std::shared_ptr<EmscriptenRenderingManager> emscriptenRenderingManager;
 
+	void keyboardInput();
+	std::optional<long> gamePadID;
 public:
 	void processInput() override;
 

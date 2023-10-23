@@ -25,6 +25,10 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
+#ifdef VIDEO_RECORDING
+#include "audio/AudioContext.h"
+#endif
+
 void GlfwIOContext::processInput() {
 
 	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
@@ -40,14 +44,14 @@ void GlfwIOContext::processInput() {
 	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
 	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
 	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
-	space.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
+	select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
 
-	pButton.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+	screenshotButton.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 	lAlt.detect(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS);
 #endif
 
 #ifdef VIDEO_RECORDING
-	REC.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+	videoButton.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
 #endif
 
 	if (lAlt.continuous() && enter.simple()) {
@@ -249,6 +253,8 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 	gameConfiguration->setStartingLevel(getIntByKey("levelNr", 1));
 	gameConfiguration->setFramesPerSec(getIntByKey("FPS", 60));
 
+	this->gameConfiguration = gameConfiguration;
+
 	config.close();
 }
 
@@ -373,12 +379,11 @@ void GlfwIOContext::initialize()
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		//std::cout << "Updating viewport: " << width << ", " << height << std::endl;
 		auto self = static_cast<GlfwIOContext*>(glfwGetWindowUserPointer(window));
-
 		self->updateViewPortValues(width, height);
 
 #ifdef VIDEO_RECORDING
 		if (self->multiMedia != nullptr) {
-			self->windowResized();
+			self->multiMedia = nullptr;
 		}
 #endif // VIDEO_RECORDING
 
@@ -418,19 +423,38 @@ void GlfwIOContext::initialize()
 
 void GlfwIOContext::terminate()
 {
+#ifdef VIDEO_RECORDING
+	if (multiMedia != nullptr) {
+		audio->setMultiMedia(nullptr);
+		multiMedia = nullptr;
+	}
+#endif 
+	this->gameConfiguration = nullptr;
 	glfwTerminate();
 }
 
 void GlfwIOContext::handleScreenRecording()
 {
 	//take a screenshot
-	if (pButton.simple()) {
+	if (screenshotButton.simple()) {
 		takeScreenShot();
 	}
 
 #ifdef VIDEO_RECORDING
-	//With the help of this function you can record videos
-	media->recordAndControl(REC.simple());
+	if (videoButton.simple()) {
+		if (multiMedia == nullptr) {
+			multiMedia = initializeMultimedia();
+			audio->setMultiMedia(multiMedia);
+		}
+		else {
+			audio->setMultiMedia(nullptr);
+			multiMedia = nullptr;			
+		}
+	}
+
+	if (multiMedia != nullptr) {
+		multiMedia->writeVideoFrame();
+	}	
 #endif
 }
 
@@ -493,18 +517,27 @@ void GlfwIOContext::loadLevel(std::string fileName, std::function<bool(std::stri
 }
 
 #ifdef VIDEO_RECORDING
-void GlfwIOContext::initializeMultimedia()
+
+#define STREAM_FRAME_RATE 60
+#define STREAM_BIT_RATE 400000
+
+std::shared_ptr<MultiMedia> GlfwIOContext::initializeMultimedia()
 {
 	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 	AudioParameters* audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 
-	VideoParameters* videoIn = new VideoParameters(GLHelper::viewPortWidth, GLHelper::viewPortHeight, AV_CODEC_ID_NONE, 400000, AV_PIX_FMT_RGB24, STREAM_FRAME_RATE);
-	VideoParameters* videoOut = new VideoParameters(0, recordingHeight, AV_CODEC_ID_H264, 400000, AV_PIX_FMT_YUV420P, STREAM_FRAME_RATE);
+	unsigned int recordingHeight = gameConfiguration->getRecordingHeight();
+	unsigned int recordingWidth = unsigned int(recordingHeight * 16.0f / 9);
 
-	media = std::make_shared<MultiMedia>(audioIn, audioOut, videoIn, videoOut);
+	std::tuple<unsigned int, unsigned int> outputSize = MultiMedia::determineOutput(std::get<0>(viewPortSize), std::get<1>(viewPortSize), recordingWidth, recordingHeight);
 
-	media->setGLViewPortReferences(&GLHelper::viewPortX, &GLHelper::viewPortY, &GLHelper::viewPortWidth, &GLHelper::viewPortHeight);
-	media->setGenerateName(generateNewVideoName);
-	media->setVideoOutputSizeWanted(0, recordingHeight);
+	VideoParameters* videoIn = new VideoParameters(std::get<0>(viewPortSize), std::get<1>(viewPortSize), STREAM_BIT_RATE, STREAM_FRAME_RATE, AV_CODEC_ID_NONE, AV_PIX_FMT_RGB24);
+	VideoParameters* videoOut = new VideoParameters(std::get<0>(outputSize), std::get<1>(outputSize), STREAM_BIT_RATE, STREAM_FRAME_RATE, AV_CODEC_ID_H264, AV_PIX_FMT_YUV420P);
+	
+	return std::make_shared<MultiMedia>(generateNewVideoName(), audioIn, audioOut, videoIn, videoOut,
+		[this](unsigned char* buffer) -> void {
+			glReadPixels(std::get<0>(viewPortPosition), std::get<1>(viewPortPosition), std::get<0>(viewPortSize), std::get<1>(viewPortSize), GL_RGB, GL_UNSIGNED_BYTE, buffer);
+		}
+	);
 }
 #endif

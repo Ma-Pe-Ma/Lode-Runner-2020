@@ -2,15 +2,10 @@
 #define VIDEOSTREAM_H
 
 #include <iostream>
-
-#include "MultiMediaHelper.h"
+#include <functional>
 
 #include "Stream.h"
 #include "VideoParameters.h"
-//#include "GLHelper.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 
 extern "C" {
 #include <libavdevice/avdevice.h>
@@ -24,24 +19,36 @@ extern "C" {
 
 class VideoStream : public Stream {
 private:
-	unsigned int* viewPortX;
-	unsigned int* viewPortY;
-	unsigned int* viewPortWidth;
-	unsigned int* viewPortHeight;
+	VideoParameters* inputVideoParameters;
+	VideoParameters* outputVideoParameters;
 
-	struct SwsContext* sws_ctx;
+	SwsContext* sws_ctx;
+	unsigned char* buffer;
+	
 	bool firstVideoFrameInitialised = false;
-	VideoParameters* input;
-	VideoParameters* output;
 	std::chrono::system_clock::time_point recordStartTime;
 
+	std::function<void(unsigned char*)> readScreenBufferData;
 public:
-	unsigned char* buffer;
+	
 	VideoStream(VideoParameters*, VideoParameters*, AVFormatContext*);
-	void firstFrameDeInitialize();
+
+	~VideoStream() {
+		//setting correct duration of the stream
+		//stream->duration = av_rescale_q(video.next_pts, codecContext->time_base, stream->time_base);;
+
+		freeFrames();
+
+		delete[] buffer;
+		delete inputVideoParameters;
+		delete outputVideoParameters;
+	}
+
 	void encodeFrame();
-	void setRecordStartTime();
-	void setGLViewPortReferences(unsigned int* viewPortX, unsigned int* viewPortY, unsigned int* viewPortWidth, unsigned int* viewPortHeight);
+
+	void setScreenBufferDataReader(std::function<void(unsigned char*)> readScreenBufferData) {
+		this->readScreenBufferData = readScreenBufferData;
+	}
 };
 
 #endif // !VIDEOSTREAM_H

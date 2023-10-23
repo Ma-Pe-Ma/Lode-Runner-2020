@@ -69,6 +69,19 @@ namespace EmscriptenHandler {
 		});
 }
 
+void EmscriptenIOContext::keyboardInput() {
+	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+
+	leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+	rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+	up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
+	down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
+	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
+	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+	select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+}
+
 void EmscriptenIOContext::processInput() {
 	if (EmscriptenHandler::is_mobile()) {
 		for (auto it = buttonStateMap.begin(); it != buttonStateMap.end(); it++)
@@ -77,17 +90,30 @@ void EmscriptenIOContext::processInput() {
 		}
 	}
 	else {
-		configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+		if (gamePadID.has_value() && emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) {
+			EmscriptenGamepadEvent gamepadState;
+			emscripten_get_gamepad_status(gamePadID.value(), &gamepadState);
 
-		leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
-		rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
-		up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
-		down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
-		rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-		leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
-		enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
-		space.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-	}	
+			if (gamepadState.connected == EM_TRUE) {
+				configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS || gamepadState.digitalButton[3] == EM_TRUE);
+
+				leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || gamepadState.digitalButton[14] == EM_TRUE || gamepadState.axis[0] < -0.5);
+				rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || gamepadState.digitalButton[15] == EM_TRUE || gamepadState.axis[0] > 0.5);
+				up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || gamepadState.digitalButton[12] == EM_TRUE || gamepadState.axis[1] < -0.5);
+				down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || gamepadState.digitalButton[13] == EM_TRUE || gamepadState.axis[1] > 0.5);
+				rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || gamepadState.digitalButton[5] == EM_TRUE || gamepadState.digitalButton[7] == EM_TRUE);
+				leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || gamepadState.digitalButton[4] == EM_TRUE || gamepadState.digitalButton[6] == EM_TRUE);
+				enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || gamepadState.digitalButton[9] == EM_TRUE);
+				select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || gamepadState.digitalButton[8] == EM_TRUE);
+			}
+			else {
+				keyboardInput();
+			}
+		}
+		else {
+			keyboardInput();
+		}
+	}
 }
 
 void EmscriptenIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration)
@@ -304,6 +330,29 @@ void EmscriptenIOContext::initialize() {
 
 		glViewport(std::get<0>(self->viewPortPosition), std::get<1>(self->viewPortPosition), std::get<0>(self->viewPortSize), std::get<1>(self->viewPortSize));
 	});
+
+
+	if (emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) {		
+		emscripten_set_gamepadconnected_callback(this, true, [](int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) -> EM_BOOL {
+			EmscriptenIOContext* self = static_cast<EmscriptenIOContext*>(userData);
+
+			if (!self->gamePadID.has_value()) {
+				self->gamePadID.emplace(gamepadEvent->index);
+			}			
+
+			return true;
+		});
+
+		emscripten_set_gamepaddisconnected_callback(this, true, [](int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) -> EM_BOOL {
+			EmscriptenIOContext* self = static_cast<EmscriptenIOContext*>(userData);
+
+			if (self->gamePadID.has_value() && self->gamePadID.value() == gamepadEvent->index) {
+				self->gamePadID.reset();
+			}
+
+			return true;
+		});
+	}
 }
 
 std::tuple<Button*, Button*> EmscriptenIOContext::getAnalogButtonByTouch(int absX, int absY) {
@@ -339,7 +388,7 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 
 	//origin is top left
 	const std::map <Button*, std::tuple<float, float, float, float>> digitalPositionMap{
-		{&space, {0.05f, -0.95f, 0.1f, 0.0f}},
+		{&select, {0.05f, -0.95f, 0.1f, 0.0f}},
 		{&enter, {0.95f, -0.95f, 0.1f, 0.0f}},
 		{&leftDigButton, {0.75f, 0.5f, 0.1f, 0.0f}},
 		{&rightDigButton, {0.9f, 0.5f, 0.1f, 0.0f}},
@@ -353,7 +402,7 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 		{&up, 3},
 		{&leftDigButton, 4},
 		{&rightDigButton, 5},
-		{&space, 6},
+		{&select, 6},
 		{&enter, 6},
 		{&configButton, 7},
 	};

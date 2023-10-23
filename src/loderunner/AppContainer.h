@@ -27,7 +27,7 @@ class AppContainer {
 	std::shared_ptr<GameContext> gameContext;
 	std::shared_ptr<GameConfiguration> gameConfiguration;
 	std::shared_ptr<IOContext> ioContext;
-	std::shared_ptr<Audio> audio;
+	std::shared_ptr<AudioContext> audio;
 	std::shared_ptr<RenderingManager> renderingManager;
 
 	std::vector<std::string> soundNames = {

@@ -29,7 +29,7 @@ private:
 	std::shared_ptr<RenderingManager> renderingManager;
 	std::shared_ptr<IOContext> ioContext;
 	std::shared_ptr<GameConfiguration> gameConfiguration;
-	std::shared_ptr<Audio> audio;
+	std::shared_ptr<AudioContext> audio;
 
 public:	
 	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
@@ -52,12 +52,12 @@ public:
 	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
 	std::shared_ptr<IOContext> getIOContext() { return this->ioContext; }
 	std::shared_ptr<GameConfiguration> getGameConfiguration() { return this->gameConfiguration; }
-	std::shared_ptr<Audio> getAudio() { return this->audio; }
+	std::shared_ptr<AudioContext> getAudio() { return this->audio; }
 
 	void setRenderingManager(std::shared_ptr<RenderingManager>);
 	void setIOContext(std::shared_ptr<IOContext>);
 	void setGameConfiguration(std::shared_ptr<GameConfiguration>);
-	void setAudio(std::shared_ptr<Audio>);
+	void setAudio(std::shared_ptr<AudioContext>);
 
 	void setMainMenu(MainMenu* mainMenu)
 	{

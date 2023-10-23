@@ -8,11 +8,13 @@
 #include <functional>
 
 class GameConfiguration;
+class MultiMedia;
+class AudioContext;
 
 class IOContext {
 
 protected:
-	Button up, down, leftButton, rightButton, space, enter, leftDigButton, rightDigButton, configButton, pauseButton;
+	Button up, down, leftButton, rightButton, select, enter, leftDigButton, rightDigButton, configButton, pauseButton, screenshotButton;
 
 #ifndef NDEBUG
 	Button fButton, gButton, hButton, tButton, jButton, kButton, lButton, iButton;
@@ -26,8 +28,9 @@ protected:
 	std::tuple<unsigned int, unsigned int> viewPortSize = std::make_tuple(1100, 600);
 
 #ifdef VIDEO_RECORDING
-	std::shared_ptr<MultiMedia> media;
-	Button REC;
+	std::shared_ptr<MultiMedia> multiMedia;
+	std::shared_ptr<AudioContext> audio;
+	Button videoButton;
 #endif
 public:
 	virtual void processInput() = 0;
@@ -80,7 +83,7 @@ public:
 	Button& getLeftButton() { return leftButton; }
 	Button& getRightButton() { return rightButton; }
 
-	Button& getSpaceButton() { return space; }
+	Button& getSelectButton() { return select; }
 	Button& getEnterButton() { return enter; }
 	Button& getPauseButton() { return pauseButton; }
 
@@ -104,6 +107,9 @@ public:
 #endif
 	virtual void handleScreenRecording() {}
 	virtual bool shouldClose() = 0;
+#ifdef VIDEO_RECORDING
+	void setAudioContext(std::shared_ptr<AudioContext> audio) { this->audio = audio; }
+#endif
 };
 
 #endif

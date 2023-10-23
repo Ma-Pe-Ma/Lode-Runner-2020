@@ -1,7 +1,9 @@
 #include "MultiMediaRecording/AudioStream.h"
+#include "MultiMedia.h"
 
 AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters* outputAudioParameters, AVFormatContext* aVFormatContext) {
-	aVFormatContext->oformat->audio_codec = outputAudioParameters->getCodecID();
+	this->inputAudioParameters = inputAudioParameters;
+	this->outputAudioParameters = outputAudioParameters;
 
 	codec = avcodec_find_encoder(outputAudioParameters->getCodecID());
 
@@ -27,9 +29,10 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	}
 
 	stream->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
-	//video.audioStream->codecpar->codec_id = AV_CODEC_ID_AC3;
-	//video.audioStream->codecpar->format = AV_SAMPLE_FMT_FLTP;
+	//stream->codecpar->codec_id = AV_CODEC_ID_AC3;
+	//stream->codecpar->format = AV_SAMPLE_FMT_FLTP;
 
+	codecContext->codec_id = outputAudioParameters->getCodecID();
 	codecContext->sample_fmt = codec->sample_fmts ? codec->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
 	codecContext->bit_rate = outputAudioParameters->getBitrate();
 	stream->codecpar->sample_rate = outputAudioParameters->getBitrate();
@@ -38,15 +41,15 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	if (codec->supported_samplerates) {
 		codecContext->sample_rate = codec->supported_samplerates[0];
 		for (int i = 0; codec->supported_samplerates[i]; i++) {
-			std::cout << "\n supported samplerates: " + codec->supported_samplerates[i];
+			std::cout << "Supported samplerates: " + codec->supported_samplerates[i] << std::endl;
 			if (codec->supported_samplerates[i] == 44100)
 				codecContext->sample_rate = 44100;
 		}
 	}
 
-	std::cout << "\n samplerate: " << codecContext->sample_rate;
+	//std::cout << "Samplerate: " << codecContext->sample_rate << std::endl;
 
-	//saját gányolás
+	//TODO: solve this improper ugly solution
 	codecContext->sample_rate = outputAudioParameters->getSampleRate();
 
 	codecContext->channels = av_get_channel_layout_nb_channels(codecContext->channel_layout);
@@ -62,14 +65,14 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 	}
 	codecContext->channels = av_get_channel_layout_nb_channels(codecContext->channel_layout);
 
-	//saját gányolás
+	//TODO: solve this improper ugly solution
 	codecContext->time_base = { 1, outputAudioParameters->getSampleRate() };
 
 	stream->time_base = { 1, codecContext->sample_rate };
 
-	//std::cout << "\n samplerate: " << video.AudioCodecContext->sample_rate;
-	//std::cout << "\n audiostream time base den: " << video.audioStream->time_base.den;
-	//std::cout << "\n audiostream time base num: " << video.audioStream->time_base.num;
+	//std::cout << "Samplerate: " << video.AudioCodecContext->sample_rate << std::endl;
+	//std::cout << "Audiostream time base den: " << video.audioStream->time_base.den << std::endl;
+	//std::cout << "Audiostream time base num: " << video.audioStream->time_base.num << std::endl;
 
 	if (aVFormatContext->oformat->flags & AVFMT_GLOBALHEADER) codecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
@@ -80,7 +83,6 @@ AudioStream::AudioStream(AudioParameters* inputAudioParameters, AudioParameters*
 		//fprintf(stderr, "Could not open audio codec: %s\n", av_err2str(ret));
 		exit(1);
 	}
-
 
 	if (codecContext->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
 		nb_samples = 10000;
@@ -146,10 +148,10 @@ void AudioStream::encodeFrame(float out) {
 	}
 
 	if (audioSampleCounter % 2 == 0) {
-		*(l)++ = MultiMediaHelper::fromShortToFloat(out);
+		*(l)++ = MultiMedia::fromShortToFloat(out);
 	}
 	else {
-		*(r)++ = MultiMediaHelper::fromShortToFloat(out);
+		*(r)++ = MultiMedia::fromShortToFloat(out);
 	}
 
 	if (++audioSampleCounter == frame->nb_samples * codecContext->channels) {
@@ -158,20 +160,20 @@ void AudioStream::encodeFrame(float out) {
 		frame->pts = nextPts;
 
 		nextPts += frame->nb_samples;
-		//std::cout <<"\n audio pts: " << video.AudioFrame->pts;
+		//std::cout << "Audio pts: " << frame->pts << std::endl;
 
 		frame->pts = av_rescale_q(frame->pts, codecContext->time_base, stream->time_base);
 		frame->pkt_dts = frame->pts;
 
 		int ret = avcodec_send_frame(codecContext, frame);
 		if (ret < 0) {
-			std::cout << "\n send_frame: " << ret;
+			std::cout << "Send frame error: " << ret << std::endl;
 			exit(1);
 		}
 
 		ret = avcodec_receive_packet(codecContext, packet);
 		if (ret < 0) {
-			std::cout << "\n receive packet: " << ret;
+			std::cout << "Receive packet error: " << ret << std::endl;;
 			exit(1);
 		}
 

@@ -21,7 +21,7 @@ void Begin::update() {
 	}
 
 	//levelselect with space
-	else if (gameContext->getIOContext()->getSpaceButton().simple()) {
+	else if (gameContext->getIOContext()->getSelectButton().simple()) {
 		auto audio = gameContext->getAudio();		
 		for (auto id : std::vector<int>{ 4, 7, 17 })
 		{

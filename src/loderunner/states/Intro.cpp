@@ -71,7 +71,7 @@ void Intro::update() {
 	float ellapsedTime = calculateEllapsedTime();
 
 	if (ellapsedTime < stateContext->getAudio()->getAudioFileByID(8)->lengthInSec()) {
-		if (stateContext->getIOContext()->getSpaceButton().simple()) {
+		if (stateContext->getIOContext()->getSelectButton().simple()) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 

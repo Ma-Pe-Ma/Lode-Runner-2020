@@ -13,7 +13,7 @@
 struct GLFWwindow;
 
 class GlfwIOContext : public IOContext {
-	Button pButton, lAlt;
+	Button lAlt;
 
 	void saveImage(unsigned char*);
 	unsigned int findScreenShotCount();
@@ -28,6 +28,8 @@ protected:
 	int getIntByKey(std::string key, int defaultValue);
 	float getFloatByKey(std::string key, float defaultValue);
 	std::map<std::string, std::string> configMap;
+
+	std::shared_ptr<GameConfiguration> gameConfiguration;
 
 public:
 	virtual void initialize() override;
@@ -49,7 +51,7 @@ public:
 
 	void handleScreenRecording() override;
 #ifdef VIDEO_RECORDING
-	void initializeMultimedia();
+	std::shared_ptr<MultiMedia> initializeMultimedia();
 #endif
 };
 

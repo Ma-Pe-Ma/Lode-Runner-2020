@@ -1,7 +1,7 @@
 # Note: in VS you have to set the "currentDir" : "${workspaceRoot}" key-value inside the executable's debug configuration 
 # Without this the dlls and the assets/resources are not found when running the app while developing
 
-# to build emscripten version: emcmake cmake -B./out/build/wasm -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+# to build emscripten version: emcmake cmake -B./out/build/wasm-release -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
 cmake_minimum_required (VERSION 3.20)
 
@@ -41,7 +41,6 @@ add_executable(LodeRunner
 	"src/loderunner/iocontext/Button.cpp"
 	"src/loderunner/iocontext/GlfwIOContext.cpp"
 	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
-	"src/loderunner/iocontext/audio/Audio.cpp"
 	"src/loderunner/iocontext/rendering/Text.cpp"
 	"src/loderunner/iocontext/rendering/RenderingManager.cpp"
 
@@ -136,13 +135,9 @@ if (VIDEO_RECORDING AND WIN32)
 	add_definitions(-DVIDEO_RECORDING)
 
 	target_sources(LodeRunner PRIVATE
-		"src/loderunner/MultiMediaRecording/AudioParameters.cpp"
-		"src/loderunner/MultiMediaRecording/AudioStream.cpp"
-		"src/loderunner/MultiMediaRecording/MultiMedia.cpp" 
-		"src/loderunner/MultiMediaRecording/MultiMediaHelper.cpp"
-		"src/loderunner/MultiMediaRecording/Stream.cpp"
-		"src/loderunner/MultiMediaRecording/VideoParameters.cpp"
-		"src/loderunner/MultiMediaRecording/VideoStream.cpp"
+		"src/loderunner/multimediarecording/MultiMedia.cpp"
+		"src/loderunner/multimediarecording/AudioStream.cpp"		
+		"src/loderunner/multimediarecording/VideoStream.cpp"
 	)
 
 	target_include_directories(LodeRunner PRIVATE "${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/include")
@@ -158,11 +153,11 @@ if (VIDEO_RECORDING AND WIN32)
 	)
 
 	list(APPEND copyable_dlls
-		"swscale-6"
+		"swscale-7"
 		"swresample-4"
-		"avutil-57"
-		"avformat-59"
-		"avcodec-59"
+		"avutil-58"
+		"avformat-60"
+		"avcodec-60"
 	)
 
 	set(dll_extension "dll")

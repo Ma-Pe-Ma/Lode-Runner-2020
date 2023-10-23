@@ -40,7 +40,7 @@ void StateContext::setIOContext(std::shared_ptr<IOContext> ioContext)
     this->ioContext = ioContext;
 }
 
-void StateContext::setAudio(std::shared_ptr<Audio> audio)
+void StateContext::setAudio(std::shared_ptr<AudioContext> audio)
 {
     this->audio = audio;
 }

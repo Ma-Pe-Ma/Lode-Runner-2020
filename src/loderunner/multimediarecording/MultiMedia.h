@@ -2,7 +2,6 @@
 #define MULTIMEDIA_H
 
 #include <string>
-#include "RecordingState.h"
 
 #include "AudioParameters.h"
 #include "VideoParameters.h"
@@ -15,47 +14,23 @@
 class MultiMedia {
 
 private:
-	unsigned int* viewPortX;
-	unsigned int* viewPortY;
-	unsigned int* viewPortWidth;
-	unsigned int* viewPortHeight;
-
 	std::string fileName;
 
-	unsigned int videoOutputWidthWanted = 0;
-	unsigned int videoOutputHeightWanted = 0;
+	AudioStream* audioStream = nullptr;
+	VideoStream* videoStream = nullptr;
 
-	AudioParameters* audioParametersIn;
-	AudioParameters* audioParametersOut = nullptr;
-
-	VideoParameters* videoParametersIn;
-	VideoParameters* videoParametersOut = nullptr;
-
-	AudioStream* audio;
-	VideoStream* video;
-
-	bool initialized = false;
-
-	RecordingState recordingState = uninitialized;
 	AVFormatContext* formatContext = nullptr;
-	std::string(*generateName)();
-
-
 public:
-	MultiMedia(AudioParameters* audioParaMetersIn, AudioParameters* audioParaMetersOut, VideoParameters* videoParaMetersIn, VideoParameters* videoParaMetersOut);
-	
-	void setGLViewPortReferences(unsigned int*, unsigned int*, unsigned int*, unsigned int*);
-	
-	void initialize();
-	void closeVideo();
+	static std::tuple<unsigned int, unsigned int> determineOutput(unsigned int, unsigned int, unsigned int, unsigned int);
+	static void ffmpegError(int);
+	static float fromShortToFloat(short input);
+	static void mirrorFrameHorizontallyJ420(AVFrame* pFrame);
+
+	MultiMedia(std::string, AudioParameters*, AudioParameters*, VideoParameters*, VideoParameters*, std::function<void(unsigned char*)>);
+	~MultiMedia();
 
 	void writeVideoFrame();
 	void writeAudioFrame(short);
-	void recordAndControl(bool impulse);
-	void windowResized();
-
-	void setGenerateName(std::string(*generateName)());
-	void setVideoOutputSizeWanted(unsigned int, unsigned int);
 };
 
 #endif // !MULTIMEDIA_H
