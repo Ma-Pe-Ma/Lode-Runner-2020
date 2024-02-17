@@ -8,7 +8,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-class OpenALAudio : public AudioContext {
+class OpenALAudioContext : public AudioContext {
 	ALCdevice* device;
 	ALCcontext* openALContext;
 

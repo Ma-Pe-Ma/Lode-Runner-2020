@@ -7,7 +7,7 @@
 #include <GLES3/gl3.h>
 #include <emscripten/emscripten.h>
 #include "iocontext/EmscriptenIOContext.h"
-#include "iocontext/audio/OpenALAudio.h"
+#include "iocontext/audio/OpenALAudioContext.h"
 #else 
 #include <glad/glad.h>
 #include "iocontext/GlfwIOContext.h"		

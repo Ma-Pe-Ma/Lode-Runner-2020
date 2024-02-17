@@ -14,7 +14,7 @@ class RTAudioContext : public AudioContext {
 public:
 	void initialize() override {
 		if (dac.getDeviceCount() < 1) {
-			std::cout << "\nNo audio devices found!\n";
+			std::cout << "No audio devices found!" << std::endl;
 			exit(0);
 		}
 		
@@ -44,7 +44,7 @@ public:
 
 					for (auto iterator = self->audioFiles.begin(); iterator != self->audioFiles.end(); iterator++)
 					{
-						std::shared_ptr<AudioFile> audioFile = *iterator;
+						std::shared_ptr<AudioFile>& audioFile = *iterator;
 
 						if (audioFile->getPlayStatus() == AudioStatus::playing)
 						{
@@ -65,7 +65,7 @@ public:
 						for (int j = 0; j < CHANNEL_COUNT; j++) {
 							short dataOut = 0;
 							for (int k = 0; k < s; k++) {
-								dataOut += (((short(self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8)) + self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1])) / s;
+								dataOut += (short(self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8) + self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1]) / s;
 							}
 
 							dataOut /= 8;

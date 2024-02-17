@@ -1,11 +1,16 @@
 #ifndef AUDIOFILE_H
 #define AUDIOFILE_H
 
-#include "AudioStatus.h"
 #include <string>
 
 #include <vorbis/vorbisfile.h>
 #include <vorbis/codec.h>
+
+enum class AudioStatus {
+	stopped,
+	paused,
+	playing
+};
 
 class AudioFile {
 protected:
