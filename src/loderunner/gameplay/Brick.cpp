@@ -46,7 +46,7 @@ bool Brick::initiateDig(float gameTime) {
 }
 
 void Brick::digging(float gameTime) {
-	if (gameTime - timer > destroyTime) {
+	if (gameTime - timer >= destroyTime) {
 		brickState = BrickState::watiting;
 		*pointerToTexture = 15;
 		timer = gameTime;
@@ -91,7 +91,7 @@ void Brick::waiting(float gameTime) {
 }
 
 void Brick::building(float gameTime) {
-	if (gameTime - timer > buildTime) {
+	if (gameTime - timer >= buildTime) {
 		brickState = BrickState::original;
 		*pointerToTexture = 0;
 

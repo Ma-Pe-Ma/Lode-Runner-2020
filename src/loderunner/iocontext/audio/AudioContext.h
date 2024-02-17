@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 
-#include "AudioStatus.h"
 #include "AudioFile.h"
 
 #ifdef VIDEO_RECORDING

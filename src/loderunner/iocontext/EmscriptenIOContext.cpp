@@ -48,6 +48,20 @@ namespace EmscriptenHandler {
 		return a;
 		});
 
+	EM_JS(char*, get_local_storage_value, (const char* key), {
+			const value = localStorage.getItem(UTF8ToString(key));
+			
+			if (value == null) {
+				return stringToNewUTF8("");
+			}
+
+			return stringToNewUTF8(value);
+		});
+
+	EM_JS(void, set_local_storage_value, (const char* key, const char* value), {
+			localStorage.setItem(UTF8ToString(key), UTF8ToString(value));
+		});
+
 	EM_JS(void, set_cookie, (const char* key, const char* value), {
 			//console.log("Setting cookie: " + UTF8ToString(key) + "=" + UTF8ToString(value) + ";");
 			document.cookie = UTF8ToString(key) + "=" + UTF8ToString(value) + ";path=/;";
@@ -120,7 +134,7 @@ void EmscriptenIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConf
 {
 	const std::string keyPrefix = "LR_";
 
-	std::string cookies = EmscriptenHandler::get_cookies();
+	/*std::string cookies = EmscriptenHandler::get_cookies();
 	std::istringstream cookieStream(cookies);
 	std::string keyValuePair;
 
@@ -133,7 +147,10 @@ void EmscriptenIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConf
 		value = std::regex_replace(value, std::regex("^ +"), "");
 
 		configMap[key] = value;
-	}
+	}*/
+
+	configMap["levelNr"] = EmscriptenHandler::get_local_storage_value((keyPrefix + "levelNr").c_str());
+	configMap["levelset"] = EmscriptenHandler::get_local_storage_value((keyPrefix + "levelset").c_str());
 
 	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
 	gameConfiguration->setStartingLevel(getIntByKey("levelNr", 1));
@@ -143,7 +160,7 @@ void EmscriptenIOContext::saveConfig(std::string key, std::string value)
 {
 	const std::string keyPrefix = "LR_";
 	key = keyPrefix + key;
-	EmscriptenHandler::set_cookie(key.c_str(), value.c_str());
+	EmscriptenHandler::set_local_storage_value(key.c_str(), value.c_str());
 }
 
 void EmscriptenIOContext::initialize() {
@@ -485,6 +502,5 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 
 	emscriptenRenderingManager->updateTouchButtonRenderer(touchRenderVertices);
 };
-
 
 #endif // __EMSCRIPTEN__

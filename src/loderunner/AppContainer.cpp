@@ -22,7 +22,7 @@ void AppContainer::initialize()
 		showImguiWindow = false;
 	}
 
-	audio = std::make_shared<OpenALAudio>();
+	audio = std::make_shared<OpenALAudioContext>();
 #else
 	audio = std::make_shared<RTAudioContext>();
 #endif

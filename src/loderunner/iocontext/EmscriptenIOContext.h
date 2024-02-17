@@ -30,6 +30,9 @@ namespace EmscriptenHandler {
 
 		bool is_mobile();
 
+		char* get_local_storage_value(const char*);
+		void set_local_storage_value(const char*, const char*);
+
 		char* get_cookies();
 		void set_cookie(const char*, const char*);
 

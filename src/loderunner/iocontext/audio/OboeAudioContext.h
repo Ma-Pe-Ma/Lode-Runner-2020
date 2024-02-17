@@ -1,14 +1,12 @@
 #ifndef OBOEAUDIO_H
 #define OBOEAUDIO_H
 
-#include "Audio.h"
+#include "AudioContext.h"
 
-#ifdef ANDROID_VERSION
 #include "../AudioCallback.h"
 #include "../Helper.h"
-#else
 
-class OboeAudio : public Audio
+class OboeAudioContext : public AudioContext
 {
 	oboe::ManagedStream managedStream;
 	AudioCallback* audioCallback;

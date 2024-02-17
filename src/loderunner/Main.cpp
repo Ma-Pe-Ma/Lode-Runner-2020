@@ -14,15 +14,13 @@ int main(int argc, char**argv) {
 		auto ac = static_cast<AppContainer*>(appContainer);
 		ac->update();
 	}, &appContainer, 60, 1);
-
 #else
 	std::chrono::system_clock::time_point prevFrameStart = std::chrono::system_clock::now();
 
 	//game loop
 	while (appContainer.shouldClose()) {
-		std::chrono::duration<double, std::milli> workTime = std::chrono::system_clock::now() - prevFrameStart;
-
-		unsigned int frameRate = appContainer.getFrameRate();
+		const std::chrono::duration<double, std::milli> workTime = std::chrono::system_clock::now() - prevFrameStart;
+		const unsigned int frameRate = appContainer.getFrameRate();
 
 		if (workTime.count() < 1000.0f / frameRate) {
 			std::chrono::duration<double, std::milli> deltaMS(1000.0f / frameRate - workTime.count());
@@ -34,7 +32,6 @@ int main(int argc, char**argv) {
 
 		appContainer.update();
 	}
-
 #endif	
 	return 0;
 }
