@@ -5,9 +5,10 @@
 void EmscriptenRenderingManager::createShaders() {
 	maxVertexUniformNumber = EmscriptenHandler::getVertexMaxUniformNumber();
 	maxFragmentUniformNumber = EmscriptenHandler::getFragmentMaxUniformNumber();
+	int maxEnemyFragmentUniformNumber = maxFragmentUniformNumber / 3;
 
 	levelShader = new Shader(assetFolder + "/Shaders/level.vs", assetFolder + "/Shaders/level.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
-	enemyShader = new Shader(assetFolder + "/Shaders/player.vs", assetFolder + "/Shaders/player.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber/3));
+	enemyShader = new Shader(assetFolder + "/Shaders/player.vs", assetFolder + "/Shaders/player.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxEnemyFragmentUniformNumber));
 	characterShader = new Shader(assetFolder + "/Shaders/character.vs", assetFolder + "/Shaders/character.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
 	mainShader = new Shader(assetFolder + "/Shaders/main.vs", assetFolder + "/Shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
 	
