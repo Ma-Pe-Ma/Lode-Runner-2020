@@ -29,9 +29,13 @@ RenderingManager::RenderingManager(std::string assetFolder, std::shared_ptr<IOCo
 }
 
 void RenderingManager::createShaders() {
-	levelShader = new Shader(assetFolder + "/Shaders/level.vs", assetFolder + "/Shaders/level.fs", std::make_format_args(540), std::make_format_args(540));
-	enemyShader = new Shader(assetFolder + "/Shaders/player.vs", assetFolder + "/Shaders/player.fs", std::make_format_args(340), std::make_format_args(340));
-	characterShader = new Shader(assetFolder + "/Shaders/character.vs", assetFolder + "/Shaders/character.fs", std::make_format_args(864), std::make_format_args(864));
+	int levelArrayNr = 540;
+	int enemyArrayNumber = 340;
+	int characterArrayNumber = 864;
+
+	levelShader = new Shader(assetFolder + "/Shaders/level.vs", assetFolder + "/Shaders/level.fs", std::make_format_args(levelArrayNr), std::make_format_args(levelArrayNr));
+	enemyShader = new Shader(assetFolder + "/Shaders/player.vs", assetFolder + "/Shaders/player.fs", std::make_format_args(enemyArrayNumber), std::make_format_args(enemyArrayNumber));
+	characterShader = new Shader(assetFolder + "/Shaders/character.vs", assetFolder + "/Shaders/character.fs", std::make_format_args(characterArrayNumber), std::make_format_args(characterArrayNumber));
 	mainShader = new Shader(assetFolder + "/Shaders/main.vs", assetFolder + "/Shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
 
 	setupMainMenuRenderer();	

@@ -96,7 +96,7 @@ if(EMSCRIPTEN)
 		"
 	)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -fexperimental-library")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -fexperimental-library")
 
 	set_target_properties(LodeRunner
 		PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/Assets@/Assets/ "
@@ -112,6 +112,7 @@ if(EMSCRIPTEN)
 
 else()
 	add_subdirectory("src/submodules/glfw")
+	set(RTAUDIO_TARGETNAME_UNINSTALL "rtuninstall" CACHE STRING "Name of 'uninstall' build target" FORCE)
 	add_subdirectory("src/submodules/rtaudio")
 
 	target_sources(LodeRunner PUBLIC		

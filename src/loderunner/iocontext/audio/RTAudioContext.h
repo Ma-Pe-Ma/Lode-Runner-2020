@@ -29,72 +29,70 @@ public:
 		}
 
 		openAudioFiles();
+		
+		RtAudioErrorType rtAudioOpenError = dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames,
+			[](void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) -> int {
+				RTAudioContext* self = static_cast<RTAudioContext*>(userData);
+				short* out = (short*) outputBuffer;
 
-		try {
-			dac.openStream(&parameters, NULL, RTAUDIO_SINT16, SAMPLE_RATE, &bufferFrames,
-				[](void* outputBuffer, void* inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void* userData) -> int {
-					RTAudioContext* self = static_cast<RTAudioContext*>(userData);
-					short* out = (short*) outputBuffer;
+				if (status) {
+					std::cout << "Stream underflow detected!" << std::endl;
+				}
 
-					if (status) {
-						std::cout << "Stream underflow detected!" << std::endl;
-					}
+				int s = 0;
 
-					int s = 0;
+				for (auto iterator = self->audioFiles.begin(); iterator != self->audioFiles.end(); iterator++) {
+					std::shared_ptr<AudioFile>& audioFile = *iterator;
 
-					for (auto iterator = self->audioFiles.begin(); iterator != self->audioFiles.end(); iterator++)
+					if (audioFile->getPlayStatus() == AudioStatus::playing)
 					{
-						std::shared_ptr<AudioFile>& audioFile = *iterator;
+						long ret = audioFile->readNextBuffer(self->pcmout[s], FRAMES_PER_BUFFER * CHANNEL_COUNT * 2);
 
-						if (audioFile->getPlayStatus() == AudioStatus::playing)
-						{
-							long ret = audioFile->readNextBuffer(self->pcmout[s], FRAMES_PER_BUFFER * CHANNEL_COUNT * 2);
-
-							if (ret == 0) {
-								audioFile->stopAndRewind();
-							}
-
-							s++;
+						if (ret == 0) {
+							audioFile->stopAndRewind();
 						}
+
+						s++;
 					}
+				}
 
-					//if (av_compare_ts(video.next_pts, video.AudioCodecContext->time_base,STREAM_DURATION, (AVRational) { 1, 1 }) >= 0);
-					//else;
+				//if (av_compare_ts(video.next_pts, video.AudioCodecContext->time_base,STREAM_DURATION, (AVRational) { 1, 1 }) >= 0);
+				//else;
 
-					for (int i = 0; i < nBufferFrames; i++) {
-						for (int j = 0; j < CHANNEL_COUNT; j++) {
-							short dataOut = 0;
-							for (int k = 0; k < s; k++) {
-								dataOut += (short(self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8) + self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1]) / s;
-							}
+				for (int i = 0; i < nBufferFrames; i++) {
+					for (int j = 0; j < CHANNEL_COUNT; j++) {
+						short dataOut = 0;
+						for (int k = 0; k < s; k++) {
+							dataOut += (short(self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j] << 8) + self->pcmout[k][2 * CHANNEL_COUNT * i + 2 * j + 1]) / s;
+						}
 
-							dataOut /= 8;
+						dataOut /= 8;
 
 #ifdef VIDEO_RECORDING
-							if (self->multiMedia != nullptr) {
-								self->multiMedia->writeAudioFrame(dataOut);
-							}
-#endif
-							*out++ = dataOut;
+						if (self->multiMedia != nullptr) {
+							self->multiMedia->writeAudioFrame(dataOut);
 						}
+#endif
+						*out++ = dataOut;
 					}
+				}
 
-					return 0;
-				}, (void*) this);
+				return 0;
+			}, (void*) this);
 
-			dac.startStream();
-		}
-		catch (RtAudioError& e) {
-			e.printMessage();
-			exit(0);
-		}
+		if (rtAudioOpenError == RTAUDIO_NO_ERROR) {
+			RtAudioErrorType rtAudioStartStreamError = dac.startStream();
+
+			if (rtAudioStartStreamError != RTAUDIO_NO_ERROR) {
+
+			}
+		}		
 	}
 
 	void terminate() override {
 		dac.closeStream();
 
-		for (int i = 0; i < audioFileNames.size(); i++)
-		{
+		for (int i = 0; i < audioFileNames.size(); i++) {
 			delete[] pcmout[i];
 		}
 

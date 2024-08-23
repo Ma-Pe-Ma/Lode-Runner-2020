@@ -15,8 +15,6 @@ ffmpeg
 __TemplateIcon.ico
 vc141.pdb
 MyTemplate.vstemplate
-lode.vcxproj.user
-LR_Paths.props
 
 # Except git tidbits
 !.gitignore
