@@ -8,6 +8,9 @@
 /build*/
 /out/
 
+/assets/textures/*.rc
+/resources/
+
 ffmpeg
 
 *dll
