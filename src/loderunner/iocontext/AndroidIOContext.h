@@ -49,7 +49,7 @@ public:
 
 			if ((bool)champ) {
 				gameVersion = 1;
-				levelFileName = "Level/ChampionshipLevels.txt";
+				levelFileName = "levels/ChampionshipLevels.txt";
 			}
 
 			usCover = (bool)ntscCover;

@@ -26,7 +26,7 @@ void AppContainer::initialize()
 #else
 	audio = std::make_shared<RTAudioContext>();
 #endif
-	audio->setAudioFileNames("Assets/SFX/", soundNames);
+	audio->setAudioFileNames("assets/sfx/", soundNames);
 	audio->initialize();
 
 	gameConfiguration = std::make_shared<GameConfiguration>();
@@ -45,10 +45,10 @@ void AppContainer::initialize()
 #endif
 
 #ifdef __EMSCRIPTEN__
-	renderingManager = std::make_shared<EmscriptenRenderingManager>("./Assets/", ioContext);
+	renderingManager = std::make_shared<EmscriptenRenderingManager>("./assets/", ioContext);
 	(std::static_pointer_cast<EmscriptenIOContext>(ioContext))->setRenderingManager(std::static_pointer_cast<EmscriptenRenderingManager>(renderingManager));
 #else
-	renderingManager = std::make_shared<RenderingManager>("./Assets/", ioContext);
+	renderingManager = std::make_shared<RenderingManager>("./assets/", ioContext);
 #endif
 	renderingManager->createShaders();
 

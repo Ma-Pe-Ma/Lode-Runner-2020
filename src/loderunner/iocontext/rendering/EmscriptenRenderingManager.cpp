@@ -144,7 +144,7 @@ void EmscriptenRenderingManager::clearRenderableObjects() {
 }
 
 void EmscriptenRenderingManager::setupTouchButtonRenderer() {
-	loadTexture(6, touchTexture, assetFolder + "Texture/Touch.png");
+	loadTexture(6, touchTexture, assetFolder + "textures/Touch.png");
 
 	touchInputShader->use();
 	touchInputShader->setInt("touchTexture", 6);

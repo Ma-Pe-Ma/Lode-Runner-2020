@@ -11,7 +11,7 @@ class GameConfiguration {
 	unsigned int startingLevel = 1;
 	unsigned int recordingHeight = 800;
 
-	std::string levelFileName = "Assets/Level/ChampionshipLevels.txt";
+	std::string levelFileName = "assets/levels/ChampionshipLevels.txt";
 
 	unsigned int framesPerSec;
 
@@ -34,10 +34,10 @@ public:
 
 		switch (this->gameVersion) {
 		case 0:
-			levelFileName = "Assets/Level/OriginalLevels.txt";
+			levelFileName = "assets/levels/OriginalLevels.txt";
 			break;
 		case 1:
-			levelFileName = "Assets/Level/ChampionshipLevels.txt";
+			levelFileName = "assets/levels/ChampionshipLevels.txt";
 			break;
 		default:
 

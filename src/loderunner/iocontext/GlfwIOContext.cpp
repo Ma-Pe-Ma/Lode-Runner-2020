@@ -138,7 +138,7 @@ void GlfwIOContext::saveImage(unsigned char* buffer)
 	//find next non-existing screenshot identifier
 	unsigned int scr = this->findScreenShotCount();
 
-	std::string sname = "Screenshots/Screenshot-" + std::to_string(scr) + ".png";
+	std::string sname = "resources/screenshots/Screenshot-" + std::to_string(scr) + ".png";
 
 	const char* name = sname.c_str();
 
@@ -158,7 +158,7 @@ unsigned int GlfwIOContext::findVideoCount() {
 	int videoCount = 0;
 
 	while (true) {
-		std::string stringName = "GameplayVideos/GameplayVideo-" + std::to_string(videoCount) + ".mkv";
+		std::string stringName = "resources/gameplay-videos/GameplayVideo-" + std::to_string(videoCount) + ".mkv";
 
 		std::ifstream fileStream;
 		fileStream.open(stringName);
@@ -178,14 +178,14 @@ unsigned int GlfwIOContext::findVideoCount() {
 
 std::string GlfwIOContext::generateNewVideoName() {
 	unsigned int vid = findVideoCount();
-	return "GameplayVideos/GameplayVideo-" + std::to_string(vid) + ".mkv";
+	return "resources/gameplay-videos/GameplayVideo-" + std::to_string(vid) + ".mkv";
 }
 
 unsigned int GlfwIOContext::findScreenShotCount() {
 	int screenshotCount = 0;
 
 	while (true) {
-		std::string stringName = "Screenshots/Screenshot-" + std::to_string(screenshotCount) + ".png";
+		std::string stringName = "resources/screenshots/Screenshot-" + std::to_string(screenshotCount) + ".png";
 
 		std::ifstream fileStream;
 		fileStream.open(stringName);
@@ -204,7 +204,7 @@ unsigned int GlfwIOContext::findScreenShotCount() {
 }
 
 void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration) {
-	std::ifstream config("config.txt", std::fstream::in);
+	std::ifstream config("resources/config.txt", std::fstream::in);
 	std::string line;
 
 	if (config.is_open()) {
@@ -371,7 +371,7 @@ void GlfwIOContext::initialize()
 
 	GLFWimage icon;
 	int iconNrComp;
-	icon.pixels = stbi_load("Assets/Texture/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
+	icon.pixels = stbi_load("assets/textures/Runner.png", &icon.width, &icon.height, &iconNrComp, 4);
 	glfwSetWindowIcon(window, 1, &icon);
 
 	glfwMakeContextCurrent(window);
@@ -464,7 +464,7 @@ void GlfwIOContext::saveConfig(std::string modifiableKey, std::string modifiable
 
 	std::ifstream configFileOld;
 	std::ofstream configFileNew;
-	configFileOld.open("config.txt");
+	configFileOld.open("resources/config.txt");
 	configFileNew.open("config_temp.txt");
 	bool modifialbleLineFound = false;
 
@@ -496,8 +496,8 @@ void GlfwIOContext::saveConfig(std::string modifiableKey, std::string modifiable
 	configFileNew.close();
 	configFileOld.close();
 
-	remove("config.txt");
-	rename("config_temp.txt", "config.txt");
+	remove("resources/config.txt");
+	rename("config_temp.txt", "resources/config.txt");
 }
 
 void GlfwIOContext::loadLevel(std::string fileName, std::function<bool(std::string)> lineProcessor)

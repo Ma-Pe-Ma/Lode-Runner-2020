@@ -52,6 +52,25 @@ add_executable(LodeRunner
 	"src/submodules/imgui/imgui_widgets.cpp"
 )
 
+if(WIN32)
+	# on windows generate icon file and add to the sources
+	file(WRITE "assets/textures/icon.rc" "IDI_ICON1 ICON \"./RUNNER.ico\"")
+
+	target_sources(LodeRunner PRIVATE
+		"assets/textures/icon.rc"
+	)
+
+	# set up resources for developing
+	file(MAKE_DIRECTORY "resources/screenshots")
+	if(VIDEO_RECORDING)
+		file(MAKE_DIRECTORY "resources/gameplay-videos")
+	endif()
+
+	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/config.txt")
+		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.txt" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+	endif()
+endif()
+
 # build external libraries
 add_subdirectory("${CMAKE_SOURCE_DIR}/src/submodules/ogg")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src/submodules/vorbis")
@@ -213,4 +232,27 @@ if (WIN32)
 	endif()
 elseif(UNIX)
 	add_definitions(-DSOUND_API=RtAudio::LINUX_ALSA)
+endif()
+
+# cmake --install /path/to/build --prefix /path/to/install --component loderunner
+if(EMSCRIPTEN)
+	set(em_target "LodeRunner")
+	install(TARGETS LodeRunner COMPONENT loderunner RUNTIME DESTINATION ".")
+	install(FILES
+        "$<TARGET_FILE_DIR:${em_target}>/${em_target}.js"
+        "$<TARGET_FILE_DIR:${em_target}>/${em_target}.wasm"
+		"$<TARGET_FILE_DIR:${em_target}>/${em_target}.data"
+		COMPONENT loderunner
+        DESTINATION ".")
+elseif(WIN32 OR UNIX)
+	install(TARGETS LodeRunner COMPONENT loderunner RUNTIME DESTINATION ".")
+	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE)
+	install(FILES "ReadMe.md" "LICENSE.md" COMPONENT loderunner DESTINATION ".")
+	
+	install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/screenshots")
+	install(FILES "config.txt" COMPONENT loderunner DESTINATION "./resources/")
+	
+	if(VIDEO_RECORDING)
+		install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/gameplay-videos")
+	endif()
 endif()
