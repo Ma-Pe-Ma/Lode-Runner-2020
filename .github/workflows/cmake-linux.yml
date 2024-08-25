@@ -1,0 +1,70 @@
+name: Build Linux
+run-name: Build Linux
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
+      fail-fast: false
+
+      # Set up a matrix to run the following 3 configurations:
+      # 1. <Linux, Release, latest GCC compiler toolchain on the default runner image, default generator>
+      # 2. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
+      matrix:
+        os: [ubuntu-24.04]
+        build_type: [Release]
+        c_compiler: [gcc, clang]
+        include:
+          - os: ubuntu-24.04
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-24.04
+            c_compiler: clang
+            cpp_compiler: clang++
+
+    steps:
+    - name: Set up dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwayland-dev
+        sudo apt-get install -y libxkbcommon-dev
+        sudo apt-get install -y xorg-dev
+        sudo apt-get install -y libasound2-dev
+        
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "install-output-dir=${{ github.workspace }}/install" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Install
+      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --prefix  ${{ steps.strings.outputs.install-output-dir }} --component loderunner
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: LodeRunner-linux-x64-${{ matrix.cpp_compiler }}
+        path: ${{ steps.strings.outputs.install-output-dir }}

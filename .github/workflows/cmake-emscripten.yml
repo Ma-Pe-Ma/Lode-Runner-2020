@@ -1,0 +1,48 @@
+name: Build Emscripten
+run-name: Build Emscripten
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-emsdk:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up dependencies
+      run: |
+        sudo apt-get install -y ninja-build
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "install-output-dir=${{ github.workspace }}/install" >> "$GITHUB_OUTPUT"
+    
+    - uses: mymindstorm/setup-emsdk@v14
+    - name: Checking out repository and its submodules
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Configure CMake
+      run: >
+        emcmake cmake -B${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_BUILD_TYPE=Release
+        -G "Ninja" 
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: ninja -C ${{ steps.strings.outputs.build-output-dir }}
+
+    - name: Install
+      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --prefix  ${{ steps.strings.outputs.install-output-dir }} --component loderunner
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: LodeRunner-wasm
+        path: ${{ steps.strings.outputs.install-output-dir }}
