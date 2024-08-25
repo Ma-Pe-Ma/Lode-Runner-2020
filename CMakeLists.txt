@@ -6,6 +6,8 @@
 cmake_minimum_required (VERSION 3.20)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 project("LodeRunner")
 
@@ -109,16 +111,14 @@ if(EMSCRIPTEN)
 	
 	# configure opengl context + pthreads
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sLLD_REPORT_UNDEFINED \
-		-s USE_GLFW=3 -sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2 \
+		-s USE_GLFW=3 -sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2 -lopenal \
 		-pthread -s USE_PTHREADS=1 -sPTHREAD_POOL_SIZE=4 -sALLOW_MEMORY_GROWTH \
-		-lopenal 
-		"
+		-std=c++23 -fexperimental-library "
 	)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -fexperimental-library")
-
+	# link the assets folders
 	set_target_properties(LodeRunner
-		PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/Assets@/Assets/ "
+		PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/assets@/assets/"
 	)
 
 	target_compile_options(LodeRunner
@@ -128,7 +128,6 @@ if(EMSCRIPTEN)
 	target_sources(LodeRunner PRIVATE
 		"src/loderunner/iocontext/rendering/EmscriptenRenderingManager.cpp"
 	)
-
 else()
 	add_subdirectory("src/submodules/glfw")
 	set(RTAUDIO_TARGETNAME_UNINSTALL "rtuninstall" CACHE STRING "Name of 'uninstall' build target" FORCE)
@@ -144,9 +143,7 @@ else()
 	)
 endif()
 
-# setting project for video recording
-# currently not working as ffmpeg update broke some functionalites (some members became const)
-# earlier only Windows build was tested
+# setting project for video recording (only Windows build was tested)
 option(VIDEO_RECORDING "Build with video recording capabilites" OFF)
 
 # download libraries from https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z and unpack it to ./src/submodules/ffmpeg
