@@ -7,13 +7,13 @@ void EmscriptenRenderingManager::createShaders() {
 	maxFragmentUniformNumber = EmscriptenHandler::getFragmentMaxUniformNumber();
 	int maxEnemyFragmentUniformNumber = maxFragmentUniformNumber / 3;
 
-	levelShader = new Shader(assetFolder + "/Shaders/level.vs", assetFolder + "/Shaders/level.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
-	enemyShader = new Shader(assetFolder + "/Shaders/player.vs", assetFolder + "/Shaders/player.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxEnemyFragmentUniformNumber));
-	characterShader = new Shader(assetFolder + "/Shaders/character.vs", assetFolder + "/Shaders/character.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
-	mainShader = new Shader(assetFolder + "/Shaders/main.vs", assetFolder + "/Shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
+	levelShader = new Shader(assetFolder + "/shaders/level.vs", assetFolder + "/shaders/level.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
+	enemyShader = new Shader(assetFolder + "/shaders/player.vs", assetFolder + "/shaders/player.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxEnemyFragmentUniformNumber));
+	characterShader = new Shader(assetFolder + "/shaders/character.vs", assetFolder + "/shaders/character.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
+	mainShader = new Shader(assetFolder + "/shaders/main.vs", assetFolder + "/shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
 	
 	if (EmscriptenHandler::is_mobile()) {
-		touchInputShader = new Shader(assetFolder + "/Shaders/touch.vs", assetFolder + "/Shaders/touch.fs", std::make_format_args(""), std::make_format_args(""));;
+		touchInputShader = new Shader(assetFolder + "/shaders/touch.vs", assetFolder + "/shaders/touch.fs", std::make_format_args(""), std::make_format_args(""));;
 		setupTouchButtonRenderer();
 	}
 	
