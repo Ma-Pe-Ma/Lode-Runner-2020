@@ -3,7 +3,7 @@
 
 ![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
-![browser](https://badgen.net/badge/browser/working/green) ![Windows](https://badgen.net/badge/Windows/working/green) ![Linux](https://badgen.net/badge/Linux/working/green) ![Android](https://badgen.net/badge/Android/working/green)
+![WASM](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-wasm.yml/badge.svg) ![Windows](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-windows.yml/badge.svg) ![Linux](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-linux.yml/badge.svg) ![Android](https://badgen.net/badge/Android/working/green)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
@@ -95,6 +95,8 @@ The game uses XInput API for controller handling.
 Check out the release section you can find simple and video recording versions. Choose the one that you want!
 
 Just simply unpack the 7z archive and launch the "Lode Runner.exe". 
+
+You can also find the [latest builds here](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions) which are delivered by Actions.
 
 For the Android notes please check the [aforementioned ReadMe](./Android/ReadMe.md).
 
