@@ -1,5 +1,5 @@
-name: Build Emscripten
-run-name: Build Emscripten
+name: Build WASM
+run-name: Build WASM
 
 on:
   push:
