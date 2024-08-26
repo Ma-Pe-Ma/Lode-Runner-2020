@@ -4,11 +4,17 @@ run-name: Build Emscripten
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'assets/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'assets/**'
 
 jobs:
-  build-emsdk:
+  build:
     runs-on: ubuntu-latest
     steps:
 
