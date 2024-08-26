@@ -12,6 +12,7 @@ on:
     paths:
       - 'src/**'
       - 'assets/**'
+  workflow_dispatch:
 
 jobs:
   build:
