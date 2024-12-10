@@ -1,5 +1,5 @@
 # Lode Runner 2020
-![](./Assets/Texture/Logo.png)
+![](./assets/textures/Logo.png)
 
 ![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
