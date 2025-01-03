@@ -10,22 +10,26 @@ private:
 	int sampleRate;
 	AVCodecID codecID;
 	int bitrate;
-	uint64_t channelLayout;
+	uint64_t channelLayoutMask;
+	AVChannelLayout channelLayout;
 	AVSampleFormat aVSampleFormat;
 
 public:
-	AudioParameters(int sampleRate, AVCodecID codecID, int bitrate, uint64_t channelLayout, AVSampleFormat aVSampleFormat) {
+	AudioParameters(int sampleRate, AVCodecID codecID, int bitrate, uint64_t channelLayoutMask, AVSampleFormat aVSampleFormat) {
 		this->sampleRate = sampleRate;
 		this->codecID = codecID;
 		this->bitrate = bitrate;
-		this->channelLayout = channelLayout;
 		this->aVSampleFormat = aVSampleFormat;
+		
+		this->channelLayoutMask = channelLayoutMask;
+		av_channel_layout_from_mask(&this->channelLayout, channelLayoutMask);
 	}
 
 	int getSampleRate() { return sampleRate; }
 	const AVCodecID getCodecID() { return codecID; }
 	int getBitrate() { return bitrate; }
-	uint64_t getChannelLayout() { return channelLayout; }
+	uint64_t getChannelLayoutMask() { return channelLayoutMask; }
+	AVChannelLayout* getChannelLayout() { return &channelLayout; }
 	AVSampleFormat getAVSampleFormat() { return aVSampleFormat; }
 };
 

@@ -1,8 +1,6 @@
 #ifndef AUDIOSTREAM_H
 #define AUDIOSTREAM_H
 
-#include <iostream>
-
 #include "Stream.h"
 #include "AudioParameters.h"
 
@@ -17,24 +15,14 @@ private:
 	AudioParameters* inputAudioParameters;
 	AudioParameters* outputAudioParameters;
 
-	SwrContext* swr_ctx;
-
-	//left channel
+	//left and right channels
 	float* l;
-	//right channel
 	float* r;
 
 	int audioSampleCounter = 0;
 public:
 	AudioStream(AudioParameters*, AudioParameters*, AVFormatContext*);
-	~AudioStream() {
-		//setting correct duration of the stream
-		//stream->duration = av_rescale_q(next_pts, codecContext->time_base, stream->time_base);
-		freeFrames();
-
-		delete inputAudioParameters;
-		delete outputAudioParameters;
-	}
+	~AudioStream();
 	void encodeFrame(float);
 };
 
