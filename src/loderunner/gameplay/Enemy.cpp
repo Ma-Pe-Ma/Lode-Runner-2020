@@ -105,21 +105,21 @@ void Enemy::findPath() {
 
 #ifndef NDEBUG
 	if (*gameContext->getGameConfiguration()->getEnemyDebugState()) {
-		auto io = gameContext->getIOContext();
+		auto& buttonInputs = gameContext->getIOContext()->getButtonInputs();
 
 		if (debugEnemy == 1)
 		{
-			if (io->getHButton().continuous()) {
+			if (buttonInputs.d1Right.continuous()) {
 				dPos.x = actualSpeed;
 			}
-			else if (io->getFButton().continuous()) {
+			else if (buttonInputs.d1Left.continuous()) {
 				dPos.x = -actualSpeed;
 			}
 
-			if (io->getTButton().continuous()) {
+			if (buttonInputs.d1Up.continuous()) {
 				dPos.y = actualSpeed;
 			}
-			else if (io->getGButton().continuous()) {
+			else if (buttonInputs.d1Down.continuous()) {
 				dPos.y = -actualSpeed;
 			}
 		}
@@ -127,17 +127,17 @@ void Enemy::findPath() {
 		{
 			auto io = gameContext->getIOContext();
 
-			if (io->getLButton().continuous()) {
+			if (buttonInputs.d2Right.continuous()) {
 				dPos.x = actualSpeed;
 			}
-			else if (io->getJButton().continuous()) {
+			else if (buttonInputs.d2Left.continuous()) {
 				dPos.x = -actualSpeed;
 			}
 
-			if (io->getIButton().continuous()) {
+			if (buttonInputs.d2Up.continuous()) {
 				dPos.y = actualSpeed;
 			}
-			else if (io->getKButton().continuous()) {
+			else if (buttonInputs.d2Down.continuous()) {
 				dPos.y = -actualSpeed;
 			}
 		}

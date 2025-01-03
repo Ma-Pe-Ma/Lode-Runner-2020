@@ -59,7 +59,6 @@ void StateContext::transitionTo(State* newState, bool start, bool end) {
     }
 
     currentState = newState;
-    //currentState->setStateContext(this);
 
     if (start) {
         currentState->start();
@@ -68,7 +67,7 @@ void StateContext::transitionTo(State* newState, bool start, bool end) {
 
 void StateContext::update() {
     currentState->update();
-    checkTransitionAtEndofFrame();
+    checkTransitionAtEndOfFrame();
 }
 
 void StateContext::transitionToAtEndOfFrame(State* newState, bool start, bool end) {
@@ -76,7 +75,7 @@ void StateContext::transitionToAtEndOfFrame(State* newState, bool start, bool en
     transitionableAtEndOfFrame = newState;
 }
 
-void StateContext::checkTransitionAtEndofFrame()
+void StateContext::checkTransitionAtEndOfFrame()
 {
     if (transitionableAtEndOfFrame != nullptr)
     {

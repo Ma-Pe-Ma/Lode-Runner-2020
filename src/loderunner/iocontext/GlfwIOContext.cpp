@@ -29,32 +29,49 @@
 #include "audio/AudioContext.h"
 #endif
 
-void GlfwIOContext::processInput() {
+void GlfwIOContext::initFrame() {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
 
-	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
-	pauseButton.detect(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
+	ImGui::NewFrame();
+
+	processInput();
+}
+
+void GlfwIOContext::finalizeFrame()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(window);
+	glfwPollEvents();
+}
+
+void GlfwIOContext::processInput() {
+	buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+	buttonInputs.pause.detect(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
 #ifndef __EMSCRIPTEN__
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
-	leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5);
-	rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5);
-	up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5);
-	down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5);
-	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
-	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
-	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
-	select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
+	buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5);
+	buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5);
+	buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5);
+	buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5);
+	buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
+	buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
+	buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
+	buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
 
-	screenshotButton.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+	buttonInputs.screenshot.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 	lAlt.detect(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS);
 #endif
 
 #ifdef VIDEO_RECORDING
-	videoButton.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+	buttonInputs.videoButton.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
 #endif
 
-	if (lAlt.continuous() && enter.simple()) {
+	if (lAlt.continuous() && buttonInputs.enter.simple()) {
 		fullscreenSwitch();
 	}
 
@@ -63,22 +80,16 @@ void GlfwIOContext::processInput() {
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	fButton.detect(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
-	gButton.detect(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
-	hButton.detect(glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS);
-	tButton.detect(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
+	buttonInputs.d1Left.detect(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+	buttonInputs.d1Down.detect(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+	buttonInputs.d1Right.detect(glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS);
+	buttonInputs.d1Up.detect(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
 
-	iButton.detect(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS);
-	jButton.detect(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS);
-	kButton.detect(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
-	lButton.detect(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
+	buttonInputs.d2Up.detect(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS);
+	buttonInputs.d2Left.detect(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS);
+	buttonInputs.d2Down.detect(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
+	buttonInputs.d2Right.detect(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
 #endif
-}
-
-void GlfwIOContext::finalizeFrame()
-{
-	glfwSwapBuffers(window);
-	glfwPollEvents();
 }
 
 unsigned int GlfwIOContext::loadTexture(char const* path)
@@ -125,8 +136,8 @@ unsigned int GlfwIOContext::loadTexture(char const* path)
 
 void GlfwIOContext::takeScreenShot()
 {
-	unsigned char* buffer = new unsigned char[std::get<0>(screenSize) * std::get<1>(screenSize) * 3];
-	glReadPixels(0, 0, std::get<0>(screenSize), std::get<1>(screenSize), GL_RGB, GL_UNSIGNED_BYTE, buffer);
+	unsigned char* buffer = new unsigned char[std::get<0>(screenParameters.screenSize) * std::get<1>(screenParameters.screenSize) * 3];
+	glReadPixels(0, 0, std::get<0>(screenParameters.screenSize), std::get<1>(screenParameters.screenSize), GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
 	std::thread saveThread(&GlfwIOContext::saveImage, this, buffer);
 	saveThread.detach();
@@ -134,7 +145,7 @@ void GlfwIOContext::takeScreenShot()
 
 void GlfwIOContext::saveImage(unsigned char* buffer)
 {
-	std::cout << "\n Trying to save image...";
+	std::cout << "Trying to save image..." << std::endl;
 	//find next non-existing screenshot identifier
 	unsigned int scr = this->findScreenShotCount();
 
@@ -144,11 +155,11 @@ void GlfwIOContext::saveImage(unsigned char* buffer)
 
 	stbi_flip_vertically_on_write(true);
 
-	if (!stbi_write_png(name, std::get<0>(screenSize), std::get<1>(screenSize), 3, buffer, 0)) {
-		std::cout << "\nERROR: Could not write screenshot file: " << name;
+	if (!stbi_write_png(name, std::get<0>(screenParameters.screenSize), std::get<1>(screenParameters.screenSize), 3, buffer, 0)) {
+		std::cout << "ERROR: Could not write screenshot file: " << name << std::endl;
 	}
 	else {
-		std::cout << "\nScreenshot taken as: " << name;
+		std::cout << "Screenshot taken as: " << name << std::endl;
 	}
 
 	delete[] buffer;
@@ -227,23 +238,23 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 
 	switch (resolutionMode) {
 	case 0:
-		this->screenSize = std::make_tuple(1500, 900);
+		this->screenParameters.screenSize = std::make_tuple(1500, 900);
 		break;
 	case 1:
-		this->screenSize = std::make_tuple(750, 450);
+		this->screenParameters.screenSize = std::make_tuple(750, 450);
 		break;
 	case 2:
-		this->screenSize = std::make_tuple(3000, 1800);
+		this->screenParameters.screenSize = std::make_tuple(3000, 1800);
 		break;
 	case 3:
-		this->screenSize = std::make_tuple(1750, 1050);
+		this->screenParameters.screenSize = std::make_tuple(1750, 1050);
 		break;
 	case 4:
-		this->screenSize = std::make_tuple(getIntByKey("width", std::get<0>(this->screenSize)), getIntByKey("height", std::get<0>(this->screenSize)));
+		this->screenParameters.screenSize = std::make_tuple(getIntByKey("width", std::get<0>(this->screenParameters.screenSize)), getIntByKey("height", std::get<0>(this->screenParameters.screenSize)));
 	}
 
-	std::get<0>(screenSize) = std::get<0>(screenSize) > 4096 ? 4096 : std::get<0>(screenSize);
-	std::get<1>(screenSize) = std::get<1>(screenSize) > 2160 ? 2160 : std::get<1>(screenSize);
+	std::get<0>(this->screenParameters.screenSize) = std::get<0>(this->screenParameters.screenSize) > 4096 ? 4096 : std::get<0>(this->screenParameters.screenSize);
+	std::get<1>(this->screenParameters.screenSize) = std::get<1>(this->screenParameters.screenSize) > 2160 ? 2160 : std::get<1>(this->screenParameters.screenSize);
 
 	gameConfiguration->setPlayerSpeed(getFloatByKey("playerSpeed", 0.9f));
 	gameConfiguration->setEnemySpeed(getFloatByKey("enemySpeed", 0.415f));
@@ -293,15 +304,15 @@ float GlfwIOContext::getFloatByKey(std::string key, float defaultValue) {
 
 void GlfwIOContext::fullscreenSwitch() {
 	if (!fullScreen) {
-		formerScreenSize = screenSize;
+		this->screenParameters.formerScreenSize = this->screenParameters.screenSize;
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 		glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);		
 	}
 	else {
-		glfwSetWindowMonitor(window, NULL, 0, 0, std::get<0>(formerScreenSize), std::get<0>(formerScreenSize), 0);
-		glfwSetWindowPos(window, std::get<0>(screenPosition), std::get<1>(screenPosition));
+		glfwSetWindowMonitor(window, NULL, 0, 0, std::get<0>(this->screenParameters.formerScreenSize), std::get<0>(this->screenParameters.formerScreenSize), 0);
+		glfwSetWindowPos(window, std::get<0>(this->screenParameters.screenPosition), std::get<1>(this->screenParameters.screenPosition));
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
@@ -317,10 +328,10 @@ bool GlfwIOContext::shouldClose()
 
 void GlfwIOContext::initialize()
 {
-	leftDigButton.setImpulseTime(0.25f);
-	rightDigButton.setImpulseTime(0.25f);
+	buttonInputs.leftDig.setImpulseTime(0.25f);
+	buttonInputs.rightDig.setImpulseTime(0.25f);
 
-	updateViewPortValues(std::get<0>(screenSize), std::get<1>(screenSize));
+	screenParameters.updateViewPortValues(std::get<0>(this->screenParameters.screenSize), std::get<1>(this->screenParameters.screenSize));
 
 	glfwInit();
 
@@ -346,7 +357,7 @@ void GlfwIOContext::initialize()
 	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(std::get<0>(screenSize), std::get<1>(screenSize), reinterpret_cast<const char*>(u8"Lode Runner 2020 - Margitai Péter Máté"), NULL, NULL);
+	window = glfwCreateWindow(std::get<0>(this->screenParameters.screenSize), std::get<1>(this->screenParameters.screenSize), reinterpret_cast<const char*>(u8"Lode Runner 2020 - Margitai Péter Máté"), NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -363,11 +374,11 @@ void GlfwIOContext::initialize()
 		auto self = static_cast<GlfwIOContext*>(glfwGetWindowUserPointer(window));
 
 		if (self->fullScreen) {
-			self->screenPosition = std::make_tuple(x, y);
+			self->screenParameters.screenPosition = std::make_tuple(x, y);
 		}
 	});
 
-	glfwSetWindowPos(window, std::get<0>(screenPosition), std::get<1>(screenPosition));
+	glfwSetWindowPos(window, std::get<0>(this->screenParameters.screenPosition), std::get<1>(this->screenParameters.screenPosition));
 
 	GLFWimage icon;
 	int iconNrComp;
@@ -379,7 +390,7 @@ void GlfwIOContext::initialize()
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		//std::cout << "Updating viewport: " << width << ", " << height << std::endl;
 		auto self = static_cast<GlfwIOContext*>(glfwGetWindowUserPointer(window));
-		self->updateViewPortValues(width, height);
+		self->screenParameters.updateViewPortValues(width, height);
 
 #ifdef VIDEO_RECORDING
 		if (self->multiMedia != nullptr) {
@@ -387,7 +398,7 @@ void GlfwIOContext::initialize()
 		}
 #endif // VIDEO_RECORDING
 
-		glViewport(std::get<0>(self->viewPortPosition), std::get<1>(self->viewPortPosition), std::get<0>(self->viewPortSize), std::get<1>(self->viewPortSize));
+		glViewport(std::get<0>(self->screenParameters.viewPortPosition), std::get<1>(self->screenParameters.viewPortPosition), std::get<0>(self->screenParameters.viewPortSize), std::get<1>(self->screenParameters.viewPortSize));
 	});
 
 	glfwSetWindowSizeCallback(window, [](GLFWwindow*, int width, int height) -> void {
@@ -436,12 +447,12 @@ void GlfwIOContext::terminate()
 void GlfwIOContext::handleScreenRecording()
 {
 	//take a screenshot
-	if (screenshotButton.simple()) {
+	if (buttonInputs.screenshot.simple()) {
 		takeScreenShot();
 	}
 
 #ifdef VIDEO_RECORDING
-	if (videoButton.simple()) {
+	if (buttonInputs.videoButton.simple()) {
 		if (multiMedia == nullptr) {
 			multiMedia = initializeMultimedia();
 			audio->setMultiMedia(multiMedia);
@@ -521,22 +532,21 @@ void GlfwIOContext::loadLevel(std::string fileName, std::function<bool(std::stri
 #define STREAM_FRAME_RATE 60
 #define STREAM_BIT_RATE 400000
 
-std::shared_ptr<MultiMedia> GlfwIOContext::initializeMultimedia()
-{
+std::shared_ptr<MultiMedia> GlfwIOContext::initializeMultimedia() {
 	AudioParameters* audioIn = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 	AudioParameters* audioOut = new AudioParameters(44100, AV_CODEC_ID_AC3, 327680, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16);
 
 	unsigned int recordingHeight = gameConfiguration->getRecordingHeight();
 	unsigned int recordingWidth = unsigned int(recordingHeight * 16.0f / 9);
 
-	std::tuple<unsigned int, unsigned int> outputSize = MultiMedia::determineOutput(std::get<0>(viewPortSize), std::get<1>(viewPortSize), recordingWidth, recordingHeight);
+	std::tuple<unsigned int, unsigned int> outputSize = MultiMedia::determineOutput(std::get<0>(screenParameters.viewPortSize), std::get<1>(screenParameters.viewPortSize), recordingWidth, recordingHeight);
 
-	VideoParameters* videoIn = new VideoParameters(std::get<0>(viewPortSize), std::get<1>(viewPortSize), STREAM_BIT_RATE, STREAM_FRAME_RATE, AV_CODEC_ID_NONE, AV_PIX_FMT_RGB24);
-	VideoParameters* videoOut = new VideoParameters(std::get<0>(outputSize), std::get<1>(outputSize), STREAM_BIT_RATE, STREAM_FRAME_RATE, AV_CODEC_ID_H264, AV_PIX_FMT_YUV420P);
+	VideoParameters* videoIn = new VideoParameters(std::get<0>(screenParameters.viewPortSize), std::get<1>(screenParameters.viewPortSize), STREAM_BIT_RATE, gameConfiguration->getFramesPerSec(), AV_CODEC_ID_NONE, AV_PIX_FMT_RGB24);
+	VideoParameters* videoOut = new VideoParameters(std::get<0>(outputSize), std::get<1>(outputSize), STREAM_BIT_RATE, gameConfiguration->getFramesPerSec(), AV_CODEC_ID_H264, AV_PIX_FMT_YUV420P);
 	
 	return std::make_shared<MultiMedia>(generateNewVideoName(), audioIn, audioOut, videoIn, videoOut,
 		[this](unsigned char* buffer) -> void {
-			glReadPixels(std::get<0>(viewPortPosition), std::get<1>(viewPortPosition), std::get<0>(viewPortSize), std::get<1>(viewPortSize), GL_RGB, GL_UNSIGNED_BYTE, buffer);
+			glReadPixels(std::get<0>(screenParameters.viewPortPosition), std::get<1>(screenParameters.viewPortPosition), std::get<0>(screenParameters.viewPortSize), std::get<1>(screenParameters.viewPortSize), GL_RGB, GL_UNSIGNED_BYTE, buffer);
 		}
 	);
 }

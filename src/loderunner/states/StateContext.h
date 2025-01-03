@@ -31,9 +31,9 @@ private:
 	std::shared_ptr<GameConfiguration> gameConfiguration;
 	std::shared_ptr<AudioContext> audio;
 
+	void checkTransitionAtEndOfFrame();
 public:	
 	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
-	void checkTransitionAtEndofFrame();
 
 	StateContext();
 	void initialize();

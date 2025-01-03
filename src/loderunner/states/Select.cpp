@@ -19,27 +19,29 @@ void Select::start() {
 void Select::update() {
 	int& levelNr = stateContext->level[stateContext->playerNr];
 
-	if (stateContext->getIOContext()->getLeftButton().simple()) {
+	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
+
+	if (buttonInputs.left.simple()) {
 		changeLevelNumber(--levelNr);
 	}
 
-	else if (stateContext->getIOContext()->getRightButton().simple()) {
+	else if (buttonInputs.right.simple()) {
 		changeLevelNumber(++levelNr);
 	}
 
-	else if (stateContext->getIOContext()->getUpButton().simple()) {
+	else if (buttonInputs.up.simple()) {
 		changeLevelNumber(levelNr += 10);
 	}
 
-	else if (stateContext->getIOContext()->getDownButton().simple()) {
+	else if (buttonInputs.down.simple()) {
 		changeLevelNumber(levelNr -= 10);
 	}
 
-	else if (stateContext->getIOContext()->getEnterButton().simple()) {
+	else if (buttonInputs.enter.simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 	}
 
-	else if (stateContext->getIOContext()->getSelectButton().simple()) {
+	else if (buttonInputs.select.simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 

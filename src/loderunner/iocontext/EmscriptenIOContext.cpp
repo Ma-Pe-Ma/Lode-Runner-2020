@@ -84,16 +84,16 @@ namespace EmscriptenHandler {
 }
 
 void EmscriptenIOContext::keyboardInput() {
-	configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+	buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
 
-	leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
-	rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
-	up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
-	down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
-	rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-	leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
-	enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
-	select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+	buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+	buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
+	buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
+	buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+	buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
+	buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+	buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 }
 
 void EmscriptenIOContext::processInput() {
@@ -109,16 +109,16 @@ void EmscriptenIOContext::processInput() {
 			emscripten_get_gamepad_status(gamePadID.value(), &gamepadState);
 
 			if (gamepadState.connected == EM_TRUE) {
-				configButton.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS || gamepadState.digitalButton[3] == EM_TRUE);
+				buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS || gamepadState.digitalButton[3] == EM_TRUE);
 
-				leftButton.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || gamepadState.digitalButton[14] == EM_TRUE || gamepadState.axis[0] < -0.5);
-				rightButton.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || gamepadState.digitalButton[15] == EM_TRUE || gamepadState.axis[0] > 0.5);
-				up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || gamepadState.digitalButton[12] == EM_TRUE || gamepadState.axis[1] < -0.5);
-				down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || gamepadState.digitalButton[13] == EM_TRUE || gamepadState.axis[1] > 0.5);
-				rightDigButton.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || gamepadState.digitalButton[5] == EM_TRUE || gamepadState.digitalButton[7] == EM_TRUE);
-				leftDigButton.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || gamepadState.digitalButton[4] == EM_TRUE || gamepadState.digitalButton[6] == EM_TRUE);
-				enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || gamepadState.digitalButton[9] == EM_TRUE);
-				select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || gamepadState.digitalButton[8] == EM_TRUE);
+				buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || gamepadState.digitalButton[14] == EM_TRUE || gamepadState.axis[0] < -0.5);
+				buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || gamepadState.digitalButton[15] == EM_TRUE || gamepadState.axis[0] > 0.5);
+				buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || gamepadState.digitalButton[12] == EM_TRUE || gamepadState.axis[1] < -0.5);
+				buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || gamepadState.digitalButton[13] == EM_TRUE || gamepadState.axis[1] > 0.5);
+				buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || gamepadState.digitalButton[5] == EM_TRUE || gamepadState.digitalButton[7] == EM_TRUE);
+				buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || gamepadState.digitalButton[4] == EM_TRUE || gamepadState.digitalButton[6] == EM_TRUE);
+				buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || gamepadState.digitalButton[9] == EM_TRUE);
+				buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || gamepadState.digitalButton[8] == EM_TRUE);
 			}
 			else {
 				keyboardInput();
@@ -245,10 +245,10 @@ void EmscriptenIOContext::initialize() {
 			if (tp.identifier == self->analogID) {
 				self->analogID = -1;
 
-				self->buttonStateMap[&self->leftButton] = false;
-				self->buttonStateMap[&self->rightButton] = false;
-				self->buttonStateMap[&self->up] = false;
-				self->buttonStateMap[&self->down] = false;
+				self->buttonStateMap[&self->buttonInputs.left] = false;
+				self->buttonStateMap[&self->buttonInputs.right] = false;
+				self->buttonStateMap[&self->buttonInputs.up] = false;
+				self->buttonStateMap[&self->buttonInputs.down] = false;
 			}
 			else {
 				auto it = self->buttonMap.find(tp.identifier);
@@ -275,10 +275,10 @@ void EmscriptenIOContext::initialize() {
 				auto x = std::get<0>(analog);
 				auto y = std::get<1>(analog);
 
-				self->buttonStateMap[&self->rightButton] = false;
-				self->buttonStateMap[&self->leftButton] = false;
-				self->buttonStateMap[&self->down] = false;
-				self->buttonStateMap[&self->up] = false;
+				self->buttonStateMap[&self->buttonInputs.right] = false;
+				self->buttonStateMap[&self->buttonInputs.left] = false;
+				self->buttonStateMap[&self->buttonInputs.down] = false;
+				self->buttonStateMap[&self->buttonInputs.up] = false;
 
 				self->buttonStateMap[x] = true;
 				self->buttonStateMap[y] = true;
@@ -319,10 +319,10 @@ void EmscriptenIOContext::initialize() {
 			if (tp.identifier == self->analogID) {
 				self->analogID = -1;
 
-				self->buttonStateMap[&self->leftButton] = false;
-				self->buttonStateMap[&self->rightButton] = false;
-				self->buttonStateMap[&self->up] = false;
-				self->buttonStateMap[&self->down] = false;
+				self->buttonStateMap[&self->buttonInputs.left] = false;
+				self->buttonStateMap[&self->buttonInputs.right] = false;
+				self->buttonStateMap[&self->buttonInputs.up] = false;
+				self->buttonStateMap[&self->buttonInputs.down] = false;
 			}
 			else {
 				auto it = self->buttonMap.find(tp.identifier);
@@ -339,13 +339,13 @@ void EmscriptenIOContext::initialize() {
 
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		auto self = static_cast<EmscriptenIOContext*>(glfwGetWindowUserPointer(window));
-		self->updateViewPortValues(width, height);
+		self->screenParameters.updateViewPortValues(width, height);
 
 		if (EmscriptenHandler::is_mobile()) {
 			self->framebufferSizeCallback(width, height);
 		}
 
-		glViewport(std::get<0>(self->viewPortPosition), std::get<1>(self->viewPortPosition), std::get<0>(self->viewPortSize), std::get<1>(self->viewPortSize));
+		glViewport(std::get<0>(self->screenParameters.viewPortPosition), std::get<1>(self->screenParameters.viewPortPosition), std::get<0>(self->screenParameters.viewPortSize), std::get<1>(self->screenParameters.viewPortSize));
 	});
 
 
@@ -384,18 +384,18 @@ std::tuple<Button*, Button*> EmscriptenIOContext::getAnalogButtonByTouch(int abs
 
 	float angle = std::atan2(y, x);
 
-	Button* xButton = -M_PI / 3 < angle && angle < M_PI / 3 ? &rightButton : angle > M_PI * 2 / 3 || angle < - M_PI * 2 / 3 ? &leftButton : nullptr;
-	Button* yButton = M_PI / 6 < angle && angle < M_PI * 5 / 6 ? &down : -M_PI * 5 / 6 < angle && angle < -M_PI / 6 ? &up : nullptr;
+	Button* xButton = -M_PI / 3 < angle && angle < M_PI / 3 ? &buttonInputs.right : angle > M_PI * 2 / 3 || angle < - M_PI * 2 / 3 ? &buttonInputs.left : nullptr;
+	Button* yButton = M_PI / 6 < angle && angle < M_PI * 5 / 6 ? &buttonInputs.down : -M_PI * 5 / 6 < angle && angle < -M_PI / 6 ? &buttonInputs.up : nullptr;
 
 	return { xButton, yButton };	
 }
 
 void EmscriptenIOContext::activateCanvasViewPort() {
-	glViewport(std::get<0>(viewPortPosition), std::get<1>(viewPortPosition), std::get<0>(viewPortSize), std::get<1>(viewPortSize));
+	glViewport(std::get<0>(screenParameters.viewPortPosition), std::get<1>(screenParameters.viewPortPosition), std::get<0>(screenParameters.viewPortSize), std::get<1>(screenParameters.viewPortSize));
 }
 
 void EmscriptenIOContext::activateDisplayViewPort() {
-	glViewport(0, 0, std::get<0>(screenSize), std::get<1>(screenSize));
+	glViewport(0, 0, std::get<0>(screenParameters.screenSize), std::get<1>(screenParameters.screenSize));
 }
 
 void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
@@ -405,23 +405,23 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 
 	//origin is top left
 	const std::map <Button*, std::tuple<float, float, float, float>> digitalPositionMap{
-		{&select, {0.05f, -0.95f, 0.1f, 0.0f}},
-		{&enter, {0.95f, -0.95f, 0.1f, 0.0f}},
-		{&leftDigButton, {0.75f, 0.5f, 0.1f, 0.0f}},
-		{&rightDigButton, {0.9f, 0.5f, 0.1f, 0.0f}},
-		{&configButton, {0.5f, -0.975f, 0.05f, 0.0f}},
+		{&buttonInputs.select, {0.05f, -0.95f, 0.1f, 0.0f}},
+		{&buttonInputs.enter, {0.95f, -0.95f, 0.1f, 0.0f}},
+		{&buttonInputs.leftDig, {0.75f, 0.5f, 0.1f, 0.0f}},
+		{&buttonInputs.rightDig, {0.9f, 0.5f, 0.1f, 0.0f}},
+		{&buttonInputs.config, {0.5f, -0.975f, 0.05f, 0.0f}},
 	};
 
 	const std::map<Button*, int> textureCoordMap{
-		{&down, 0},
-		{&leftButton, 1},
-		{&rightButton, 2},
-		{&up, 3},
-		{&leftDigButton, 4},
-		{&rightDigButton, 5},
-		{&select, 6},
-		{&enter, 6},
-		{&configButton, 7},
+		{&buttonInputs.down, 0},
+		{&buttonInputs.left, 1},
+		{&buttonInputs.right, 2},
+		{&buttonInputs.up, 3},
+		{&buttonInputs.leftDig, 4},
+		{&buttonInputs.rightDig, 5},
+		{&buttonInputs.select, 6},
+		{&buttonInputs.enter, 6},
+		{&buttonInputs.config, 7},
 	};
 
 	float touchRenderVertices[TOUCH_BUTTON_NR * 16] = {};
@@ -479,10 +479,10 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 	}
 
 	const std::map<Button*, std::tuple<float, float, float, float>> analogPositionMap{
-		{&leftButton, { -0.8f, 0.0f, 0.2f, 0.0f} },
-		{&rightButton, {-0.4f, 0.0f, 0.2f, 0.0f} },
-		{&up, {-0.6f, 0.0f, 0.2f, 0.2f} },
-		{&down, {-0.6f, 0.0f, 0.2f, -0.2f} },
+		{&buttonInputs.left, { -0.8f, 0.0f, 0.2f, 0.0f} },
+		{&buttonInputs.right, {-0.4f, 0.0f, 0.2f, 0.0f} },
+		{&buttonInputs.up, {-0.6f, 0.0f, 0.2f, 0.2f} },
+		{&buttonInputs.down, {-0.6f, 0.0f, 0.2f, -0.2f} },
 	};
 
 	for (auto it = analogPositionMap.begin(); it != analogPositionMap.end(); it++) {

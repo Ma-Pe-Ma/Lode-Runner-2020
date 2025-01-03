@@ -15,8 +15,7 @@ void Play::start() {
 	gameContext->setSessionStartTime();
 	auto audio = gameContext->getAudio();
 
-	for (auto id : std::vector<int>{ 1, 4, 7 })
-	{
+	for (auto id : std::vector<int>{ 1, 4, 7 })	{
 		auto audioFile = audio->getAudioFileByID(id);
 
 		if (audioFile->getPlayStatus() == AudioStatus::playing) {
@@ -46,10 +45,9 @@ void Play::end() {
 }
 
 void Play::handleNonControlButtons() {
+	auto& buttonInputs = gameContext->getIOContext()->getButtonInputs();
 
-	auto ioContext = gameContext->getIOContext();
-
-	if (ioContext->getEnterButton().simple() || ioContext->getPauseButton().simple()) {
+	if (buttonInputs.enter.simple() || buttonInputs.pause.simple()) {
 		auto audio = gameContext->getAudio();
 	
 		for (auto id : std::vector<int>{ 7,14 })
@@ -70,7 +68,7 @@ void Play::handleNonControlButtons() {
 	}
 
 	//levelselect with space
-	if (ioContext->getSelectButton().simple()) {
+	if (buttonInputs.select.simple()) {
 		auto audio = gameContext->getAudio();
 
 		for (auto id : std::vector<int>{ 4, 7, 17 })

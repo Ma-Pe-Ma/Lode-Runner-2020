@@ -49,14 +49,14 @@ private:
 	std::map<int, Button*> buttonMap;
 	//maps button to its current state
 	std::map<Button*, bool> buttonStateMap{
-		{&select, false},
-		{&enter, false},
-		{&leftDigButton, false},
-		{&rightDigButton, false},
-		{&leftButton, false},
-		{&rightButton, false},
-		{&up, false},
-		{&down, false},
+		{&buttonInputs.select, false},
+		{&buttonInputs.enter, false},
+		{&buttonInputs.leftDig, false},
+		{&buttonInputs.rightDig, false},
+		{&buttonInputs.left, false},
+		{&buttonInputs.right, false},
+		{&buttonInputs.up, false},
+		{&buttonInputs.down, false},
 		//{&configButton, false},
 	};
 	std::map <Button*, std::tuple<int, int, int, int>> sizedPositionMap;
@@ -82,13 +82,13 @@ public:
 
 		if (isMobile)
 		{
-			std::get<0>(screenSize) = EmscriptenHandler::screen_get_width() * 0.9f;
+			std::get<0>(screenParameters.screenSize) = EmscriptenHandler::screen_get_width() * 0.9f;
 		}
 		else {
-			std::get<0>(screenSize) = 900;
+			std::get<0>(screenParameters.screenSize) = 900;
 		}
 
-		std::get<1>(screenSize) = std::get<0>(screenSize) * 3 / 5;
+		std::get<1>(screenParameters.screenSize) = std::get<0>(screenParameters.screenSize) * 3 / 5;
 	}
 
 	void initialize() override;
