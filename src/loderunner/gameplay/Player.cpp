@@ -14,23 +14,25 @@ void Player::setCharSpeed(float charSpeed) {
 }
 
 void Player::findPath() {
-	if (ioContext->getRightButton().continuous() && ioContext->getLeftButton().continuous()) {
+	auto& buttonInputs = ioContext->getButtonInputs();
+
+	if (buttonInputs.right.continuous() && buttonInputs.left.continuous()) {
 		dPos.x = 0;
 	}
-	else if (ioContext->getRightButton().continuous()) {
+	else if (buttonInputs.right.continuous()) {
 		dPos.x = actualSpeed;
 	}
-	else if (ioContext->getLeftButton().continuous()) {
+	else if (buttonInputs.left.continuous()) {
 		dPos.x = -actualSpeed;
 	}
 
-	if (ioContext->getUpButton().continuous() && ioContext->getDownButton().continuous()) {
+	if (buttonInputs.up.continuous() && buttonInputs.down.continuous()) {
 		dPos.y = 0;
 	}
-	else if (ioContext->getUpButton().continuous()) {
+	else if (buttonInputs.up.continuous()) {
 		dPos.y = actualSpeed;
 	}
-	else if (ioContext->getDownButton().continuous()) {
+	else if (buttonInputs.down.continuous()) {
 		dPos.y = -actualSpeed;
 	}
 
@@ -38,8 +40,10 @@ void Player::findPath() {
 }
 
 void Player::freeRun() {
+	auto& buttonInputs = ioContext->getButtonInputs();
+
 	//Check digging input
-	if (ioContext->getLeftDigButton().impulse()) {
+	if (buttonInputs.leftDig.impulse()) {
 		if (gameContext->getBrickByCoordinates(current.x - 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x - 1, current.y -1)->initiateDig(gameTime)) {
 			dPos.x = 0;
 			dPos.y = 0;
@@ -50,7 +54,7 @@ void Player::freeRun() {
 		}
 	}
 	
-	if (ioContext->getRightDigButton().impulse()) {
+	if (buttonInputs.rightDig.impulse()) {
 		if (gameContext->getBrickByCoordinates(current.x + 1, current.y - 1) && gameContext->getBrickByCoordinates(current.x + 1, current.y - 1)->initiateDig(gameTime)) {
 			dPos.x = 0;
 			dPos.y = 0;

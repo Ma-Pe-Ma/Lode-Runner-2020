@@ -27,15 +27,15 @@ void MainMenu::update() {
 		mainMenuMusic->playPause();
 	}
 
-	auto ioContext = stateContext->getIOContext();
+	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
 	int& menuCursor = stateContext->menuCursor;
 
 	//changing gamemode
-	if (ioContext->getDownButton().simple()) {
+	if (buttonInputs.down.simple()) {
 		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
 	}
 
-	if (ioContext->getUpButton().simple()) {
+	if (buttonInputs.up.simple()) {
 		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
 	}
 
@@ -46,7 +46,7 @@ void MainMenu::update() {
 	stateContext->getRenderingManager()->renderMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
 
 	//choosing selected gamemode
-	if (ioContext->getEnterButton().simple()) {
+	if (buttonInputs.enter.simple()) {
 		mainMenuMusic->stopAndRewind();
 
 		switch (menuCursor) {

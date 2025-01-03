@@ -70,13 +70,12 @@ void AppContainer::initialize()
 
 void AppContainer::update()
 {
-	ioContext->processInput();
-	handleImGuiConfigurer();
+	ioContext->initFrame();
+	this->handleImGuiConfigurer();
 
 	stateContext->update();
-	ioContext->handleScreenRecording();
 
-	finalizeImguiWindow();
+	ioContext->handleScreenRecording();
 	ioContext->finalizeFrame();
 }
 
@@ -89,7 +88,7 @@ void AppContainer::terminate()
 
 void AppContainer::handleImGuiConfigurer()
 {
-	if (ioContext->getConfigButton().simple()) {
+	if (ioContext->getButtonInputs().config.simple()) {
 #ifdef __EMSCRIPTEN__
 		if (EmscriptenHandler::is_mobile()) {
 			int* gameVersion = gameConfiguration->getGameVersionPointer();
@@ -112,17 +111,13 @@ void AppContainer::handleImGuiConfigurer()
 	}
 
 	if (showImguiWindow) {
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-
-		ImGui::NewFrame();
-
 #ifndef NDEBUG
 		ImVec2 windowSize = ImVec2(220, 310);
 #else
 		ImVec2 windowSize = ImVec2(220, 280);
 #endif
-		ImGui::SetNextWindowPos(ImVec2(std::get<0>(ioContext->getScreenSize()) / 25, std::get<0>(ioContext->getScreenSize()) / 25), ImGuiCond_FirstUseEver);
+		auto screenSize = ioContext->getScreenParameters().screenSize;
+		ImGui::SetNextWindowPos(ImVec2(std::get<0>(screenSize) / 25, std::get<0>(screenSize) / 25), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(windowSize);
 
 		ImGui::Begin("Lode Runner - configurer", &showImguiWindow, ImGuiWindowFlags_NoResize);
@@ -143,7 +138,7 @@ void AppContainer::handleImGuiConfigurer()
 			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
 		}
 
-		ImGui::PushItemWidth(std::get<0>(ioContext->getScreenSize()) / 20);
+		ImGui::PushItemWidth(std::get<0>(screenSize) / 20);
 
 		if (ImGui::InputInt("Level", &stateContext->level[stateContext->playerNr], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
@@ -177,15 +172,6 @@ void AppContainer::handleImGuiConfigurer()
 		ImGui::PopItemWidth();
 
 		ImGui::End();
-	}
-}
-
-void AppContainer::finalizeImguiWindow()
-{
-	if (showImguiWindow)
-	{
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 }
 

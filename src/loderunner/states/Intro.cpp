@@ -71,11 +71,13 @@ void Intro::update() {
 	float ellapsedTime = calculateEllapsedTime();
 
 	if (ellapsedTime < stateContext->getAudio()->getAudioFileByID(8)->lengthInSec()) {
-		if (stateContext->getIOContext()->getSelectButton().simple()) {
+		auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
+		
+		if (buttonInputs.select.simple()) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 
-		if (stateContext->getIOContext()->getEnterButton().simple()) {
+		if (buttonInputs.enter.simple()) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
 		}
 	}

@@ -45,7 +45,9 @@ void Generator::update() {
 	auto itemChangeSoundFile = audio->getAudioFileByID(9);
 	auto cursorSoundFile = audio->getAudioFileByID(10);
 
-	if (ioContext->getRightButton().simple()) {
+	auto& buttonInputs = ioContext->getButtonInputs();
+
+	if (buttonInputs.right.simple()) {
 		if (++geX > 28) {
 			geX = 28;
 		}
@@ -56,7 +58,7 @@ void Generator::update() {
 		}
 	}
 
-	if (ioContext->getLeftButton().simple()) {
+	if (buttonInputs.left.simple()) {
 		if (--geX < 1) {
 			geX = 1;
 		}
@@ -67,7 +69,7 @@ void Generator::update() {
 		}
 	}
 
-	if (ioContext->getUpButton().simple()) {
+	if (buttonInputs.up.simple()) {
 		if (++geY > 16) {
 			geY = 16;
 		}
@@ -78,7 +80,7 @@ void Generator::update() {
 		}
 	}
 
-	if (ioContext->getDownButton().simple()) {
+	if (buttonInputs.down.simple()) {
 		if (--geY < 1) {
 			geY = 1;
 		}
@@ -90,7 +92,7 @@ void Generator::update() {
 	}
 
 	//chaning element upwards
-	if (ioContext->getRightDigButton().simple()) {
+	if (buttonInputs.rightDig.simple()) {
 		if (++gen[geX][geY] > 9) {
 			gen[geX][geY] = 0;	
 		}
@@ -102,7 +104,7 @@ void Generator::update() {
 	}
 
 	//chaning element ioContext->downwards
-	if (ioContext->getLeftDigButton().simple()) {
+	if (buttonInputs.leftDig.simple()) {
 		if (--gen[geX][geY] < 0) {
 			gen[geX][geY] = 9;
 		}
@@ -123,14 +125,14 @@ void Generator::update() {
 	
 	stateContext->getRenderingManager()->renderGenerator();
 
-	if (ioContext->getEnterButton().simple()) {
+	if (buttonInputs.enter.simple()) {
 		texture[geX][geY] = textureMap.at(gen[geX][geY]);
 
 		gameContext->generateLevel(gen);
 		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
 	}
 
-	if (ioContext->getSelectButton().simple()) {
+	if (buttonInputs.select.simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
 }

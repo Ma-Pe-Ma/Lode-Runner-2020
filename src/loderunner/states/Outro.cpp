@@ -127,7 +127,7 @@ void Outro::update() {
 		this->player->setTexture(44 + timeFactor);
 	}
 
-	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getEnterButton().simple()) {
+	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getButtonInputs().enter.simple()) {
 		if (stateContext->menuCursor < 2) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 		}

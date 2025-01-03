@@ -38,7 +38,6 @@ class AppContainer {
 	};
 
 	void handleImGuiConfigurer();
-	void finalizeImguiWindow();
 
 public:
 	void initialize();

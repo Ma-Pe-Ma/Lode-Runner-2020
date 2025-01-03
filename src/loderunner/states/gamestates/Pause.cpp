@@ -12,9 +12,9 @@ void Pause::start() {
 }
 
 void Pause::update() {
-	auto ioContext = gameContext->getIOContext();
+	auto& buttonInputs = gameContext->getIOContext()->getButtonInputs();
 
-	if (ioContext->getEnterButton().simple() || ioContext->getPauseButton().simple()) {
+	if (buttonInputs.enter.simple() || buttonInputs.pause.simple()) {
 		auto audio = gameContext->getAudio();
 
 		for (auto id : std::vector<int>{ 7, 14 })
@@ -26,7 +26,7 @@ void Pause::update() {
 	}
 
 	//levelselect with space
-	if (ioContext->getSelectButton().simple()) {
+	if (buttonInputs.select.simple()) {
 		auto audio = gameContext->getAudio();
 
 		for (auto id : std::vector<int>{ 4, 7, 14 })

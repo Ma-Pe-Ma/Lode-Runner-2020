@@ -36,6 +36,7 @@ public:
 	virtual void terminate() override;
 
 	virtual void processInput() override;
+	virtual void initFrame() override;
 	virtual void finalizeFrame() override;
 
 	unsigned int loadTexture(char const* path) override;

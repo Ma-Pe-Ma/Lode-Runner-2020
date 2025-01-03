@@ -5,7 +5,8 @@ RenderingManager::RenderingManager(std::string assetFolder, std::shared_ptr<IOCo
 	this->assetFolder = assetFolder;
 	this->ioContext = ioContext;
 
-	glViewport(std::get<0>(ioContext->getViewPortPosition()), std::get<1>(ioContext->getViewPortPosition()), std::get<0>(ioContext->getViewPortSize()), std::get<1>(ioContext->getViewPortSize()));
+	auto& screenParameters = ioContext->getScreenParameters();
+	glViewport(std::get<0>(screenParameters.viewPortPosition), std::get<1>(screenParameters.viewPortPosition), std::get<0>(screenParameters.viewPortSize), std::get<1>(screenParameters.viewPortSize));
 
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
