@@ -12,19 +12,19 @@ protected:
 	const AVCodec* codec;
 
 	AVFrame* frame = nullptr;
-	AVFrame* tempFrame = nullptr;
+	AVFrame* rawFrame = nullptr;
 
 	bool have = false;
 	AVPacket* packet = nullptr;
 	int64_t nextPts = 0;
 	AVCodecContext* codecContext = nullptr;
-
 public:
-	void freeFrames() {
+	void freeAVContainers() {
+		avcodec_close(codecContext);
 		avcodec_free_context(&codecContext);
 		av_frame_free(&frame);
-		av_frame_free(&tempFrame);
-		av_packet_unref(packet);
+		av_frame_free(&rawFrame);
+		av_packet_free(&packet);
 	}
 
 	friend class MultiMedia;

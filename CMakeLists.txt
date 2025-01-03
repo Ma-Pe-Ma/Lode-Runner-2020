@@ -71,7 +71,7 @@ if(WIN32)
 	endif()
 
 	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/config.txt")
-		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.txt" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.txt" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 	endif()
 endif()
 
@@ -102,10 +102,9 @@ target_link_libraries(LodeRunner PRIVATE
 if(EMSCRIPTEN)
 	file(GLOB ASSET_FILES "${CMAKE_SOURCE_DIR}/assets/*")
 
-	# link the assets folders
 	set_target_properties(LodeRunner PROPERTIES
 		SUFFIX ".html" # generate html
-		LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/assets@/assets/"
+		LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/assets@/assets/" # link the assets folders
 		LINK_DEPENDS "${ASSET_FILES}" # rebuild if an asset is changed
 	)
 
@@ -177,8 +176,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR EMSCRIPTEN)
 	)
 endif()
 
-# download libraries from https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z and unpack it to ./src/submodules/ffmpeg
-if (VIDEO_RECORDING AND WIN32)
+# for developing this path needs to be added in the proper cmake preset: 
+# "environment": { "PATH": "$penv{PATH};${sourceDir}/src/submodules/ffmpeg/bin/"}
+if (VIDEO_RECORDING)
 	# set macro used by game source
 	target_compile_definitions(LodeRunner PRIVATE
 		-DVIDEO_RECORDING
@@ -190,37 +190,31 @@ if (VIDEO_RECORDING AND WIN32)
 		"src/loderunner/multimediarecording/VideoStream.cpp"
 	)
 
-	target_include_directories(LodeRunner PRIVATE "${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/include")
+	if (WIN32)
+		set(URL "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z")
+		set(submodulePath "${CMAKE_CURRENT_SOURCE_DIR}/src/submodules/")
 
-	target_link_directories(LodeRunner PRIVATE "${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/lib")
+		if(NOT EXISTS "${submodulePath}/ffmpeg/")
+			file(DOWNLOAD ${URL} "${submodulePath}/ffmpeg.7z" SHOW_PROGRESS)
+			file(ARCHIVE_EXTRACT INPUT "${submodulePath}/ffmpeg.7z" DESTINATION "${submodulePath}/ffmpeg/")
+			file(REMOVE "${submodulePath}/ffmpeg.7z")
+		endif()
+
+		target_include_directories(LodeRunner PRIVATE 
+			"${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/include"
+		)
+
+		target_link_directories(LodeRunner PRIVATE 
+			"${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/lib"
+		)
+	endif()
 
 	target_link_libraries(LodeRunner PRIVATE
 		avformat
 		avutil
 		avcodec
 		swscale
-		swresample
 	)
-
-	list(APPEND copyable_dlls
-		"swscale-7"
-		"swresample-4"
-		"avutil-58"
-		"avformat-60"
-		"avcodec-60"
-	)
-
-	set(dll_extension "dll")
-
-	# copy the dlls to working directory
-	foreach(copyable_dll IN LISTS copyable_dlls)
-		if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${copyable_dll}.${dll_extension}")
-			message(STATUS "Copying ${copyable_dll} ...")
-			file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/submodules/ffmpeg/bin/${copyable_dll}.${dll_extension}" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
-		else()
-			message(STATUS "DLL ${copyable_dll} already copied.")
-		endif()
-	endforeach()
 endif()
 
 # cmake --install /path/to/build --prefix /path/to/install --component loderunner
@@ -232,7 +226,8 @@ if(EMSCRIPTEN)
         "$<TARGET_FILE_DIR:${em_target}>/${em_target}.wasm"
 		"$<TARGET_FILE_DIR:${em_target}>/${em_target}.data"
 		COMPONENT loderunner
-        DESTINATION ".")
+        DESTINATION "."
+	)
 elseif(WIN32 OR UNIX)
 	install(TARGETS LodeRunner COMPONENT loderunner RUNTIME DESTINATION ".")
 	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE PATTERN "config.txt" EXCLUDE)
@@ -243,5 +238,12 @@ elseif(WIN32 OR UNIX)
 	
 	if(VIDEO_RECORDING)
 		install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/gameplay-videos")
+
+		if(WIN32)
+			foreach(dll "avformat" "avutil" "avcodec" "swresample" "swscale")
+				file(GLOB DllPath "src/submodules/ffmpeg/bin/${dll}-*.dll")
+				install(FILES "${DllPath}" COMPONENT loderunner DESTINATION ".")
+			endforeach()
+		endif()
 	endif()
 endif()
