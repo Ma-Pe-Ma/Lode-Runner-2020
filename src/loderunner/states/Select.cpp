@@ -13,11 +13,12 @@ void Select::start() {
 
 	stateContext->getRenderingManager()->setTextList(textList);
 	stateContext->getRenderingManager()->initializeCharacters();
-	levelText->changeContent("STAGE " + std::to_string(stateContext->level[stateContext->playerNr]).insert(0, 3 - std::to_string(stateContext->level[stateContext->playerNr]).length(), '0'));
+	int& levelNumber = stateContext->getCurrentLevel();
+	levelText->changeContent("STAGE " + std::to_string(levelNumber).insert(0, 3 - std::to_string(levelNumber).length(), '0'));
 }
 
 void Select::update() {
-	int& levelNr = stateContext->level[stateContext->playerNr];
+	int& levelNr = stateContext->getCurrentLevel();
 
 	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
 
@@ -44,19 +45,25 @@ void Select::update() {
 	else if (buttonInputs.select.simple()) {
 		stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 	}
+	else {
+		changeLevelNumber(levelNr);
+	}
 
-	stateContext->getRenderingManager()->render();
+	stateContext->getRenderingManager()->render();	
 }
 
 void Select::end() {
 
 }
 
-void Select::changeLevelNumber(int& levelNr)
-{
-	stateContext->getGameConfiguration()->validateLevel(levelNr);
-	levelText->changeContent("STAGE " + std::to_string(levelNr).insert(0, 3 - std::to_string(levelNr).length(), '0'));
+void Select::changeLevelNumber(int& levelNr) {
+	if (previousNr != levelNr) {
+		stateContext->getGameConfiguration()->validateLevel(levelNr);
+		levelText->changeContent("STAGE " + std::to_string(levelNr).insert(0, 3 - std::to_string(levelNr).length(), '0'));
 
-	stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
-	stateContext->getAudio()->getAudioFileByID(16)->playPause();
+		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
+		stateContext->getAudio()->getAudioFileByID(16)->playPause();
+
+		previousNr = levelNr;
+	}	
 }

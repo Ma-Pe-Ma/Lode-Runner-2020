@@ -8,10 +8,11 @@
 #if defined __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #include <GLES3/gl3.h>
-#else 
+#else
 #include <glad/glad.h>
 #endif
 
+#include <json.hpp>
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -261,7 +262,8 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
 
 	gameConfiguration->setRecordingHeight(getIntByKey("RecordingHeight", 800));
-	gameConfiguration->setStartingLevel(getIntByKey("levelNr", 1));
+	gameConfiguration->setLevel(0, getIntByKey("levelNr", 1));
+	gameConfiguration->setLevel(1, getIntByKey("levelNr", 1));
 	gameConfiguration->setFramesPerSec(getIntByKey("FPS", 60));
 
 	this->gameConfiguration = gameConfiguration;
@@ -417,6 +419,10 @@ void GlfwIOContext::initialize()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("./assets/Roboto-Medium.ttf", 13, nullptr);
+	io.Fonts->Build();
+
 	//int major, minor, rev;
 	//glfwGetVersion(&major, &minor, &rev);
 	//std::cout << "GLFW - major: " << major << ", minor: " << minor << ", rev: " << rev << std::endl;
@@ -511,20 +517,34 @@ void GlfwIOContext::saveConfig(std::string modifiableKey, std::string modifiable
 	rename("config_temp.txt", "resources/config.txt");
 }
 
-void GlfwIOContext::loadLevel(std::string fileName, std::function<bool(std::string)> lineProcessor)
+std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileName, short levelNumber)
 {
-	std::string row;
+	if (!levels.count(fileName)) {
+ 		std::ifstream f(fileName);
+		nlohmann::json data = nlohmann::json::parse(f);
 
-	std::fstream levelFile;
-	levelFile.open(fileName);
-	while (std::getline(levelFile, row, '\n')) {
-		if (lineProcessor(row))
-		{
-			break;
+		levels[fileName] = {};
+
+		for (auto levelIt = data.begin(); levelIt != data.end(); levelIt++) {
+			short key = std::stoi(levelIt.key());
+
+			for (auto lineIt = levelIt->begin(); lineIt != levelIt->end(); lineIt++) {
+				int index = lineIt - levelIt->begin();
+
+				std::array<char, 28> lineArray;
+
+				std::string line = lineIt.value().get<std::string>();
+				std::copy(line.begin(), line.begin() + line.size(), lineArray.begin());
+
+				levels[fileName][key][index] = lineArray;
+
+			}
 		}
+
+		f.close();
 	}
 
-	levelFile.close();
+	return levels[fileName][levelNumber - 1];
 }
 
 #ifdef VIDEO_RECORDING

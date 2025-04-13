@@ -17,6 +17,7 @@ class IOContext;
 #include <map>
 #include <memory>
 #include <vector>
+#include <array>
 #include <chrono>
 
 #include "iocontext/GameConfiguration.h"
@@ -31,7 +32,7 @@ class GameContext {
 
 	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
-	LayoutBlock layout[30][18];
+	std::array<std::array<LayoutBlock, 18>, 30> layout;
 	//Two dimensional garbage collected arrays
 	std::shared_ptr<std::shared_ptr<std::shared_ptr<Brick>[]>[]> bricks = nullptr;
 	std::shared_ptr<std::shared_ptr<std::shared_ptr<Trapdoor>[]>[]> trapdoors = nullptr;
@@ -46,8 +47,8 @@ class GameContext {
 	std::shared_ptr<Text> timeText;
 
 	short highestLadder = 30;
-	int killCounter = 0;
-	int randomDebris = 0;
+	short killCounter = 0;
+	short randomDebris = 0;
 
 	int* pointerToDebrisTexture;
 	int* pointerToDebrisLocation;
@@ -143,8 +144,8 @@ public:
 
 	void clearContainers();
 
-	void loadLevel(unsigned int);
-	void generateLevel(short[30][18]);
+	void loadLevel(int);
+	void generateLevel(std::array<std::array<short, 18>, 30>);
 	
 	void resetSessionLength();
 	void setSessionStartTime();

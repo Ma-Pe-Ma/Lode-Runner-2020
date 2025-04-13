@@ -1,6 +1,8 @@
 #ifndef STATECONTEXT_H
 #define STATECONTEXT_H
 
+#include <array>
+
 #include "State.h"
 
 #include "MainMenu.h"
@@ -32,22 +34,21 @@ private:
 	std::shared_ptr<AudioContext> audio;
 
 	void checkTransitionAtEndOfFrame();
-public:	
-	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
-
-	StateContext();
-	void initialize();
-	
-	void update();
 
 	//cursor of the menu
-	int menuCursor = 0;
-	int level[2] = { 1,1 };
-	int playerLife[2] = { 5,5 };
-	int score[2] = { 0,0 };
+	short menuCursor = 0;
+	std::array<unsigned int, 2> playerLife = { 5,5 };
+	std::array<unsigned int, 2> score = { 0,0 };
 
-	int playerNr = 0;
-	int highScore = 0;
+	short playerNr = 0;
+	short highScore = 0;
+public:	
+	StateContext();
+
+	void initialize();	
+	void update();	
+
+	void transitionToAtEndOfFrame(State*, bool start = true, bool end = true);
 
 	std::shared_ptr<RenderingManager> getRenderingManager() { return this->renderingManager; }
 	std::shared_ptr<IOContext> getIOContext() { return this->ioContext; }
@@ -127,6 +128,21 @@ public:
 	Generator* getGenerator()
 	{
 		return this->generator;
+	}
+
+	void setMenuCursor(int menuCursor) { this->menuCursor = menuCursor; }
+	short& getMenuCursor() { return this->menuCursor; }
+
+	void setPlayerNr(short playerNr) { this->playerNr = playerNr; }
+	short& getPlayerNr() { return this->playerNr; }
+
+	std::array<unsigned int, 2>& getPlayerLife() { return playerLife; }
+	std::array<unsigned int, 2>& getPlayerScore() { return score; }
+
+	short& getHighScore() { return this->highScore; }
+
+	int& getCurrentLevel() {
+		return this->getGameConfiguration()->getLevel()[getPlayerNr()];
 	}
 };
 

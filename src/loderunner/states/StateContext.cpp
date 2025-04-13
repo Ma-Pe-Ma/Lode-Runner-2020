@@ -47,9 +47,6 @@ void StateContext::setAudio(std::shared_ptr<AudioContext> audio)
 
 void StateContext::setGameConfiguration(std::shared_ptr<GameConfiguration> gameConfiguration)
 {
-    level[0] = gameConfiguration->getStartingLevel();
-    level[1] = gameConfiguration->getStartingLevel();
-
     this->gameConfiguration = gameConfiguration;
 }
 

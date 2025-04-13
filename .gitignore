@@ -9,6 +9,7 @@
 /out/
 
 /assets/textures/*.rc
+/assets/*.ttf
 /resources/
 
 ffmpeg

@@ -33,9 +33,9 @@ void Death::update() {
 	else {
 		auto stateContext = gamePlay->getStateContext();
 
-		if (stateContext->menuCursor < 2) {
-			if (--stateContext->playerLife[stateContext->playerNr] != 0) {
-				stateContext->playerNr = stateContext->menuCursor == 1 ? 1 - stateContext->playerNr : stateContext->playerNr;
+		if (stateContext->getMenuCursor() < 2) {
+			if (--stateContext->getPlayerLife()[stateContext->getPlayerNr()] != 0) {
+				stateContext->getPlayerNr() = stateContext->getMenuCursor() == 1 ? 1 - stateContext->getPlayerNr() : stateContext->getPlayerNr();
 				stateContext->transitionToAtEndOfFrame(stateContext->getIntro());				
 			}
 			else {

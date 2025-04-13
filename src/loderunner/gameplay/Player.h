@@ -9,7 +9,7 @@ private:
 	void findPath() override;
 
 	//variable for changing moving sound, going-0, laddering-1, poling-2
-	int going[3] = {};
+	std::array<short, 3> going = {};
 	int idleTimeStart;
 
 	//Moving

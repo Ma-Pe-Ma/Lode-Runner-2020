@@ -51,6 +51,7 @@ add_executable(LodeRunner
 	"src/submodules/imgui/imgui_draw.cpp"
 	"src/submodules/imgui/imgui_tables.cpp"
 	"src/submodules/imgui/imgui_widgets.cpp"
+ 	"src/loderunner/iocontext/GeneratorGUI.cpp"
 )
 
 # setting project for video recording (only Windows build was tested)
@@ -69,10 +70,15 @@ if(WIN32)
 	if(VIDEO_RECORDING)
 		file(MAKE_DIRECTORY "resources/gameplay-videos")
 	endif()
-
+	
 	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/config.txt")
 		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.txt" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-	endif()
+	endif()	
+endif()
+
+# copy the font file
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets/Roboto-Medium.ttf")
+	file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/submodules/imgui/misc/fonts/Roboto-Medium.ttf" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 endif()
 
 # build external libraries

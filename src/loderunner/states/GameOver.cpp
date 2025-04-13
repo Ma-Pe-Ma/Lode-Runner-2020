@@ -4,7 +4,7 @@
 #include "states/StateContext.h"
 
 void GameOver::start() {
-	playerNameText = std::make_shared<Text>(Text("PLAYER " + std::to_string(stateContext->playerNr + 1), { 12.5, 6.0 }));
+	playerNameText = std::make_shared<Text>(Text("PLAYER " + std::to_string(stateContext->getPlayerNr() + 1), {12.5, 6.0}));
 	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(6)->playPause();
 
@@ -29,12 +29,12 @@ void GameOver::update() {
 	float ellapsedTime = calculateEllapsedTime();
 
 	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(6)->lengthInSec()) {
-		if (stateContext->menuCursor == 0) {
+		if (stateContext->getMenuCursor() == 0) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 		}
-		else if (stateContext->menuCursor == 1) {
-			if (stateContext->playerLife[1 - stateContext->playerNr] != 0) {
-				stateContext->playerNr = 1 - stateContext->playerNr;
+		else if (stateContext->getMenuCursor() == 1) {
+			if (stateContext->getPlayerLife()[1 - stateContext->getPlayerNr()] != 0) {
+				stateContext->getPlayerNr() = 1 - stateContext->getPlayerNr();
 				stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 			}
 			else {

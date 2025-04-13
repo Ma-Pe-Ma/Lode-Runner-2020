@@ -95,12 +95,12 @@ void AppContainer::handleImGuiConfigurer()
 			*gameVersion = !(*gameVersion);
 
 			if (*gameVersion == 1) {
-				stateContext->menuCursor = 0;
+				stateContext->getMenuCursor() = 0;
 			}
 
 			gameConfiguration->setGameVersion(*gameVersion);
 			ioContext->saveConfig("levelset", std::to_string(*gameVersion));
-			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
+			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 		else {
 			showImguiWindow = !showImguiWindow;
@@ -112,9 +112,9 @@ void AppContainer::handleImGuiConfigurer()
 
 	if (showImguiWindow) {
 #ifndef NDEBUG
-		ImVec2 windowSize = ImVec2(220, 310);
+		ImVec2 windowSize = ImVec2(220, 395);
 #else
-		ImVec2 windowSize = ImVec2(220, 280);
+		ImVec2 windowSize = ImVec2(220, 365);
 #endif
 		auto screenSize = ioContext->getScreenParameters().screenSize;
 		ImGui::SetNextWindowPos(ImVec2(std::get<0>(screenSize) / 25, std::get<0>(screenSize) / 25), ImGuiCond_FirstUseEver);
@@ -124,24 +124,24 @@ void AppContainer::handleImGuiConfigurer()
 
 		ImGui::Text("Game version");
 
-		if (ImGui::RadioButton("Original", gameConfiguration->getGameVersionPointer(), 0)) {
-			gameConfiguration->setGameVersion(0);
-			ioContext->saveConfig("levelset", "0");
-			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
-		}
+		int index = 0;
+		ImGui::Indent(10.0f);
+		for (auto it = gameConfiguration->configurations.begin(); it != gameConfiguration->configurations.end(); it++) {			
+			std::string name = std::get<3>(it->second) + "(" + std::to_string(std::get<1>(it->second)) + ")";
 
-		ImGui::SameLine();
-		if (ImGui::RadioButton("Championship", gameConfiguration->getGameVersionPointer(), 1)) {
-			stateContext->menuCursor = 0;
-			gameConfiguration->setGameVersion(1);
-			ioContext->saveConfig("levelset", "1");
-			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
+			if (ImGui::RadioButton(name.c_str(), gameConfiguration->getGameVersionPointer(), index)) {
+				gameConfiguration->setGameVersion(index);
+				ioContext->saveConfig("levelset", std::to_string(index++));
+				gameConfiguration->validateLevel(stateContext->getCurrentLevel());
+			}
+			index += 1;
 		}
+		ImGui::Unindent(10.0f);
 
 		ImGui::PushItemWidth(std::get<0>(screenSize) / 20);
 
-		if (ImGui::InputInt("Level", &stateContext->level[stateContext->playerNr], 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
-			gameConfiguration->validateLevel(stateContext->level[stateContext->playerNr]);
+		if (ImGui::InputInt("Level", &stateContext->getCurrentLevel(), 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
+			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 
 		if (ImGui::SliderFloat("Player speed", gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {

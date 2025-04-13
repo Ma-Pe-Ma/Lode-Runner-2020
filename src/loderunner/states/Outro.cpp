@@ -77,15 +77,15 @@ void Outro::start() {
 
 	stateContext->getAudio()->getAudioFileByID(13)->playPause();
 
-	int& playerLife = stateContext->playerLife[stateContext->playerNr];
+	int& playerLevel = stateContext->getCurrentLevel();
+	++playerLevel;
+	
+	unsigned int& playerLife = stateContext->getPlayerLife()[stateContext->getPlayerNr()];
 	playerLife = ++playerLife > 9 ? 9 : playerLife;
 
-	int& playerLevel = stateContext->level[stateContext->playerNr];
-	playerLevel = ++playerLevel > 150 ? 1 : playerLevel;
-
-	int& playerScore = stateContext->score[stateContext->playerNr];
+	unsigned int& playerScore = stateContext->getPlayerScore()[stateContext->getPlayerNr()];
 	playerScore += enemyScore + goldScore;
-	stateContext->highScore = playerScore > stateContext->highScore ? playerScore : stateContext->highScore;
+	stateContext->getHighScore() = playerScore > stateContext->getHighScore() ? playerScore : stateContext->getHighScore();
 
 	startTimePoint = std::chrono::system_clock::now();
 	previousFrame = startTimePoint;
@@ -128,7 +128,7 @@ void Outro::update() {
 	}
 
 	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getButtonInputs().enter.simple()) {
-		if (stateContext->menuCursor < 2) {
+		if (stateContext->getMenuCursor() < 2) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getIntro());
 		}
 		else {

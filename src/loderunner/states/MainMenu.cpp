@@ -6,17 +6,15 @@
 #include "iocontext/audio/AudioFile.h"
 
 void MainMenu::start() {
-	stateContext->menuCursor = 0;
-	stateContext->playerLife[0] = 5;
-	stateContext->playerLife[1] = 5;
+	stateContext->setMenuCursor(0);
 
-	stateContext->score[0] = 0;
-	stateContext->score[1] = 0;
+	stateContext->getPlayerLife()[0] = 5;
+	stateContext->getPlayerLife()[1] = 5;
 
-	//stateContext->level[0] = 1;
-	//stateContext->level[1] = 1;
+	stateContext->getPlayerScore()[0] = 0;
+	stateContext->getPlayerScore()[1] = 0;
 
-	stateContext->playerNr = 0;
+	stateContext->setPlayerNr(0);
 }
 
 void MainMenu::update() {
@@ -28,7 +26,7 @@ void MainMenu::update() {
 	}
 
 	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
-	int& menuCursor = stateContext->menuCursor;
+	short& menuCursor = stateContext->getMenuCursor();
 
 	//changing gamemode
 	if (buttonInputs.down.simple()) {
@@ -43,7 +41,7 @@ void MainMenu::update() {
 		menuCursor = 0;
 	}
 
-	stateContext->getRenderingManager()->renderMainMenu(menuCursor, stateContext->getGameConfiguration()->getGameVersion());
+	stateContext->getRenderingManager()->renderMainMenu(menuCursor, stateContext->getGameConfiguration()->getCurrentMainTexture());
 
 	//choosing selected gamemode
 	if (buttonInputs.enter.simple()) {

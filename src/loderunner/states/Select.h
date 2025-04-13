@@ -7,6 +7,7 @@
 #include <string>
 
 class Select : public State {
+	int previousNr = -1;
 	void changeLevelNumber(int&);
 
 	const std::shared_ptr<Text> levelText = std::make_shared<Text>(Text("STAGE    ", { 8,12 }));
