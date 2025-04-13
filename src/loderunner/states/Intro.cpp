@@ -11,18 +11,11 @@ void Intro::start() {
 	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(8)->playPause();
 
-	int& level = stateContext->level[stateContext->playerNr];
-	level = level < 1 ? 1 : level;
-
-	int maxLevelNumber = stateContext->getGameConfiguration()->getGameVersion() == 0 ? 150 : 51;
-	level = level > maxLevelNumber ? 1 : level;
-
-	/*else {
-		//stateContext->gamePlay->play->loadLevel(stateContext->level[stateContext->playerNr]);
-	}*/
+	int& level = stateContext->getGameConfiguration()->getLevel()[stateContext->getPlayerNr()];
+	stateContext->getGameConfiguration()->validateLevel(level);
 
 	//write player id 
-	std::string playerString = stateContext->getGameConfiguration()->getGameVersion() == 0 ? "PLAYER " + std::to_string(stateContext->playerNr + 1) : "";
+	std::string playerString = stateContext->getGameConfiguration()->getGameVersion() != 1 ? "PLAYER " + std::to_string(stateContext->getPlayerNr() + 1) : "";
 	playerName = std::make_shared<Text>(Text(playerString, { 12, 6 }));
 
 	//write level number
@@ -30,20 +23,24 @@ void Intro::start() {
 	levelNumber.insert(0, 3 - levelNumber.length(), '0');
 	levelName = std::make_shared<Text>(Text("STAGE " + levelNumber, {8,12}));
 
+	auto currentPlayer = stateContext->getPlayerNr();
+
 	//write remaining life number
-	lifeLeft = std::make_shared<Text>(Text("LEFT " + std::to_string(stateContext->playerLife[stateContext->playerNr]), { 19, 12}));
+	auto playerLife = stateContext->getPlayerLife()[currentPlayer];
+	lifeLeft = std::make_shared<Text>(Text("LEFT " + std::to_string(playerLife), {19, 12}));
 
 	//write current player score
-	std::string point = std::to_string(stateContext->score[stateContext->playerNr]);
+	auto playerScore = stateContext->getPlayerScore();
+	std::string point = std::to_string(playerScore[currentPlayer]);
 	point.insert(0, 8 - point.length(), '0');
 	scoreText = std::make_shared<Text>(Text("SCORE    " + point, { 8,18 }));
 
 	//write high score
-	std::string record = std::to_string(stateContext->highScore);
+	std::string record = std::to_string(stateContext->getHighScore());
 	record.insert(0, 8 - record.length(), '0');
 	hiscore = std::make_shared<Text>(Text("HISCORE  " + record, { 8,20 }));
 
-	stateContext->getIOContext()->saveConfig("levelNr", std::to_string(stateContext->level[stateContext->playerNr]));
+	stateContext->getIOContext()->saveConfig("levelNr", std::to_string(level));
 
 	setupRenderingManager();
 }
@@ -94,7 +91,7 @@ void Intro::end() {
 		audio->getAudioFileByID(id)->stopAndRewind();
 	}
 
-	if (stateContext->menuCursor < 2) {
-		stateContext->getGamePlay()->getGameContext()->loadLevel(stateContext->level[stateContext->playerNr]);
+	if (stateContext->getMenuCursor() < 2) {
+		stateContext->getGamePlay()->getGameContext()->loadLevel(stateContext->getCurrentLevel());
 	}
 }

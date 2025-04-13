@@ -4,6 +4,8 @@
 #include "State.h"
 #include <map>
 
+#include <json.hpp>
+
 #include "gamestates/Play.h"
 
 #include "gameplay/LayoutBlock.h"
@@ -12,12 +14,13 @@
 
 #include "iocontext/rendering/RenderingManager.h"
 
+#include "iocontext/GeneratorGUI.h"
+
 class Generator : public State {
 private:
-	short gen[30][18];
-	
-	int pos[30][18][2];
-	int texture[30][18];
+	std::array<std::array<short, 18>, 30> gen;
+	std::array<std::array<int, 18>, 30> texture;
+	std::array<std::array<std::array<int, 2>, 18>, 30> pos;	
 
 	short geX = 1;
 	short geY = 16;
@@ -35,6 +38,7 @@ private:
 	};
 
 	std::shared_ptr<GameContext> gameContext;
+	GeneratorGUI generatorGUI = GeneratorGUI(this);
 public:
 	Generator();
 	void start() override;

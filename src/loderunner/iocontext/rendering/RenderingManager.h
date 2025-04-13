@@ -102,8 +102,8 @@ protected:
 	int levelDrawables[540 * 2];
 #endif //  USE_DYNAMIC_ARRAY
 	
-	int levelDrawableSize = 0;
-	int currentLevelDrawableSize = 0;
+	short levelDrawableSize = 0;
+	short currentLevelDrawableSize = 0;
 
 	std::vector<std::shared_ptr<Brick>> brickList;
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
@@ -115,12 +115,12 @@ protected:
 	std::vector<std::tuple<int, int>> ladderList;
 	std::vector<std::tuple<int, int>> finishingLadderList;	
 
-	int goldStartIndex = 0;
-	int goldSize = 0;
+	short goldStartIndex = 0;
+	short goldSize = 0;
 
-	int ladderStartIndex = 0;
-	int ladderSize = 0;
-	int finishingLadderSize = 0;
+	short ladderStartIndex = 0;
+	short ladderSize = 0;
+	short finishingLadderSize = 0;
 
 #ifdef USE_DYNAMIC_ARRAY
 	float* enemyDrawables = nullptr;
@@ -133,7 +133,7 @@ protected:
 	int enemyDirections[340];
 	int enemyGoldIndicator[340];
 #endif
-	int enemyDrawableSize = 0;
+	short enemyDrawableSize = 0;
 
 	std::vector<std::shared_ptr<Text>> textList;
 	
@@ -145,7 +145,7 @@ protected:
 	float characterDrawables[864 * 2];
 #endif // USE_DYNAMIC_ARRAY
 	
-	int characterDrawableSize = 0;
+	short characterDrawableSize = 0;
 
 	int* generatorDrawables;
 	int* generatorTextures;

@@ -44,7 +44,7 @@ public:
 	virtual void loadConfig(std::shared_ptr<GameConfiguration>) override;
 	virtual void saveConfig(std::string key, std::string value) override;
 
-	void loadLevel(std::string, std::function<bool(std::string)>) override;
+	std::array<std::array<char, 28>, 16> loadLevel(std::string, short) override;
 
 	GLFWwindow* getWindow() { return this->window; }
 

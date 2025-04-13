@@ -5,6 +5,8 @@
 #include "ScreenParameters.h"
 
 #include <tuple>
+#include <map>
+#include <array>
 #include <memory>
 #include <string>
 #include <functional>
@@ -23,6 +25,7 @@ protected:
 	std::shared_ptr<MultiMedia> multiMedia;
 	std::shared_ptr<AudioContext> audio;
 #endif
+	std::map<std::string, std::map<int, std::array<std::array<char, 28>, 16>>> levels;
 public:
 	virtual void processInput() = 0;
 	virtual void initFrame() = 0;
@@ -35,7 +38,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void terminate() {}
 
-	virtual void loadLevel(std::string, std::function<bool(std::string)>) = 0;
+	virtual std::array<std::array<char, 28>, 16> loadLevel(std::string, short levelNr) = 0;
 
 	virtual void saveConfig(std::string key, std::string value) = 0;
 

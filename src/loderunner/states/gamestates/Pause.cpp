@@ -34,7 +34,7 @@ void Pause::update() {
 			audio->getAudioFileByID(id)->stopAndRewind();
 		}
 
-		if (gamePlay->getStateContext()->menuCursor < 2) {
+		if (gamePlay->getStateContext()->getMenuCursor() < 2) {
 			gamePlay->getStateContext()->transitionToAtEndOfFrame(gamePlay->getStateContext()->getSelect());
 		}
 		else {

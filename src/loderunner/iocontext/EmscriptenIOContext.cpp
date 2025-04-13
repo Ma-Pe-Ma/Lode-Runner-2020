@@ -153,7 +153,8 @@ void EmscriptenIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConf
 	configMap["levelset"] = EmscriptenHandler::get_local_storage_value((keyPrefix + "levelset").c_str());
 
 	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
-	gameConfiguration->setStartingLevel(getIntByKey("levelNr", 1));
+	gameConfiguration->setLevel(0, getIntByKey("levelNr", 1));
+	gameConfiguration->setLevel(1, getIntByKey("levelNr", 1));
 }
 
 void EmscriptenIOContext::saveConfig(std::string key, std::string value)

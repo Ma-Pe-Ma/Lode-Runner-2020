@@ -29,7 +29,7 @@ void Begin::update() {
 		}
 
 		auto stateContext = gamePlay->getStateContext();
-		if (stateContext->menuCursor < 2) {
+		if (stateContext->getMenuCursor() < 2) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getSelect());
 		}
 		else {

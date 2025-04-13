@@ -344,10 +344,10 @@ void RenderingManager::clearRenderableObjects()
 	textList.clear();
 }
 
-void RenderingManager::renderMainMenu(int menuCursor, int gameVersion)
+void RenderingManager::renderMainMenu(int menuCursor, int textureID)
 {
 	//Drawing main menu
-	if (gameVersion == 1) {
+	if (textureID == 4) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else {
@@ -359,13 +359,18 @@ void RenderingManager::renderMainMenu(int menuCursor, int gameVersion)
 	mainShader->use();
 	glBindVertexArray(mainVAO);
 
-	int mainTextures[2] = { 3 + (gameVersion == 1), 1 };
+	int mainTextures[2] = { textureID, 1 };
 	int cursor[2] = { 0, -menuCursor };
 
 	mainShader->setIntArray("textures", mainTextures, 2);
 	mainShader->setIntArray("cursor", cursor, 2);
 
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1 + (gameVersion == 0));
+	if (textureID == 3) {
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 2);
+	}
+	else {
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1);
+	}	
 }
 
 void RenderingManager::renderGenerator()
