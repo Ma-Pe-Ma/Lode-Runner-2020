@@ -17,11 +17,6 @@
 void AppContainer::initialize()
 {
 #ifdef __EMSCRIPTEN__
-	
-	if (EmscriptenHandler::is_mobile()) {
-		showImguiWindow = false;
-	}
-
 	audio = std::make_shared<OpenALAudioContext>();
 #else
 	audio = std::make_shared<RTAudioContext>();
@@ -92,7 +87,7 @@ void AppContainer::handleImGuiConfigurer()
 #ifdef __EMSCRIPTEN__
 		if (EmscriptenHandler::is_mobile()) {
 			int* gameVersion = gameConfiguration->getGameVersionPointer();
-			*gameVersion = !(*gameVersion);
+			++(*gameVersion);
 
 			if (*gameVersion == 1) {
 				stateContext->getMenuCursor() = 0;
@@ -103,24 +98,24 @@ void AppContainer::handleImGuiConfigurer()
 			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 		else {
-			showImguiWindow = !showImguiWindow;
+			stateContext->getShowImGuiWindow() = !stateContext->getShowImGuiWindow();
 		}		
 #else
-		showImguiWindow = !showImguiWindow;
+		stateContext->getShowImGuiWindow() = !stateContext->getShowImGuiWindow();
 #endif // __EMSCRIPTEN__
 	}
 
-	if (showImguiWindow) {
+	if (stateContext->getShowImGuiWindow()) {
 #ifndef NDEBUG
-		ImVec2 windowSize = ImVec2(220, 395);
+		ImVec2 windowSize = ImVec2(220, 400);
 #else
-		ImVec2 windowSize = ImVec2(220, 365);
+		ImVec2 windowSize = ImVec2(220, 370);
 #endif
 		auto screenSize = ioContext->getScreenParameters().screenSize;
 		ImGui::SetNextWindowPos(ImVec2(std::get<0>(screenSize) / 25, std::get<0>(screenSize) / 25), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(windowSize);
 
-		ImGui::Begin("Lode Runner - configurer", &showImguiWindow, ImGuiWindowFlags_NoResize);
+		ImGui::Begin("Lode Runner - configurer", &stateContext->getShowImGuiWindow(), ImGuiWindowFlags_NoResize);
 
 		ImGui::Text("Game version");
 

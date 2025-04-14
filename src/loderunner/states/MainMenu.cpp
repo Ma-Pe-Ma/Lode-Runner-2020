@@ -15,6 +15,8 @@ void MainMenu::start() {
 	stateContext->getPlayerScore()[1] = 0;
 
 	stateContext->setPlayerNr(0);
+	
+	stateContext->getShowImGuiWindow() = true;
 }
 
 void MainMenu::update() {
@@ -63,5 +65,6 @@ void MainMenu::update() {
 }
 
 void MainMenu::end() {
+	stateContext->getShowImGuiWindow() = false;
 	stateContext->getAudio()->getAudioFileByID(5)->stopAndRewind();
 }

@@ -72,8 +72,8 @@ public:
 		auto& currentConfiguration = configurations[gameVersion];
 
 		short maxLevelNumber = std::get<1>(currentConfiguration);
-		newLevel = newLevel > maxLevelNumber ? newLevel % maxLevelNumber : newLevel;
-		newLevel = newLevel < 1 ? maxLevelNumber + newLevel : newLevel;
+		newLevel = newLevel > maxLevelNumber ? (newLevel < maxLevelNumber + 10 ? newLevel % maxLevelNumber : maxLevelNumber ) : newLevel;
+		newLevel = newLevel < 1 ? (-10 < newLevel ? maxLevelNumber + newLevel : 1) : newLevel;
 	}
 
 #ifndef NDEBUG

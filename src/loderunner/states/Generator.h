@@ -18,7 +18,7 @@
 
 class Generator : public State {
 private:
-	std::array<std::array<short, 18>, 30> gen;
+	std::array<std::array<short, 28>, 16> gen;
 	std::array<std::array<int, 18>, 30> texture;
 	std::array<std::array<std::array<int, 2>, 18>, 30> pos;	
 
@@ -48,6 +48,17 @@ public:
 	void setGameContext(std::shared_ptr<GameContext> gameContext)
 	{
 		this->gameContext = gameContext;
+	}
+
+	std::array<std::array<short, 28>, 16> getGeneratedLayout() { return this->gen; }
+	void setGeneratedLayout(std::array<std::array<short, 28>, 16> newLayout = {}) {
+		gen = newLayout;
+
+		for (int j = 0; j < 16; j++) {
+			for (int i = 0; i < 28; i++) {
+				texture[i + 1][j + 1] = textureMap.at(gen[j][i]);
+			}
+		}		
 	}
 };
 

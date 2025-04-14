@@ -320,12 +320,17 @@ void GameContext::loadLevel(int levelNumber)
 #endif
 }
 
-void GameContext::generateLevel(std::array<std::array<short, 18>, 30> gen)
+void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 {
 	clearContainers();
 
 	bricks = std::make_shared<std::shared_ptr<std::shared_ptr<Brick>[]>[]>(30);
 	trapdoors = std::make_shared<std::shared_ptr<std::shared_ptr<Trapdoor>[]>[]>(30);;
+
+
+	std::vector<std::tuple<int, int>> poleList;
+	std::vector<std::tuple<int, int>> concreteList;
+	std::vector<std::tuple<int, int>> ladderList;
 
 	for (int i = 0; i < 30; i++) {
 		bricks[i] = std::make_shared<std::shared_ptr<Brick>[]>(18);
@@ -333,55 +338,57 @@ void GameContext::generateLevel(std::array<std::array<short, 18>, 30> gen)
 
 		for (int j = 0; j < 18; j++)
 		{
-			layout[i][j] = LayoutBlock::empty;
+			if (j == 0 || i == 0 || i == 29) {
+				layout[i][j] = LayoutBlock::concrete;
+				concreteList.push_back({ i, j });
+			}
+			else {
+				layout[i][j] = LayoutBlock::empty;
+			}			
 		}
 	}
 
-	std::vector<std::tuple<int, int>> poleList;
-	std::vector<std::tuple<int, int>> concreteList;
-	std::vector<std::tuple<int, int>> ladderList;
+	for (int i = 0; i < 28; i++) {
+		for (int j = 0; j < 16; j++) {
+			Vector2DInt pos = { i + 1, j + 1};
 
-	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 18; j++) {
-			Vector2DInt pos = { i, j };
-
-			if (gen[i][j] == 1) {
+			if (gen[j][i] == 1) {
 				std::shared_ptr<Brick> newBrick = std::make_shared<Brick>(Brick({ pos.x, pos.y }));
 
 				brickList.push_back(newBrick);
-				bricks[i][j] = newBrick;
+				bricks[i + 1][j + 1] = newBrick;
 
 				newBrick->setGameContext(this);
 			}
-			else if (gen[i][j] == 2) {
+			else if (gen[j][i] == 2) {
 				concreteList.push_back({ pos.x, pos.y });
 			}
-			else if (gen[i][j] == 3) {
+			else if (gen[j][i] == 3) {
 				ladderList.push_back({ pos.x, pos.y });
 			}
-			else if (gen[i][j] == 4) {
+			else if (gen[j][i] == 4) {
 				poleList.push_back({ pos.x, pos.y });
 			}
-			else if (gen[i][j] == 5) {
+			else if (gen[j][i] == 5) {
 				std::shared_ptr<Trapdoor> newTrapdoor = std::make_shared<Trapdoor>(Trapdoor({ pos.x, pos.y }));
 
 				trapdoorList.push_back(newTrapdoor);
-				trapdoors[i][j] = newTrapdoor;
+				trapdoors[i + 1][j + 1] = newTrapdoor;
 			}
-			else if (gen[i][j] == 6) {
+			else if (gen[j][i] == 6) {
 				finishingLadders.push_back({ pos.x, pos.y });
 			}
-			else if (gen[i][j] == 7) {
+			else if (gen[j][i] == 7) {
 				std::shared_ptr<Gold> gold = std::make_shared<Gold>(pos);
 				uncollectedGoldList.push_back(gold);
 			}
-			else if (gen[i][j] == 8) {
+			else if (gen[j][i] == 8) {
 				std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(pos.x, pos.y);
 				enemy->setGameContext(this);
 				enemy->setCharSpeed(gameConfiguration->getEnemySpeed());
 				enemies.push_back(enemy);
 			}
-			else if (gen[i][j] == 9) {
+			else if (gen[j][i] == 9) {
 				if (player == nullptr) {
 					player = std::make_shared<Player>(pos.x, pos.y);
 					player->setGameContext(this);
@@ -390,7 +397,7 @@ void GameContext::generateLevel(std::array<std::array<short, 18>, 30> gen)
 				}
 			}
 
-			layout[i][j] = generatorLayoutMap.at(gen[i][j]);
+			layout[i + 1][j + 1] = generatorLayoutMap.at(gen[j][i]);
 		}
 	}
 
@@ -402,7 +409,7 @@ void GameContext::generateLevel(std::array<std::array<short, 18>, 30> gen)
 			}
 
 			for (int i = 1; i < 30; i++) {
-				if (layout[i][j] == LayoutBlock::empty && gen[i][j] != 7 && gen[i][j] != 8) {
+				if (layout[i][j] == LayoutBlock::empty && gen[j][i] != 7 && gen[j][i] != 8) {
 					Vector2DInt pos = { i, j };
 
 					player = std::make_shared<Player>(pos.x, pos.y);

@@ -21,8 +21,6 @@
 #include "states/StateContext.h"
 
 class AppContainer {
-	bool showImguiWindow = true;
-
 	std::shared_ptr<StateContext> stateContext;
 	std::shared_ptr<GameContext> gameContext;
 	std::shared_ptr<GameConfiguration> gameConfiguration;

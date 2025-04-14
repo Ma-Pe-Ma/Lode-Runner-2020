@@ -8,7 +8,7 @@
 #include "gameplay/Enemy.h"
 
 void Pause::start() {
-	
+	gamePlay->getStateContext()->getShowImGuiWindow() = true;
 }
 
 void Pause::update() {
@@ -46,5 +46,5 @@ void Pause::update() {
 }
 
 void Pause::end() {
-
+	gamePlay->getStateContext()->getShowImGuiWindow() = false;
 }

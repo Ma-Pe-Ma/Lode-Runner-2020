@@ -101,6 +101,9 @@ public:
 	void activateCanvasViewPort();
 	void activateDisplayViewPort();
 	void framebufferSizeCallback(int width, int height);
+
+	nlohmann::json loadGeneratorLevels() override;
+	void saveGeneratorLevels(nlohmann::json) override;
 };
 
 #endif
