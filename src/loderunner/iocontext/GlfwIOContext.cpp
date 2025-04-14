@@ -547,6 +547,28 @@ std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileNa
 	return levels[fileName][levelNumber - 1];
 }
 
+nlohmann::json GlfwIOContext::loadGeneratorLevels() {
+	std::ifstream fileStream;
+	fileStream.open(generatorFilePath);
+
+	if (fileStream.fail()) {
+		std::cout << "Generator not exist!" << std::endl;
+		std::ofstream newFile;
+		newFile.open(generatorFilePath);
+		newFile << "{}";
+	}
+
+	fileStream.open(generatorFilePath);
+
+	return nlohmann::json::parse(fileStream);
+}
+
+void GlfwIOContext::saveGeneratorLevels(nlohmann::json generatorLevels) {
+	std::ofstream outFile(generatorFilePath);
+	outFile << generatorLevels.dump(2);
+	outFile.close();
+}
+
 #ifdef VIDEO_RECORDING
 
 #define STREAM_FRAME_RATE 60

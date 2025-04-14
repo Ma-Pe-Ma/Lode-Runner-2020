@@ -145,7 +145,7 @@ public:
 	void clearContainers();
 
 	void loadLevel(int);
-	void generateLevel(std::array<std::array<short, 18>, 30>);
+	void generateLevel(std::array<std::array<short, 28>, 16>);
 	
 	void resetSessionLength();
 	void setSessionStartTime();

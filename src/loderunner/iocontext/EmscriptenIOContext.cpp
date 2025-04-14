@@ -504,4 +504,15 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 	emscriptenRenderingManager->updateTouchButtonRenderer(touchRenderVertices);
 };
 
+nlohmann::json EmscriptenIOContext::loadGeneratorLevels() {
+	std::string levelString = EmscriptenHandler::get_local_storage_value("generator");
+	levelString = levelString.size() == 0 ? "{}" : levelString;
+	return nlohmann::json::parse(levelString);
+}
+
+void EmscriptenIOContext::saveGeneratorLevels(nlohmann::json generatorLevels) {
+	std::string levelString = generatorLevels.dump();
+	EmscriptenHandler::set_local_storage_value("generator", levelString.c_str());
+}
+
 #endif // __EMSCRIPTEN__

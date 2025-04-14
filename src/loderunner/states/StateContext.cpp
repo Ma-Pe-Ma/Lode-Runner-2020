@@ -1,6 +1,10 @@
 #include "states/StateContext.h"
 #include "iocontext/IOContext.h"
 
+#ifdef __EMSCRIPTEN__
+#include "iocontext/EmscriptenIOContext.h"
+#endif
+
 StateContext::StateContext() {
     this->mainMenu = new MainMenu();
     this->mainMenu->setStateContext(this);
@@ -28,6 +32,12 @@ void StateContext::initialize()
 {
     currentState = mainMenu;
     transitionTo(mainMenu);
+
+#ifdef __EMSCRIPTEN__
+    if (EmscriptenHandler::is_mobile()) {
+        showImGuiWindow = false;
+    }
+#endif
 }
 
 void StateContext::setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)

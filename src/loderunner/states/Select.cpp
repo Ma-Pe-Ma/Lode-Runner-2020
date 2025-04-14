@@ -15,6 +15,8 @@ void Select::start() {
 	stateContext->getRenderingManager()->initializeCharacters();
 	int& levelNumber = stateContext->getCurrentLevel();
 	levelText->changeContent("STAGE " + std::to_string(levelNumber).insert(0, 3 - std::to_string(levelNumber).length(), '0'));
+
+	stateContext->getShowImGuiWindow() = true;
 }
 
 void Select::update() {
@@ -53,7 +55,7 @@ void Select::update() {
 }
 
 void Select::end() {
-
+	stateContext->getShowImGuiWindow() = false;
 }
 
 void Select::changeLevelNumber(int& levelNr) {

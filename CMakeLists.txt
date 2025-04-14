@@ -95,6 +95,7 @@ target_include_directories(LodeRunner PRIVATE
 	"src/submodules/vorbis/include/"
 	"src/submodules/imgui/"
 	"src/submodules/glfw/include"
+	"src/submodules/json/single_include/nlohmann"
 )
 
 # link libraries with the app

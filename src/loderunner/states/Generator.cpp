@@ -11,15 +11,16 @@ Generator::Generator() {
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 18; j++) {
 			if (j == 0) {
-				gen[i][j] = 2;
 				texture[i][j] = textureMap.at(2);
 			}
 			else if (i == 0 || i == 29) {
-				gen[i][j] = 2;
 				texture[i][j] = textureMap.at(2);
 			}
 			else {
-				gen[i][j] = 0;
+				if (j != 17) {
+					gen[j - 1][i - 1] = 0;
+				}
+				
 				texture[i][j] = textureMap.at(0);
 			}
 
@@ -34,6 +35,7 @@ Generator::Generator() {
 
 void Generator::start() {
 	stateContext->getRenderingManager()->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
+	stateContext->getShowImGuiWindow() = false;
 
 	getStateContext()->getGamePlay()->getGameContext()->clearContainers();
 	startTimePoint = std::chrono::system_clock::now();
@@ -55,7 +57,7 @@ void Generator::update() {
 				geX = 28;
 			}
 			else {
-				texture[geX - 1][geY] = textureMap.at(gen[geX - 1][geY]);
+				texture[geX - 1][geY] = textureMap.at(gen[geY - 1][geX -2]);
 				itemChangeSoundFile->stopAndRewind();
 				itemChangeSoundFile->playPause();
 			}
@@ -66,7 +68,7 @@ void Generator::update() {
 				geX = 1;
 			}
 			else {
-				texture[geX + 1][geY] = textureMap.at(gen[geX + 1][geY]);
+				texture[geX + 1][geY] = textureMap.at(gen[geY - 1][geX]);
 				itemChangeSoundFile->stopAndRewind();
 				itemChangeSoundFile->playPause();
 			}
@@ -77,7 +79,7 @@ void Generator::update() {
 				geY = 16;
 			}
 			else {
-				texture[geX][geY - 1] = textureMap.at(gen[geX][geY - 1]);
+				texture[geX][geY - 1] = textureMap.at(gen[geY - 2][geX - 1]);
 				itemChangeSoundFile->stopAndRewind();
 				itemChangeSoundFile->playPause();
 			}
@@ -88,7 +90,7 @@ void Generator::update() {
 				geY = 1;
 			}
 			else {
-				texture[geX][geY + 1] = textureMap.at(gen[geX][geY + 1]);
+				texture[geX][geY + 1] = textureMap.at(gen[geY][geX - 1]);
 				itemChangeSoundFile->stopAndRewind();
 				itemChangeSoundFile->playPause();
 			}
@@ -96,23 +98,23 @@ void Generator::update() {
 
 		//chaning element upwards
 		if (buttonInputs.rightDig.simple()) {
-			if (++gen[geX][geY] > 9) {
-				gen[geX][geY] = 0;
+			if (++gen[geY - 1][geX - 1] > 9) {
+				gen[geY - 1][geX - 1] = 0;
 			}
 
-			texture[geX][geY] = textureMap.at(gen[geX][geY]);
+			texture[geX][geY] = textureMap.at(gen[geY - 1][geX - 1]);
 
 			cursorSoundFile->stopAndRewind();
 			cursorSoundFile->playPause();
 		}
 
-		//chaning element ioContext->downwards
+		//chaning element downwards
 		if (buttonInputs.leftDig.simple()) {
-			if (--gen[geX][geY] < 0) {
-				gen[geX][geY] = 9;
+			if (--gen[geY - 1][geX - 1] < 0) {
+				gen[geY - 1][geX - 1] = 9;
 			}
 
-			texture[geX][geY] = textureMap.at(gen[geX][geY]);
+			texture[geX][geY] = textureMap.at(gen[geY -1][geX -1]);
 
 			cursorSoundFile->stopAndRewind();
 			cursorSoundFile->playPause();
@@ -123,7 +125,7 @@ void Generator::update() {
 			texture[geX][geY] = 54;
 		}
 		else {
-			texture[geX][geY] = textureMap.at(gen[geX][geY]);
+			texture[geX][geY] = textureMap.at(gen[geY - 1][geX - 1]);
 		}
 	}	
 	

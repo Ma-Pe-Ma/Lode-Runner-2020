@@ -42,6 +42,8 @@ private:
 
 	short playerNr = 0;
 	short highScore = 0;
+
+	bool showImGuiWindow = true;
 public:	
 	StateContext();
 
@@ -144,6 +146,8 @@ public:
 	int& getCurrentLevel() {
 		return this->getGameConfiguration()->getLevel()[getPlayerNr()];
 	}
+
+	bool& getShowImGuiWindow() { return showImGuiWindow; }
 };
 
 #endif

@@ -28,3 +28,6 @@
 [submodule "src/submodules/imgui"]
 	path = src/submodules/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "src/submodules/json"]
+	path = src/submodules/json
+	url = https://github.com/nlohmann/json.git

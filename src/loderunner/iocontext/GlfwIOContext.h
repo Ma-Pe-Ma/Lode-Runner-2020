@@ -23,6 +23,7 @@ class GlfwIOContext : public IOContext {
 	bool fullScreen = false;
 	void fullscreenSwitch();
 
+	std::string generatorFilePath = "./resources/generator.json";
 protected:
 	GLFWwindow* window;
 	int getIntByKey(std::string key, int defaultValue);
@@ -51,6 +52,9 @@ public:
 	virtual bool shouldClose() override;
 
 	void handleScreenRecording() override;
+
+	virtual nlohmann::json loadGeneratorLevels() override;
+	virtual void saveGeneratorLevels(nlohmann::json) override;
 #ifdef VIDEO_RECORDING
 	std::shared_ptr<MultiMedia> initializeMultimedia();
 #endif
