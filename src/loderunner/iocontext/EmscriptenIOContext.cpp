@@ -81,6 +81,66 @@ namespace EmscriptenHandler {
 		const gl2 = Module.canvas.getContext('webgl2');
 		return gl2.getParameter(gl2.MAX_FRAGMENT_UNIFORM_VECTORS);
 		});
+
+	EM_JS(void, openLevelFilePicker, (), {
+		if (document.getElementById("lrLevelImport") == null) {
+			var fileInput = document.createElement('input');
+			fileInput.type = 'file';
+			fileInput.id = 'lrLevelImport';
+			fileInput.style.display = 'none';
+			fileInput.accept = "application/json";
+			document.body.appendChild(fileInput);
+
+			fileInput.addEventListener('change', function(e) {
+				let file = e.target.files[0];
+				if (!file) return;
+
+				let reader = new FileReader();
+				reader.onload = function(event) {
+					let arrayBuffer = event.target.result;
+					let byteArray = new Uint8Array(arrayBuffer);
+
+					let ptr = Module._malloc(byteArray.length);
+					Module.HEAPU8.set(byteArray, ptr);
+
+					Module.ccall('jsonFileLoaded', null, ['string', 'number', 'number'], [file.name, ptr, byteArray.length]);
+					Module._free(ptr);
+				};
+				reader.readAsArrayBuffer(file);
+			});
+
+		}
+
+		let lrLevelInput = document.getElementById("lrLevelImport");
+		lrLevelInput.click();
+		});
+
+	void exportLevels(const std::string& content) {
+		EM_ASM({
+			const text = UTF8ToString($0);
+			
+			const blob = new Blob([text], { type: 'application/json' });
+		
+			if (document.getElementById("lrLevelExport") == null) {
+				const downloadElement = document.createElement('a');
+				downloadElement.id = "lrLevelExport";
+				downloadElement.style.display = 'none';
+				document.body.appendChild(downloadElement);
+			}
+
+			let lrLevelInput = document.getElementById("lrLevelExport");
+			lrLevelInput.href = URL.createObjectURL(blob);
+			lrLevelInput.download = 'LodeRunnerLevels.json';
+			lrLevelInput.click();
+			URL.revokeObjectURL(lrLevelInput.href);
+		}, content.c_str());
+	}
+
+	void jsonFileLoaded(char* fileName, uint8_t* data, int length) {
+		rawImportableLevels = std::make_tuple(std::string(fileName), std::string(reinterpret_cast<const char*>(data), length));
+	}
+
+	std::optional<std::tuple<std::string, std::string>> rawImportableLevels;
 }
 
 void EmscriptenIOContext::keyboardInput() {

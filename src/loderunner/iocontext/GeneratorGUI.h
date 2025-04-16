@@ -9,8 +9,22 @@
 class Generator;
 
 enum class GeneratorState {
-	select,
-	edit
+	select = 0,
+	edit = 1,
+	import = 2
+};
+
+class InvalidLevelException : public std::exception {
+	std::string message;
+
+public:
+	InvalidLevelException(std::string message) {
+		this->message = message;
+	}
+
+	const char* what() const noexcept override {
+		return this->message.c_str();
+	}
 };
 
 class GeneratorGUI {
@@ -35,9 +49,16 @@ class GeneratorGUI {
 	};
 
 	void loadLevel();
+	void saveLevels();
 
 	void select();
 	void edit();
+
+#ifdef __EMSCRIPTEN__
+	bool clearExistingWhenImport = false;
+	void importLevels();
+	std::optional<std::string> importExportMessage;
+#endif
 public:
 	GeneratorGUI(Generator* generator);
 

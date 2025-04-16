@@ -135,7 +135,7 @@ void AppContainer::handleImGuiConfigurer()
 
 		ImGui::PushItemWidth(std::get<0>(screenSize) / 20);
 
-		if (ImGui::InputInt("Level", &stateContext->getCurrentLevel(), 0, 0, ImGuiInputTextFlags_EnterReturnsTrue)) {
+		if (ImGui::InputInt("Level", &stateContext->getCurrentLevel(), 0, 0)) {
 			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 

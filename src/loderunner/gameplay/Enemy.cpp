@@ -690,7 +690,16 @@ void Enemy::checkCollisionsWithEnvironment() {
 	}	
 
 	if (dPos.y != 0) {
-		short directionY = (dPos.y > 0) - (dPos.y < 0);
+		//TODO
+		if (dPos.y + pos.y > 17) {
+			dPos.y = 17 - pos.y;
+		}
+
+		short directionY = (dPos.y > 0) - (dPos.y < 0);		
+		if ((pos.y + dPos.y - current.y) * directionY <= 0) {
+			return;
+		}
+
 		int nextY = current.y + directionY;
 		LayoutBlock nextYBlock = gameContext->getLayoutElement(current.x, nextY);
 
@@ -711,7 +720,7 @@ void Enemy::freeRun() {
 	ladderTransformation();
 
 	directionHelper.x = (dPos.x > 0) - (dPos.x < 0);
-	directionHelper.y = (dPos.y > 0) - (dPos.y < 0);
+	directionHelper.y = (dPos.y > 0) - (dPos.y < 0);	
 
 	checkCollisionWithOthers();
 	checkCollisionsWithEnvironment();

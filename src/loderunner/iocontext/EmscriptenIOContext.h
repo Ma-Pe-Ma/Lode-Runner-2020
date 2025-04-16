@@ -14,6 +14,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
+#include <json.hpp>
 
 #define TOUCH_BUTTON_NR 9
 
@@ -38,7 +39,15 @@ namespace EmscriptenHandler {
 
 		int getVertexMaxUniformNumber();
 		int getFragmentMaxUniformNumber();
+
+		void openLevelFilePicker();
+		//EMSCRIPTEN_KEEPALIVE
+		void exportLevels(const std::string& content);
+
+		void jsonFileLoaded(char* fileName, uint8_t* data, int length);
 	}
+
+	extern std::optional<std::tuple<std::string, std::string>> rawImportableLevels;
 }
 
 class EmscriptenRenderingManager;
@@ -104,6 +113,19 @@ public:
 
 	nlohmann::json loadGeneratorLevels() override;
 	void saveGeneratorLevels(nlohmann::json) override;
+
+	std::optional<std::tuple<std::string, nlohmann::json>> getRawImportableLevels() {
+		return EmscriptenHandler::rawImportableLevels;
+	}
+
+	void clearRawImportableLevels() {
+		EmscriptenHandler::rawImportableLevels.reset();
+	}
+
+	void exportLevels(nlohmann::json exportableLevels) {
+		std::string levelString = exportableLevels.dump(2);
+		EmscriptenHandler::exportLevels(levelString.c_str());
+	}
 };
 
 #endif

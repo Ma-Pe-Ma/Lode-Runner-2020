@@ -552,7 +552,7 @@ nlohmann::json GlfwIOContext::loadGeneratorLevels() {
 	fileStream.open(generatorFilePath);
 
 	if (fileStream.fail()) {
-		std::cout << "Generator not exist!" << std::endl;
+		std::cout << "Generator does not exist!" << std::endl;
 		std::ofstream newFile;
 		newFile.open(generatorFilePath);
 		newFile << "{}";

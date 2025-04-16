@@ -114,7 +114,7 @@ void Generator::update() {
 				gen[geY - 1][geX - 1] = 9;
 			}
 
-			texture[geX][geY] = textureMap.at(gen[geY -1][geX -1]);
+			texture[geX][geY] = textureMap.at(gen[geY -1][geX - 1]);
 
 			cursorSoundFile->stopAndRewind();
 			cursorSoundFile->playPause();
@@ -132,7 +132,7 @@ void Generator::update() {
 	stateContext->getRenderingManager()->renderGenerator();
 
 	if (buttonInputs.enter.simple()) {
-		texture[geX][geY] = textureMap.at(gen[geX][geY]);
+		texture[geX][geY] = textureMap.at(gen[geY - 1][geX - 1]);
 
 		gameContext->generateLevel(gen);
 		stateContext->transitionToAtEndOfFrame(stateContext->getGamePlay());
