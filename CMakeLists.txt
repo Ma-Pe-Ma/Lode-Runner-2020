@@ -117,6 +117,7 @@ if(EMSCRIPTEN)
 
 	target_compile_options(LodeRunner PUBLIC 
 		"-pthread;"
+		"-fexceptions"
 	)
 
 	target_link_options(LodeRunner PUBLIC
@@ -125,11 +126,26 @@ if(EMSCRIPTEN)
 		"-std=c++23;-fexperimental-library;"
 		"-sPTHREAD_POOL_SIZE=4;-sALLOW_MEMORY_GROWTH;"
 		"-sLLD_REPORT_UNDEFINED"
+		"-sEXPORTED_FUNCTIONS=_main,_malloc,_free,_jsonFileLoaded"
+		"-sEXPORTED_RUNTIME_METHODS=ccall,HEAPU8"
+		"-fexceptions"
+		"-sEXCEPTION_CATCHING_ALLOWED=[json.exception]"
 	)
 
 	target_sources(LodeRunner PRIVATE
 		"src/loderunner/iocontext/rendering/EmscriptenRenderingManager.cpp"
 	)
+
+	if(NOT DEFINED LEVEL_URL)
+		message(FATAL_ERROR "LEVEL_URL is not set. Please specify it with: -DLEVEL_URL=http://...")
+	else()
+		message("Levelset URL is set as: ${LEVEL_URL}")
+	endif()
+
+	target_compile_definitions(LodeRunner PRIVATE
+		"LEVEL_URL=\"${LEVEL_URL}\""
+	)
+
 else()
 	add_subdirectory("src/submodules/glfw")
 	set(RTAUDIO_TARGETNAME_UNINSTALL "rtuninstall" CACHE STRING "Name of 'uninstall' build target" FORCE)

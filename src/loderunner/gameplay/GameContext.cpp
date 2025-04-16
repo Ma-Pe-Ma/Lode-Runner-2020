@@ -271,12 +271,6 @@ void GameContext::loadLevel(int levelNumber)
 		}		
 	}
 
-	//my level ending conditions are different than the original, in most levels it's OK apart from this:
-	//original conditions check if player is at the highest block or not
-	if (levelNumber == 115 && gameConfiguration->getGameVersion() == 0) {
-		highestLadder--;
-	}
-
 	timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
 	std::vector<std::shared_ptr<Text>> textList{
 		timeText
@@ -365,6 +359,10 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 			}
 			else if (gen[j][i] == 3) {
 				ladderList.push_back({ pos.x, pos.y });
+
+				if (j > highestLadder) {
+					highestLadder = j + 1;
+				}
 			}
 			else if (gen[j][i] == 4) {
 				poleList.push_back({ pos.x, pos.y });
@@ -377,6 +375,10 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 			}
 			else if (gen[j][i] == 6) {
 				finishingLadders.push_back({ pos.x, pos.y });
+
+				if (j > highestLadder) {
+					highestLadder = j + 1;
+				}
 			}
 			else if (gen[j][i] == 7) {
 				std::shared_ptr<Gold> gold = std::make_shared<Gold>(pos);
