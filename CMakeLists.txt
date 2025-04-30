@@ -223,12 +223,14 @@ if (VIDEO_RECORDING)
 			file(REMOVE "${submodulePath}/ffmpeg.7z")
 		endif()
 
-		target_include_directories(LodeRunner PRIVATE 
-			"${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/include"
+		file(GLOB FFMPEG_DIR "${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/*/")
+
+		target_include_directories(LodeRunner PRIVATE
+			"${FFMPEG_DIR}/include"
 		)
 
 		target_link_directories(LodeRunner PRIVATE 
-			"${CMAKE_SOURCE_DIR}/src/submodules/ffmpeg/lib"
+			"${FFMPEG_DIR}/lib"
 		)
 	endif()
 
@@ -264,8 +266,8 @@ elseif(WIN32 OR UNIX)
 
 		if(WIN32)
 			foreach(dll "avformat" "avutil" "avcodec" "swresample" "swscale")
-				file(GLOB DllPath "src/submodules/ffmpeg/bin/${dll}-*.dll")
-				install(FILES "${DllPath}" COMPONENT loderunner DESTINATION ".")
+				file(GLOB DllPath "src/submodules/ffmpeg/*/bin/${dll}-*.dll")
+				install(FILES ${DllPath} COMPONENT loderunner DESTINATION ".")
 			endforeach()
 		endif()
 	endif()

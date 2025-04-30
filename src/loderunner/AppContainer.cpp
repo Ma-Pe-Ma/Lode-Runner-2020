@@ -128,6 +128,7 @@ void AppContainer::handleImGuiConfigurer()
 				gameConfiguration->setGameVersion(index);
 				ioContext->saveConfig("levelset", std::to_string(index++));
 				gameConfiguration->validateLevel(stateContext->getCurrentLevel());
+				stateContext->getMainMenu()->setTexts();
 			}
 			index += 1;
 		}

@@ -1,0 +1,64 @@
+﻿{
+	"en" : {		
+		"player1" : {
+			"value" : "1 PLAYER",
+			"x": 12,
+			"y": 13
+		},
+		"player2" : {
+			"value" : "2 PLAYERS",
+			"x": 12,
+			"y": 15
+		},
+		"editMode" : {
+			"value" : "EDIT MODE",
+			"x": 12,
+			"y": 17
+		},
+		"copyRight": {
+			"value": "COPYRIGHT © 1984 HUDSON SOFT",
+			"x": 2,
+			"y": 23
+		},
+		"permission" : {
+			"value" : "WITH PERMISSION OF",
+			"x": 7,
+			"y": 24
+		},
+		"software" : {
+			"value" : "BRODERBUND SOFTWARE INC",
+			"x": 4,
+			"y": 25
+		},
+		"allRights" : {
+			"value" : "ALL RIGHTS RESERVED",
+			"x": 7,
+			"y": 26
+		},
+		"cStart" : {
+			"value" : "PRESS START BUTTON",
+			"x": 8,
+			"y": 20
+		},
+		"cCopyRight" : {
+			"value" : "COPYRIGHT 1984  DOUG SMITH",
+			"x": 3,
+			"y": 23
+		},
+		"cPublish" : {
+			"value" : "PUBLISHED BY HUDSON SOFT",
+			"x": 4,
+			"y": 24
+		},
+		"cLicense" : {
+			"value" : "UNDER LICENSE FROM",
+			"x": 7,
+			"y": 25
+		},
+		"cSoftware" : {
+			"value" : "BRODERBUND SOFTWARE INC",
+			"x": 4,
+			"y": 26
+		}
+	}
+}

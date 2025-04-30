@@ -266,6 +266,13 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 	gameConfiguration->setLevel(1, getIntByKey("levelNr", 1));
 	gameConfiguration->setFramesPerSec(getIntByKey("FPS", 60));
 
+
+	std::ifstream f("./assets/translation.json");
+	nlohmann::json data = nlohmann::json::parse(f);
+	nlohmann::json translation = data["en"];
+
+	gameConfiguration->loadMainMenuTexts(translation);
+
 	this->gameConfiguration = gameConfiguration;
 
 	config.close();

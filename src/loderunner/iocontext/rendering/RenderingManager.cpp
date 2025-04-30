@@ -370,7 +370,13 @@ void RenderingManager::renderMainMenu(int menuCursor, int textureID)
 	}
 	else {
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1);
-	}	
+	}
+
+	characterShader->use();
+	glBindVertexArray(characterVAO);
+	characterShader->setIntArray("textureID", characterTextureIDs, characterDrawableSize);
+	characterShader->setVec2Array("gPos", characterDrawables, characterDrawableSize);
+	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, characterDrawableSize);
 }
 
 void RenderingManager::renderGenerator()
