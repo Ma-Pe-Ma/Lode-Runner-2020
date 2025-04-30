@@ -11,6 +11,8 @@ public:
 	void start() override;
 	void update() override;
 	void end() override;
+
+	void setTexts();
 };
 
 #endif

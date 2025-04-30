@@ -17,6 +17,8 @@ void MainMenu::start() {
 	stateContext->setPlayerNr(0);
 	
 	stateContext->getShowImGuiWindow() = true;
+
+	setTexts();
 }
 
 void MainMenu::update() {
@@ -67,4 +69,11 @@ void MainMenu::update() {
 void MainMenu::end() {
 	stateContext->getShowImGuiWindow() = false;
 	stateContext->getAudio()->getAudioFileByID(5)->stopAndRewind();
+}
+
+void MainMenu::setTexts() {
+	auto textList = stateContext->getGameConfiguration()->getCurrentMainMenuTexts();
+
+	stateContext->getRenderingManager()->setTextList(*textList);
+	stateContext->getRenderingManager()->initializeCharacters();
 }
