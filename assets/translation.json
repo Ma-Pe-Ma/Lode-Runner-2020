@@ -1,17 +1,17 @@
 ﻿{
-	"en" : {		
-		"player1" : {
-			"value" : "1 PLAYER",
+	"English": {
+		"player1": {
+			"value": "1 PLAYER",
 			"x": 12,
 			"y": 13
 		},
-		"player2" : {
-			"value" : "2 PLAYERS",
+		"player2": {
+			"value": "2 PLAYERS",
 			"x": 12,
 			"y": 15
 		},
-		"editMode" : {
-			"value" : "EDIT MODE",
+		"editMode": {
+			"value": "EDIT MODE",
 			"x": 12,
 			"y": 17
 		},
@@ -20,45 +20,112 @@
 			"x": 2,
 			"y": 23
 		},
-		"permission" : {
-			"value" : "WITH PERMISSION OF",
+		"permission": {
+			"value": "WITH PERMISSION OF",
 			"x": 7,
 			"y": 24
 		},
-		"software" : {
-			"value" : "BRODERBUND SOFTWARE INC",
+		"software": {
+			"value": "BRODERBUND SOFTWARE INC",
 			"x": 4,
 			"y": 25
 		},
-		"allRights" : {
-			"value" : "ALL RIGHTS RESERVED",
+		"allRights": {
+			"value": "ALL RIGHTS RESERVED",
 			"x": 7,
 			"y": 26
 		},
-		"cStart" : {
-			"value" : "PRESS START BUTTON",
+		"cStart": {
+			"value": "PRESS START BUTTON",
 			"x": 8,
 			"y": 20
 		},
-		"cCopyRight" : {
-			"value" : "COPYRIGHT 1984  DOUG SMITH",
+		"cCopyRight": {
+			"value": "COPYRIGHT 1984  DOUG SMITH",
 			"x": 3,
 			"y": 23
 		},
-		"cPublish" : {
-			"value" : "PUBLISHED BY HUDSON SOFT",
+		"cPublish": {
+			"value": "PUBLISHED BY HUDSON SOFT",
 			"x": 4,
 			"y": 24
 		},
-		"cLicense" : {
-			"value" : "UNDER LICENSE FROM",
+		"cLicense": {
+			"value": "UNDER LICENSE FROM",
 			"x": 7,
 			"y": 25
 		},
-		"cSoftware" : {
-			"value" : "BRODERBUND SOFTWARE INC",
+		"cSoftware": {
+			"value": "BRODERBUND SOFTWARE INC",
 			"x": 4,
 			"y": 26
+		},
+		"playerID": {
+			"value": "PLAYER {0}",
+			"x": 12,
+			"y": 6
+		},
+		"stage": {
+			"value": "STAGE {0:03}",
+			"x": 8,
+			"y": 12
+		},
+		"life": {
+			"value": "LEFT {0}",
+			"x": 19,
+			"y": 12
+		},
+		"score": {
+			"value": "SCORE    {0:08}",
+			"x": 8,
+			"y": 18
+		},
+		"hiscore": {
+			"value": "HISCORE  {0:08}",
+			"x": 8,
+			"y": 20
+		},
+		"goldPoints": {
+			"value": "{0} POINTS",
+			"x": 20,
+			"y": 6.5
+		},
+		"enemyPoints": {
+			"value": "{0} POINTS",
+			"x": 20,
+			"y": 12.5
+		},
+		"totalPoints": {
+			"value": "TOTAL {0} POINTS",
+			"x": 14.5,
+			"y": 23.25
+		},
+		"gameOver": {
+			"value": "GAME OVER",
+			"x": 12,
+			"y": 10
+		},
+		"gameOverPlayer": {
+			"value": "PLAYER {0}",
+			"x": 12.5,
+			"y": 6
+		},
+		"gameTime": {
+			"value": "GAMETIME: {0:.1f} SEC",
+			"x": -5,
+			"y": 0
+		}
+	},
+	"Magyar": {
+		"player1": {
+			"value": "1 JATEKOS",
+			"x": 12,
+			"y": 13
+		},
+		"player2": {
+			"value": "2 JATEKOS",
+			"x": 12,
+			"y": 15
 		}
 	}
 }

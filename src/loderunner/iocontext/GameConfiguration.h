@@ -4,11 +4,13 @@
 #include <string>
 #include <algorithm>
 
-#include "rendering/Text.h"
-
 #include <json.hpp>
 
+#include "rendering/Text.h"
+
 #define GAME_VERSION_NUMBER 5
+
+#include "Translation.h"
 
 class GameConfiguration {
 	float enemySpeed = 0.415f;
@@ -24,6 +26,7 @@ class GameConfiguration {
 	bool debugEnemy = false;
 #endif
 
+	std::shared_ptr<Translation> translation;
 public:
 	//game version - {filename, maxlevel, textureID, name, mainmenu texts}
 	std::map<int, std::tuple<std::string, short, int, std::string, std::shared_ptr<std::vector<std::shared_ptr<Text>>>>> configurations = {
@@ -80,51 +83,55 @@ public:
 		newLevel = newLevel > maxLevelNumber ? (newLevel < maxLevelNumber + 10 ? newLevel % maxLevelNumber : maxLevelNumber ) : newLevel;
 		newLevel = newLevel < 1 ? (-10 < newLevel ? maxLevelNumber + newLevel : 1) : newLevel;
 	}
-
-	void loadMainMenuTexts(nlohmann::json translation) {
-		std::function<Text(nlohmann::json, std::string, std::string, float, float)> getTextValue = [](nlohmann::json translation, std::string key, std::string defaultValue, int defaultX, int defaultY) -> Text {
-			nlohmann::json properties = translation.value(key, nlohmann::json::object());
-			
-			std::string value = properties.value("value", defaultValue);
-			float x = properties.value("x", defaultX);
-			float y = properties.value("y", defaultY);
-
-			return Text(value, { x,y });
-			};
-
-		auto originalTexts = std::make_shared<std::vector<std::shared_ptr<Text>>>(
-			std::initializer_list<std::shared_ptr<Text>>{
-				std::make_shared<Text>(getTextValue(translation, "player1", "PLAYER1", 12, 13)),
-				std::make_shared<Text>(getTextValue(translation, "player2", "2 PLAYERS", 12, 15)),
-				std::make_shared<Text>(getTextValue(translation, "editMode", "EDIT MODE", 12, 17)),
-	
-				std::make_shared<Text>(getTextValue(translation, "copyRight", "COPYRIGHT © 1984 HUDSON SOFT", 2, 23)),
-				std::make_shared<Text>(getTextValue(translation, "permission", "WITH PERMISSION OF", 7, 24)),
-				std::make_shared<Text>(getTextValue(translation, "software", "BRODERBUND SOFTWARE INC", 4, 25)),
-				std::make_shared<Text>(getTextValue(translation, "allRights", "ALL RIGHTS RESERVED", 7, 26))
-			}
-		);
-
-		auto championshipTexts = std::make_shared<std::vector<std::shared_ptr<Text>>>(
-			std::initializer_list<std::shared_ptr<Text>>{
-				std::make_shared<Text>(getTextValue(translation, "cStart", "PRESS START BUTTON", 8, 20)),
-				std::make_shared<Text>(getTextValue(translation, "cCopyRight", "COPYRIGHT 1984  DOUG SMITH", 3, 23)),
-				std::make_shared<Text>(getTextValue(translation, "cPublish", "PUBLISHED BY HUDSON SOFT", 4, 24)),
-				std::make_shared<Text>(getTextValue(translation, "cLicense", "UNDER LICENSE FROM", 7, 25)),
-				std::make_shared<Text>(getTextValue(translation, "cSoftware", "BRODERBUND SOFTWARE INC", 4, 26)),
-			}
-		);
-
-		std::get<4>(configurations[0]) = originalTexts;
-		std::get<4>(configurations[1]) = championshipTexts;
-		std::get<4>(configurations[2]) = originalTexts;
-		std::get<4>(configurations[3]) = originalTexts;
-		std::get<4>(configurations[4]) = originalTexts;
-	}
-
 #ifndef NDEBUG
 	bool* getEnemyDebugState() { return &this->debugEnemy; }
 #endif
+
+	void loadTranslations(std::string defaultLanguage, nlohmann::json translation) {
+		this->translation = std::make_shared<Translation>(translation);
+		this->translation->loadGenericTexts();
+
+		auto languages = this->translation->getLanguages();
+		auto it = std::find(languages.begin(), languages.end(), defaultLanguage);
+		int currentLanguageIndex = it != languages.end() ? std::distance(languages.begin(), it) : 0;
+		this->translation->setCurrentLanguageIndex(currentLanguageIndex);
+
+		updateMainMenuTexts();
+	}
+
+	void updateMainMenuTexts() {
+		std::shared_ptr<std::vector<std::shared_ptr<Text>>> mainMenuText = std::make_shared<std::vector<std::shared_ptr<Text>>>();
+
+		for (auto s : { "player1", "player2", "editMode", "copyRight", "permission", "software", "allRights" }) {
+			mainMenuText->push_back(std::make_shared<Text>(this->translation->getTranslationText(s)));
+		}
+
+		for (auto i : { 0,2,3,4 }) {
+			std::get<4>(configurations[i]) = mainMenuText;
+		}
+
+		std::shared_ptr<std::vector<std::shared_ptr<Text>>> championText = std::make_shared<std::vector<std::shared_ptr<Text>>>();
+
+		for (auto s : { "cStart", "cCopyRight", "cPublish", "cLicense", "cSoftware" }) {
+			championText->push_back(std::make_shared<Text>(this->translation->getTranslationText(s)));
+		}
+		std::get<4>(configurations[1]) = championText;
+	}
+
+	std::string changeLanguage(int index) {
+		this->translation->setCurrentLanguageIndex(index);
+		updateMainMenuTexts();
+
+		return this->translation->getLanguages()[index];
+	}
+	
+	std::vector<std::string> getLanguages() {
+		return this->translation->getLanguages();
+	}
+
+	std::shared_ptr<Translation> getTranslation() {
+		return this->translation;
+	}
 };
 
 #endif

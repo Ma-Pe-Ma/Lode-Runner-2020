@@ -44,14 +44,15 @@ add_executable(LodeRunner
 	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
 	"src/loderunner/iocontext/rendering/Text.cpp"
 	"src/loderunner/iocontext/rendering/RenderingManager.cpp"
+	"src/loderunner/iocontext/GeneratorGUI.cpp"
+	"src/loderunner/iocontext/Translation.cpp"
 
 	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
 	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"
 	"src/submodules/imgui/imgui.cpp"
 	"src/submodules/imgui/imgui_draw.cpp"
 	"src/submodules/imgui/imgui_tables.cpp"
-	"src/submodules/imgui/imgui_widgets.cpp"
- 	"src/loderunner/iocontext/GeneratorGUI.cpp"
+	"src/submodules/imgui/imgui_widgets.cpp" 	
 )
 
 # setting project for video recording (only Windows build was tested)
@@ -69,12 +70,15 @@ if(WIN32)
 	file(MAKE_DIRECTORY "resources/screenshots")
 	if(VIDEO_RECORDING)
 		file(MAKE_DIRECTORY "resources/gameplay-videos")
-	endif()
-	
-	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/config.txt")
-		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/config.txt" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 	endif()	
 endif()
+
+# copy resource files needed for installation
+foreach(json "config" "translation")
+	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/${json}.json")
+		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/${json}.json" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+	endif()	
+endforeach()	
 
 # copy the font file
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets/Roboto-Medium.ttf")
@@ -255,7 +259,7 @@ if(EMSCRIPTEN)
 	)
 elseif(WIN32 OR UNIX)
 	install(TARGETS LodeRunner COMPONENT loderunner RUNTIME DESTINATION ".")
-	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE PATTERN "config.txt" EXCLUDE)
+	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE PATTERN "*.json" EXCLUDE)
 	install(FILES "ReadMe.md" "LICENSE.md" COMPONENT loderunner DESTINATION ".")
 	
 	install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/screenshots")

@@ -7,6 +7,8 @@
 #include "gameplay/Enemy.h"
 #include "gameplay/Gold.h"
 
+#include <format>
+
 void Intro::start() {
 	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(8)->playPause();
@@ -14,33 +16,40 @@ void Intro::start() {
 	int& level = stateContext->getGameConfiguration()->getLevel()[stateContext->getPlayerNr()];
 	stateContext->getGameConfiguration()->validateLevel(level);
 
+	auto translation = stateContext->getGameConfiguration()->getTranslation();
+
 	//write player id 
-	std::string playerString = stateContext->getGameConfiguration()->getGameVersion() != 1 ? "PLAYER " + std::to_string(stateContext->getPlayerNr() + 1) : "";
-	playerName = std::make_shared<Text>(Text(playerString, { 12, 6 }));
+	auto playerIDtranslation = translation->getTranslationText("playerID");
+	auto playerNr = stateContext->getPlayerNr() + 1;
+	std::get<0>(playerIDtranslation) = std::vformat(std::get<0>(playerIDtranslation), std::make_format_args(playerNr));
+	playerName = std::make_shared<Text>(playerIDtranslation);
 
 	//write level number
-	std::string levelNumber = std::to_string(level);
-	levelNumber.insert(0, 3 - levelNumber.length(), '0');
-	levelName = std::make_shared<Text>(Text("STAGE " + levelNumber, {8,12}));
+	auto stageTranslation = translation->getTranslationText("stage");
+	std::get<0>(stageTranslation) = std::vformat(std::get<0>(stageTranslation), std::make_format_args(level));
+	levelName = std::make_shared<Text>(Text(stageTranslation));
 
 	auto currentPlayer = stateContext->getPlayerNr();
 
 	//write remaining life number
+	auto lifeTranslation = translation->getTranslationText("life");
 	auto playerLife = stateContext->getPlayerLife()[currentPlayer];
-	lifeLeft = std::make_shared<Text>(Text("LEFT " + std::to_string(playerLife), {19, 12}));
+	std::get<0>(lifeTranslation) = std::vformat(std::get<0>(lifeTranslation), std::make_format_args(playerLife));
+	lifeLeft = std::make_shared<Text>(Text(lifeTranslation));
 
 	//write current player score
-	auto playerScore = stateContext->getPlayerScore();
-	std::string point = std::to_string(playerScore[currentPlayer]);
-	point.insert(0, 8 - point.length(), '0');
-	scoreText = std::make_shared<Text>(Text("SCORE    " + point, { 8,18 }));
+	auto scoreTranslation = translation->getTranslationText("score");
+	int playerPoint = stateContext->getPlayerScore()[currentPlayer];
+	std::get<0>(scoreTranslation) = std::vformat(std::get<0>(scoreTranslation), std::make_format_args(playerPoint));
+	scoreText = std::make_shared<Text>(scoreTranslation);
 
 	//write high score
-	std::string record = std::to_string(stateContext->getHighScore());
-	record.insert(0, 8 - record.length(), '0');
-	hiscore = std::make_shared<Text>(Text("HISCORE  " + record, { 8,20 }));
+	auto hiscoreTranslation = translation->getTranslationText("hiscore");
+	int hiscorePoint = stateContext->getHighScore();
+	std::get<0>(hiscoreTranslation) = std::vformat(std::get<0>(hiscoreTranslation), std::make_format_args(hiscorePoint));
+	hiscore = std::make_shared<Text>(Text(hiscoreTranslation));
 
-	stateContext->getIOContext()->saveConfig("levelNr", std::to_string(level));
+	stateContext->getIOContext()->saveConfig("levelNr", level);
 
 	setupRenderingManager();
 }

@@ -4,7 +4,16 @@
 #include "states/StateContext.h"
 
 void GameOver::start() {
-	playerNameText = std::make_shared<Text>(Text("PLAYER " + std::to_string(stateContext->getPlayerNr() + 1), {12.5, 6.0}));
+	auto translation = stateContext->getGameConfiguration()->getTranslation();
+	
+	auto gameOverTranslation = translation->getTranslationText("gameOver");
+	gameOverText = std::make_shared<Text>(gameOverTranslation);
+
+	auto gameOverPlayerTranslation = translation->getTranslationText("gameOverPlayer");
+	int playerNr = stateContext->getPlayerNr() + 1;
+	std::get<0>(gameOverPlayerTranslation) = std::vformat(std::get<0>(gameOverPlayerTranslation), std::make_format_args(playerNr));
+
+	playerNameText = std::make_shared<Text>(Text(gameOverPlayerTranslation));
 	startTimePoint = std::chrono::system_clock::now();
 	stateContext->getAudio()->getAudioFileByID(6)->playPause();
 

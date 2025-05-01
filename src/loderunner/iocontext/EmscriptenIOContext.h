@@ -81,6 +81,9 @@ private:
 
 	void keyboardInput();
 	std::optional<long> gamePadID;
+protected:
+	nlohmann::json readJson(std::string) override;
+	void dumpJson(std::string key, nlohmann::json) override;
 public:
 	void processInput() override;
 
@@ -100,19 +103,13 @@ public:
 		std::get<1>(screenParameters.screenSize) = std::get<0>(screenParameters.screenSize) * 3 / 5;
 	}
 
-	void initialize() override;
-
-	void loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration) override;
-	void saveConfig(std::string key, std::string value) override;
+	void initialize() override;	
 
 	void setRenderingManager(std::shared_ptr<EmscriptenRenderingManager> emscriptenRenderingManager) { this->emscriptenRenderingManager = emscriptenRenderingManager; }
 
 	void activateCanvasViewPort();
 	void activateDisplayViewPort();
 	void framebufferSizeCallback(int width, int height);
-
-	nlohmann::json loadGeneratorLevels() override;
-	void saveGeneratorLevels(nlohmann::json) override;
 
 	std::optional<std::tuple<std::string, nlohmann::json>> getRawImportableLevels() {
 		return EmscriptenHandler::rawImportableLevels;

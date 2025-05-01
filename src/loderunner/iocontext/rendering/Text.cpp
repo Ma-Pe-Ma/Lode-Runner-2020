@@ -33,6 +33,11 @@ Text::Text(std::string text, Vector2D pos)
 	fixedLength = text.size();
 }
 
+Text::Text(std::tuple<std::string, float, float> text) : Text(std::get<0>(text), {std::get<1>(text), std::get<2>(text) }) 
+{
+	
+}
+
 void Text::setPositionPointer(float* positionPointer)
 {
 	this->positionPointer = positionPointer;

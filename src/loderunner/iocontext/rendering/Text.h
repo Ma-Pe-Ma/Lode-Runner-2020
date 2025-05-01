@@ -22,6 +22,7 @@ public:
 	static void initCharMap();
 
 	Text(std::string text, Vector2D pos);
+	Text(std::tuple<std::string, float, float>);
 	void setPositionPointer(float* positionPointer);
 
 	void setTexturePointer(int* texturePointer);

@@ -190,40 +190,6 @@ void EmscriptenIOContext::processInput() {
 	}
 }
 
-void EmscriptenIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration)
-{
-	const std::string keyPrefix = "LR_";
-
-	/*std::string cookies = EmscriptenHandler::get_cookies();
-	std::istringstream cookieStream(cookies);
-	std::string keyValuePair;
-
-	while (std::getline(cookieStream, keyValuePair, ';')) {
-		std::string key = keyValuePair.substr(0, keyValuePair.find("="));
-		key = key.substr(key.find(keyPrefix) + keyPrefix.length());
-		key = std::regex_replace(key, std::regex("^ +"), "");
-
-		std::string value = keyValuePair.substr(keyValuePair.find("=") + 1);
-		value = std::regex_replace(value, std::regex("^ +"), "");
-
-		configMap[key] = value;
-	}*/
-
-	configMap["levelNr"] = EmscriptenHandler::get_local_storage_value((keyPrefix + "levelNr").c_str());
-	configMap["levelset"] = EmscriptenHandler::get_local_storage_value((keyPrefix + "levelset").c_str());
-
-	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
-	gameConfiguration->setLevel(0, getIntByKey("levelNr", 1));
-	gameConfiguration->setLevel(1, getIntByKey("levelNr", 1));
-}
-
-void EmscriptenIOContext::saveConfig(std::string key, std::string value)
-{
-	const std::string keyPrefix = "LR_";
-	key = keyPrefix + key;
-	EmscriptenHandler::set_local_storage_value(key.c_str(), value.c_str());
-}
-
 void EmscriptenIOContext::initialize() {
 	initializeEmscriptenCanvas();
 	GlfwIOContext::initialize();
@@ -564,15 +530,15 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 	emscriptenRenderingManager->updateTouchButtonRenderer(touchRenderVertices);
 };
 
-nlohmann::json EmscriptenIOContext::loadGeneratorLevels() {
-	std::string levelString = EmscriptenHandler::get_local_storage_value("generator");
-	levelString = levelString.size() == 0 ? "{}" : levelString;
-	return nlohmann::json::parse(levelString);
+nlohmann::json EmscriptenIOContext::readJson(std::string key) {
+	std::string serialized = EmscriptenHandler::get_local_storage_value("key");
+	return nlohmann::json::parse(serialized);
 }
 
-void EmscriptenIOContext::saveGeneratorLevels(nlohmann::json generatorLevels) {
-	std::string levelString = generatorLevels.dump();
-	EmscriptenHandler::set_local_storage_value("generator", levelString.c_str());
+
+void EmscriptenIOContext::dumpJson(std::string key, nlohmann::json data) {
+	std::string serialized = data.dump();
+	EmscriptenHandler::set_local_storage_value(key.c_str(), serialized.c_str());
 }
 
 #endif // __EMSCRIPTEN__
