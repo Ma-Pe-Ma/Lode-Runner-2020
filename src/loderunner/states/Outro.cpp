@@ -69,9 +69,21 @@ void Outro::setupRenderingManager()
 }
 
 void Outro::start() {
-	goldPoints = std::make_shared<Text>(Text(std::to_string(goldScore).append(" POINTS"), { 20, 6.75f }));
-	enemyPoints = std::make_shared<Text>(Text(std::to_string(enemyScore).append(" POINTS"), { 20, 12.75f }));
-	totalPoints = std::make_shared<Text>(Text(std::string("TOTAL ").append(std::to_string(goldScore + enemyScore)).append(" POINTS"), { 14.5f, 23.25f }));
+	auto translation = stateContext->getGameConfiguration()->getTranslation();
+
+	//write player id 
+	auto goldPointsTranslation = translation->getTranslationText("goldPoints");
+	std::get<0>(goldPointsTranslation) = std::vformat(std::get<0>(goldPointsTranslation), std::make_format_args(goldScore));
+	goldPoints = std::make_shared<Text>(goldPointsTranslation);
+
+	auto enemyPointsTranslation = translation->getTranslationText("enemyPoints");
+	std::get<0>(enemyPointsTranslation) = std::vformat(std::get<0>(enemyPointsTranslation), std::make_format_args(enemyScore));
+	enemyPoints = std::make_shared<Text>(enemyPointsTranslation);
+
+	auto totalPointsTranslation = translation->getTranslationText("totalPoints");
+	int totalScore = goldScore + enemyScore;
+	std::get<0>(totalPointsTranslation) = std::vformat(std::get<0>(totalPointsTranslation), std::make_format_args(totalScore));
+	totalPoints = std::make_shared<Text>(totalPointsTranslation);
 
 	setupRenderingManager();
 

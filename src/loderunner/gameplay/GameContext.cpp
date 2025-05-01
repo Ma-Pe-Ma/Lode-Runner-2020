@@ -16,9 +16,12 @@ void GameContext::run() {
 	getRenderingManager()->setLadderFlashFactor(ladderFactor);
 
 	//Write the current time on screen
-	std::string timeValue = std::to_string(gameTime);
-	timeValue = timeValue.substr(0, timeValue.length() - 5);
-	timeText->changeContent("GAMETIME: " + timeValue + " SEC");
+
+	auto translation = gameConfiguration->getTranslation();
+	auto gameTimeTranslation = translation->getTranslationText("gameTime");
+	std::get<0>(gameTimeTranslation) = std::vformat(std::get<0>(gameTimeTranslation), std::make_format_args(gameTime));
+
+	timeText->changeContent(std::get<0>(gameTimeTranslation));
 
 	//handle player and enemy interactions
 	player->handle(gameTime, frameDelta);
@@ -271,7 +274,13 @@ void GameContext::loadLevel(int levelNumber)
 		}		
 	}
 
-	timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
+	auto translation = gameConfiguration->getTranslation();
+	auto gameTimeTranslation = translation->getTranslationText("gameTime");
+	float gameTime = 0.0f;
+	std::get<0>(gameTimeTranslation) = std::vformat(std::get<0>(gameTimeTranslation), std::make_format_args(gameTime));
+
+	timeText = std::make_shared<Text>(Text(gameTimeTranslation));
+
 	std::vector<std::shared_ptr<Text>> textList{
 		timeText
 	};
@@ -427,7 +436,12 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 	if (player) {
 		highestLadder = highestLadder < 15 ? 15 : highestLadder;
 
-		timeText = std::make_shared<Text>(Text("GAMETIME: 0.0 SEC   ", { -5, 0 }));
+		auto translation = gameConfiguration->getTranslation();
+		auto gameTimeTranslation = translation->getTranslationText("gameTime");
+		float zeroTime = 0.0f;
+		std::get<0>(gameTimeTranslation) = std::vformat(std::get<0>(gameTimeTranslation), std::make_format_args(zeroTime));
+
+		timeText = std::make_shared<Text>(gameTimeTranslation);
 
 		std::vector<std::shared_ptr<Text>> textList;
 		textList.push_back(timeText);

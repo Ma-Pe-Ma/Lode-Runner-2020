@@ -23,15 +23,16 @@ class GlfwIOContext : public IOContext {
 	bool fullScreen = false;
 	void fullscreenSwitch();
 
-	std::string generatorFilePath = "./resources/generator.json";
+	std::string resourcePath = "./resources/{0}.json";
 protected:
+	nlohmann::json jsonConfiguration;
 	GLFWwindow* window;
-	int getIntByKey(std::string key, int defaultValue);
-	float getFloatByKey(std::string key, float defaultValue);
 	std::map<std::string, std::string> configMap;
 
 	std::shared_ptr<GameConfiguration> gameConfiguration;
 
+	virtual nlohmann::json readJson(std::string);
+	virtual void dumpJson(std::string key, nlohmann::json);
 public:
 	virtual void initialize() override;
 	virtual void terminate() override;
@@ -42,8 +43,9 @@ public:
 
 	unsigned int loadTexture(char const* path) override;
 	void takeScreenShot() override;
+
 	virtual void loadConfig(std::shared_ptr<GameConfiguration>) override;
-	virtual void saveConfig(std::string key, std::string value) override;
+	virtual void saveConfig(std::string key, std::variant<int, float, std::string> value) override;
 
 	std::array<std::array<char, 28>, 16> loadLevel(std::string, short) override;
 
@@ -54,7 +56,7 @@ public:
 	void handleScreenRecording() override;
 
 	virtual nlohmann::json loadGeneratorLevels() override;
-	virtual void saveGeneratorLevels(nlohmann::json) override;
+	void saveGeneratorLevels(nlohmann::json) override;
 #ifdef VIDEO_RECORDING
 	std::shared_ptr<MultiMedia> initializeMultimedia();
 #endif

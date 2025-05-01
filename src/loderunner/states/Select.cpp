@@ -4,6 +4,7 @@
 #include "iocontext/audio/AudioFile.h"
 
 #include <string>
+#include <format>
 
 void Select::start() {
 	stateContext->getRenderingManager()->clearRenderableObjects();
@@ -14,7 +15,11 @@ void Select::start() {
 	stateContext->getRenderingManager()->setTextList(textList);
 	stateContext->getRenderingManager()->initializeCharacters();
 	int& levelNumber = stateContext->getCurrentLevel();
-	levelText->changeContent("STAGE " + std::to_string(levelNumber).insert(0, 3 - std::to_string(levelNumber).length(), '0'));
+
+	auto translation = stateContext->getGameConfiguration()->getTranslation();
+	auto stageTranslation = translation->getTranslationText("stage");
+	std::get<0>(stageTranslation) = std::vformat(std::get<0>(stageTranslation), std::make_format_args(levelNumber));
+	levelText->changeContent(std::get<0>(stageTranslation));
 
 	stateContext->getShowImGuiWindow() = true;
 }
@@ -61,7 +66,11 @@ void Select::end() {
 void Select::changeLevelNumber(int& levelNr) {
 	if (previousNr != levelNr) {
 		stateContext->getGameConfiguration()->validateLevel(levelNr);
-		levelText->changeContent("STAGE " + std::to_string(levelNr).insert(0, 3 - std::to_string(levelNr).length(), '0'));
+
+		auto translation = stateContext->getGameConfiguration()->getTranslation();
+		auto stageTranslation = translation->getTranslationText("stage");
+		std::get<0>(stageTranslation) = std::vformat(std::get<0>(stageTranslation), std::make_format_args(levelNr));
+		levelText->changeContent(std::get<0>(stageTranslation));
 
 		stateContext->getAudio()->getAudioFileByID(16)->stopAndRewind();
 		stateContext->getAudio()->getAudioFileByID(16)->playPause();

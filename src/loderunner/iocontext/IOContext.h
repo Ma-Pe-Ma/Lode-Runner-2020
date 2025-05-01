@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <variant>
 #include <json.hpp>
 
 class GameConfiguration;
@@ -41,7 +42,7 @@ public:
 
 	virtual std::array<std::array<char, 28>, 16> loadLevel(std::string, short levelNr) = 0;
 
-	virtual void saveConfig(std::string key, std::string value) = 0;
+	virtual void saveConfig(std::string key, std::variant<int, float, std::string> value) = 0;
 
 	virtual void handleScreenRecording() {}
 	virtual bool shouldClose() = 0;

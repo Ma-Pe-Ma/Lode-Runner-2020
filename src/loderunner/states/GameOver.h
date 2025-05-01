@@ -10,8 +10,8 @@
 
 class GameOver : public State {
 private:
-	const std::shared_ptr<Text> gameOverText = std::make_shared<Text>(Text("GAME OVER", { 12,10 }));
-	std::shared_ptr<Text> playerNameText = nullptr;
+	std::shared_ptr<Text> gameOverText;
+	std::shared_ptr<Text> playerNameText;
 
 	void setupRenderingManager();
 public:

@@ -190,7 +190,7 @@ unsigned int GlfwIOContext::findVideoCount() {
 
 std::string GlfwIOContext::generateNewVideoName() {
 	unsigned int vid = findVideoCount();
-	return "resources/gameplay-videos/GameplayVideo-" + std::to_string(vid) + ".mkv";
+	return std::vformat("resources/gameplay-videos/GameplayVideo-{0}.mkv", std::make_format_args(vid));
 }
 
 unsigned int GlfwIOContext::findScreenShotCount() {
@@ -216,99 +216,58 @@ unsigned int GlfwIOContext::findScreenShotCount() {
 }
 
 void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfiguration) {
-	std::ifstream config("resources/config.txt", std::fstream::in);
-	std::string line;
-
-	if (config.is_open()) {
-		while (getline(config, line)) {
-			if (line.length() == 0 || line[0] == '#') {
-				continue;
-			}
-
-			std::string key = line.substr(0, line.find(' '));
-			std::string value = line.substr(line.find(' ') + 1);
-
-			configMap[key] = value;
-		}
-	}
-	else {
-		std::cout << "\n Config File Not Found!";
-	}
-
-	int resolutionMode = getIntByKey("resolution", 0);
-
-	switch (resolutionMode) {
-	case 0:
-		this->screenParameters.screenSize = std::make_tuple(1500, 900);
-		break;
-	case 1:
-		this->screenParameters.screenSize = std::make_tuple(750, 450);
-		break;
-	case 2:
-		this->screenParameters.screenSize = std::make_tuple(3000, 1800);
-		break;
-	case 3:
-		this->screenParameters.screenSize = std::make_tuple(1750, 1050);
-		break;
-	case 4:
-		this->screenParameters.screenSize = std::make_tuple(getIntByKey("width", std::get<0>(this->screenParameters.screenSize)), getIntByKey("height", std::get<0>(this->screenParameters.screenSize)));
-	}
-
-	std::get<0>(this->screenParameters.screenSize) = std::get<0>(this->screenParameters.screenSize) > 4096 ? 4096 : std::get<0>(this->screenParameters.screenSize);
-	std::get<1>(this->screenParameters.screenSize) = std::get<1>(this->screenParameters.screenSize) > 2160 ? 2160 : std::get<1>(this->screenParameters.screenSize);
-
-	gameConfiguration->setPlayerSpeed(getFloatByKey("playerSpeed", 0.9f));
-	gameConfiguration->setEnemySpeed(getFloatByKey("enemySpeed", 0.415f));
-	gameConfiguration->setGameVersion(getIntByKey("levelset", 0));
-
-	gameConfiguration->setRecordingHeight(getIntByKey("RecordingHeight", 800));
-	gameConfiguration->setLevel(0, getIntByKey("levelNr", 1));
-	gameConfiguration->setLevel(1, getIntByKey("levelNr", 1));
-	gameConfiguration->setFramesPerSec(getIntByKey("FPS", 60));
-
-
-	std::ifstream f("./assets/translation.json");
-	nlohmann::json data = nlohmann::json::parse(f);
-	nlohmann::json translation = data["en"];
-
-	gameConfiguration->loadMainMenuTexts(translation);
-
 	this->gameConfiguration = gameConfiguration;
 
-	config.close();
-}
+	nlohmann::json data = readJson("config");
 
-int GlfwIOContext::getIntByKey(std::string key, int defaultValue) {
-	std::string value = configMap[key];
-
-	if (value != "") {
-		try {
-			return std::stoi(value);
-		}
-		catch (std::invalid_argument& e) {
-
-		}
-		catch (std::out_of_range& e) {
-			
-		}		
+	jsonConfiguration["resolutionID"] = data.value("resolutionID", 0);
+	jsonConfiguration["resolutions"] = data.value("resolutions", nlohmann::json::array());
+	//nlohmann::json resolutions = data.value("resolutions", nlohmann::json::array());
+	
+	if (jsonConfiguration["resolutionID"] >= jsonConfiguration["resolutions"].size()) {
+		jsonConfiguration["resolutions"].push_back(nlohmann::json::object());
+		jsonConfiguration["resolutionID"] = jsonConfiguration["resolutions"].size() - 1;
 	}
+	
+	nlohmann::json resolution = jsonConfiguration["resolutions"][jsonConfiguration["resolutionID"].get<int>()];
 
-	return defaultValue;
-}
+	int x = resolution.value("x", 1500);
+	int y = resolution.value("y", 900);
 
-float GlfwIOContext::getFloatByKey(std::string key, float defaultValue) {
-	std::string value = configMap[key];
+	jsonConfiguration["resolutions"][jsonConfiguration["resolutionID"].get<int>()]["x"] = x;
+	jsonConfiguration["resolutions"][jsonConfiguration["resolutionID"].get<int>()]["y"] = y;
 
-	if (value != "") {
-		try {
-			return std::stof(value);
-		}
-		catch (std::invalid_argument e) {
+	this->screenParameters.screenSize = std::make_tuple(x, y);
+	std::get<0>(this->screenParameters.screenSize) = std::get<0>(this->screenParameters.screenSize) > 4096 ? 4096 : std::get<0>(this->screenParameters.screenSize);
+	std::get<1>(this->screenParameters.screenSize) = std::get<1>(this->screenParameters.screenSize) > 2160 ? 2160 : std::get<1>(this->screenParameters.screenSize);
+	
+	jsonConfiguration["playerSpeed"] = data.value("playerSpeed", 0.9f);
+	gameConfiguration->setPlayerSpeed(jsonConfiguration["playerSpeed"]);
 
-		}
-	}
+	jsonConfiguration["enemySpeed"] = data.value("enemySpeed", 0.415f);
+	gameConfiguration->setEnemySpeed(jsonConfiguration["enemySpeed"]);
+	
+	jsonConfiguration["levelset"] = data.value("levelset", 0);
+	gameConfiguration->setGameVersion(jsonConfiguration["levelset"]);
 
-	return defaultValue;
+#ifdef VIDEO_RECORDING
+	jsonConfiguration["recordingHeight"] = data.value("recordingHeight", 800);
+	gameConfiguration->setRecordingHeight(jsonConfiguration["recordingHeight"]);
+#endif
+
+	jsonConfiguration["levelNr"] = data.value("levelNr", 1);
+	gameConfiguration->setLevel(0, jsonConfiguration["levelNr"]);
+	gameConfiguration->setLevel(1, jsonConfiguration["levelNr"]);
+	
+	jsonConfiguration["FPS"] = data.value("FPS", 60);
+	gameConfiguration->setFramesPerSec(jsonConfiguration["FPS"]);
+
+	jsonConfiguration["language"] = data.value("language", "English");
+	
+	dumpJson("config", jsonConfiguration);	
+
+	nlohmann::json translationData = readJson("translation");
+	gameConfiguration->loadTranslations(jsonConfiguration["language"], translationData);
 }
 
 void GlfwIOContext::fullscreenSwitch() {
@@ -482,46 +441,13 @@ void GlfwIOContext::handleScreenRecording()
 #endif
 }
 
-void GlfwIOContext::saveConfig(std::string modifiableKey, std::string modifiableValue)
+void GlfwIOContext::saveConfig(std::string modifiableKey, std::variant<int, float, std::string> modifiableValue)
 {
-	std::string line;
+	std::visit([this, modifiableKey](auto&& value) {
+		jsonConfiguration[modifiableKey] = value;
+	}, modifiableValue);
 
-	std::ifstream configFileOld;
-	std::ofstream configFileNew;
-	configFileOld.open("resources/config.txt");
-	configFileNew.open("config_temp.txt");
-	bool modifialbleLineFound = false;
-
-	while (getline(configFileOld, line)) {
-		if (line.length() == 0 || line[0] == '#') {
-			configFileNew << line + "\n";
-			continue;
-		}
-
-		std::string lineKey = line.substr(0, line.find(' '));
-		std::string lineValue = line.substr(line.find(' ') + 1);
-
-		if (lineKey == modifiableKey) {
-			modifialbleLineFound = true;
-
-			std::string newLine = modifiableKey + " " + modifiableValue;
-			configFileNew << newLine + "\n";
-}
-		else {
-			configFileNew << line + "\n";
-		}
-	}
-
-	if (!modifialbleLineFound) {
-		std::string newLine = modifiableKey + " " + modifiableValue;
-		configFileNew << newLine + "\n";
-	}
-
-	configFileNew.close();
-	configFileOld.close();
-
-	remove("resources/config.txt");
-	rename("config_temp.txt", "resources/config.txt");
+	dumpJson("config", jsonConfiguration);
 }
 
 std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileName, short levelNumber)
@@ -544,7 +470,6 @@ std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileNa
 				std::copy(line.begin(), line.begin() + line.size(), lineArray.begin());
 
 				levels[fileName][key][index] = lineArray;
-
 			}
 		}
 
@@ -555,24 +480,43 @@ std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileNa
 }
 
 nlohmann::json GlfwIOContext::loadGeneratorLevels() {
-	std::ifstream fileStream;
-	fileStream.open(generatorFilePath);
-
-	if (fileStream.fail()) {
-		std::cout << "Generator does not exist!" << std::endl;
-		std::ofstream newFile;
-		newFile.open(generatorFilePath);
-		newFile << "{}";
-	}
-
-	fileStream.open(generatorFilePath);
-
-	return nlohmann::json::parse(fileStream);
+	return readJson("generator");
 }
 
 void GlfwIOContext::saveGeneratorLevels(nlohmann::json generatorLevels) {
-	std::ofstream outFile(generatorFilePath);
-	outFile << generatorLevels.dump(2);
+	dumpJson("generator", generatorLevels);
+}
+
+nlohmann::json GlfwIOContext::readJson(std::string key) {
+	std::string filePath = std::vformat(resourcePath, std::make_format_args(key));
+	std::ifstream file;
+
+	file.open(filePath);
+
+	std::cout << "resou: " << filePath << ", "<<key<<std::endl;
+
+	if (file.fail()) {
+		std::cout << "Generator does not exist: "<<filePath << std::endl;
+		std::ofstream newFile;
+		file.close();
+		
+		newFile.open(filePath);
+		newFile << "{}";
+		newFile.close();		
+		return nlohmann::json::object();
+	}
+
+	nlohmann::json data = file.is_open() ? nlohmann::json::parse(file) : nlohmann::json::object();
+	file.close();
+
+	return data;;
+}
+
+void GlfwIOContext::dumpJson(std::string key, nlohmann::json data) {
+	std::string filePath = std::vformat(resourcePath, std::make_format_args(key));
+
+	std::ofstream outFile(filePath);
+	outFile << data.dump(2);
 	outFile.close();
 }
 

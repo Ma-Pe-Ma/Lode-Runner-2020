@@ -94,7 +94,7 @@ void AppContainer::handleImGuiConfigurer()
 			}
 
 			gameConfiguration->setGameVersion(*gameVersion);
-			ioContext->saveConfig("levelset", std::to_string(*gameVersion));
+			ioContext->saveConfig("levelset", *gameVersion);
 			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 		else {
@@ -121,12 +121,12 @@ void AppContainer::handleImGuiConfigurer()
 
 		int index = 0;
 		ImGui::Indent(10.0f);
-		for (auto it = gameConfiguration->configurations.begin(); it != gameConfiguration->configurations.end(); it++) {			
-			std::string name = std::get<3>(it->second) + "(" + std::to_string(std::get<1>(it->second)) + ")";
+		for (auto it = gameConfiguration->configurations.begin(); it != gameConfiguration->configurations.end(); it++) {
+			std::string name = std::vformat("{0} ({1})", std::make_format_args(std::get<3>(it->second), std::get<1>(it->second)));
 
 			if (ImGui::RadioButton(name.c_str(), gameConfiguration->getGameVersionPointer(), index)) {
 				gameConfiguration->setGameVersion(index);
-				ioContext->saveConfig("levelset", std::to_string(index++));
+				ioContext->saveConfig("levelset", index);
 				gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 				stateContext->getMainMenu()->setTexts();
 			}
@@ -156,6 +156,21 @@ void AppContainer::handleImGuiConfigurer()
 #ifndef NDEBUG	
 		ImGui::Checkbox("Control enemies", gameConfiguration->getEnemyDebugState());
 #endif
+
+		ImGui::Text("Language");
+
+		index = 0;
+		for (auto& language : gameConfiguration->getLanguages()) {
+			if (ImGui::RadioButton(language.c_str(), gameConfiguration->getTranslation()->getCurrentLanguageIndex(), index)) {
+				auto newLanguage = gameConfiguration->changeLanguage(index);
+				ioContext->saveConfig("language", newLanguage);
+				//stateContext->getMainMenu()->setTexts();
+			}
+
+			++index;
+			ImGui::SameLine();
+		}
+
 		ImGui::NewLine();
 		ImGui::Text("Controls:");
 		ImGui::Text("\tarrows - moving");

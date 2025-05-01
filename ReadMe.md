@@ -1,7 +1,7 @@
 # Lode Runner 2020
 ![](./assets/textures/Logo.png)
 
-![status](https://badgen.net/badge/status/finished/green) ![license](https://badgen.net/github/license/Ma-Pe-Ma/Lode-Runner-2020)
+![status](https://img.shields.io/badge/status-finished-green) ![license](https://img.shields.io/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
 ![WASM](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-wasm.yml/badge.svg) ![Windows](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-windows.yml/badge.svg) ![Linux](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-linux.yml/badge.svg) ![Android](https://badgen.net/badge/Android/working/green)
 

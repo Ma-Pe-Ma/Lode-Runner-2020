@@ -1,0 +1,27 @@
+{
+  "FPS": 60,
+  "enemySpeed": 0.415,
+  "language": "English",
+  "levelNr": 1,
+  "levelset": 0,
+  "playerSpeed": 0.9,
+  "resolutionID": 0,
+  "resolutions": [
+    {
+      "x": 1750,
+      "y": 1050
+    },
+	{
+      "x": 1500,
+      "y": 900
+    },
+	{
+      "x": 750,
+      "y": 450
+    },
+	{
+      "x": 3000,
+      "y": 1800
+    }
+  ]
+}
