@@ -9,7 +9,8 @@ void Text::initCharMap()
 		characterMap['.'] = 0;
 		characterMap[':'] = 1;
 		characterMap[' '] = 2;
-		characterMap['©'] = 32;
+		//copyright sign
+		characterMap[169] = 32;
 
 		//adding alphabet characters
 		for (int i = 0; i < 26; i++)

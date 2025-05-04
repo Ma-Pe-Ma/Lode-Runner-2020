@@ -106,18 +106,21 @@ void AppContainer::handleImGuiConfigurer()
 	}
 
 	if (stateContext->getShowImGuiWindow()) {
+		auto translation = gameConfiguration->getTranslation();
+
 #ifndef NDEBUG
-		ImVec2 windowSize = ImVec2(220, 400);
+		ImVec2 windowSize = ImVec2(220, 430);
 #else
-		ImVec2 windowSize = ImVec2(220, 370);
+		ImVec2 windowSize = ImVec2(220, 400);
 #endif
 		auto screenSize = ioContext->getScreenParameters().screenSize;
 		ImGui::SetNextWindowPos(ImVec2(std::get<0>(screenSize) / 25, std::get<0>(screenSize) / 25), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(windowSize);
 
-		ImGui::Begin("Lode Runner - configurer", &stateContext->getShowImGuiWindow(), ImGuiWindowFlags_NoResize);
+		std::string windowTitle = translation->getTranslationString("imguiTitle") + "###mainWindow";
+		ImGui::Begin(windowTitle.c_str(), &stateContext->getShowImGuiWindow(), ImGuiWindowFlags_NoResize);
 
-		ImGui::Text("Game version");
+		ImGui::Text(translation->getTranslationString("gameVersion").c_str());
 
 		int index = 0;
 		ImGui::Indent(10.0f);
@@ -136,18 +139,18 @@ void AppContainer::handleImGuiConfigurer()
 
 		ImGui::PushItemWidth(std::get<0>(screenSize) / 20);
 
-		if (ImGui::InputInt("Level", &stateContext->getCurrentLevel(), 0, 0)) {
+		if (ImGui::InputInt(translation->getTranslationString("level").c_str(), &stateContext->getCurrentLevel(), 0, 0)) {
 			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 
-		if (ImGui::SliderFloat("Player speed", gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {
+		if (ImGui::SliderFloat(translation->getTranslationString("playerSpeed").c_str(), gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {
 
 			if (gameContext->getPlayer()) {
 				gameContext->getPlayer()->setCharSpeed(gameConfiguration->getPlayerSpeed());
 			}
 		}
 
-		if (ImGui::SliderFloat("Enemy speed", gameConfiguration->getEnemySpeedPointer(), 0.0f, 1.0f, "%.2f")) {
+		if (ImGui::SliderFloat(translation->getTranslationString("enemySpeed").c_str(), gameConfiguration->getEnemySpeedPointer(), 0.0f, 1.0f, "%.2f")) {
 			for (auto& enemy : gameContext->getEnemies()) {
 				enemy->setCharSpeed(gameConfiguration->getEnemySpeed());
 			}
@@ -156,12 +159,27 @@ void AppContainer::handleImGuiConfigurer()
 #ifndef NDEBUG	
 		ImGui::Checkbox("Control enemies", gameConfiguration->getEnemyDebugState());
 #endif
+		ImGui::Text(translation->getTranslationString("controls").c_str());
+		auto arrows = translation->getTranslationString("arrows");
+		ImGui::Text(std::vformat("\t{0}", std::make_format_args(arrows)).c_str());
+		auto leftDig = translation->getTranslationString("leftDig");
+		ImGui::Text(std::vformat("\tq - {0}", std::make_format_args(leftDig)).c_str());
+		auto rightDig = translation->getTranslationString("rightDig");
+		ImGui::Text(std::vformat("\tw - {0}", std::make_format_args(rightDig)).c_str());
+		auto space = translation->getTranslationString("space");
+		ImGui::Text(std::vformat("\tspace - {0}", std::make_format_args(space)).c_str());
+		auto escEnter = translation->getTranslationString("escEnter");
+		ImGui::Text(std::vformat("\tesc/enter - {0}", std::make_format_args(escEnter)).c_str());
+		auto cButton = translation->getTranslationString("cButton");
+		ImGui::Text(std::vformat("\tc - {0}", std::make_format_args(cButton)).c_str());
 
-		ImGui::Text("Language");
+		ImGui::PopItemWidth();
+
+		ImGui::Text(translation->getTranslationString("language").c_str());
 
 		index = 0;
 		for (auto& language : gameConfiguration->getLanguages()) {
-			if (ImGui::RadioButton(language.c_str(), gameConfiguration->getTranslation()->getCurrentLanguageIndex(), index)) {
+			if (ImGui::RadioButton(language.c_str(), translation->getCurrentLanguageIndex(), index)) {
 				auto newLanguage = gameConfiguration->changeLanguage(index);
 				ioContext->saveConfig("language", newLanguage);
 				//stateContext->getMainMenu()->setTexts();
@@ -170,17 +188,6 @@ void AppContainer::handleImGuiConfigurer()
 			++index;
 			ImGui::SameLine();
 		}
-
-		ImGui::NewLine();
-		ImGui::Text("Controls:");
-		ImGui::Text("\tarrows - moving");
-		ImGui::Text("\tq - left dig");
-		ImGui::Text("\tw - right dig");
-		ImGui::Text("\tspace - level select");
-		ImGui::Text("\tesc/enter - pause");
-		ImGui::Text("\tc - show/hide this window");
-
-		ImGui::PopItemWidth();
 
 		ImGui::End();
 	}
