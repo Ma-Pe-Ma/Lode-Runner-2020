@@ -530,13 +530,22 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 	emscriptenRenderingManager->updateTouchButtonRenderer(touchRenderVertices);
 };
 
-nlohmann::json EmscriptenIOContext::readJson(std::string key) {
-	std::string serialized = EmscriptenHandler::get_local_storage_value("key");
+nlohmann::json EmscriptenIOContext::readJson(std::string key, std::string folder) {
+	if (folder == "assets") {
+		return GlfwIOContext::readJson(key, folder);
+	}
+
+	std::string serialized = EmscriptenHandler::get_local_storage_value(key.c_str());
+
+	if (serialized.length() < 2) {
+		serialized = "{}";
+	}
+
 	return nlohmann::json::parse(serialized);
 }
 
 
-void EmscriptenIOContext::dumpJson(std::string key, nlohmann::json data) {
+void EmscriptenIOContext::dumpJson(std::string key, nlohmann::json data, std::string folder) {
 	std::string serialized = data.dump();
 	EmscriptenHandler::set_local_storage_value(key.c_str(), serialized.c_str());
 }

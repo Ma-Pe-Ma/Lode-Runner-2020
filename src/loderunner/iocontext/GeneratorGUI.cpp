@@ -2,6 +2,8 @@
 #include "../states/Generator.h"
 #include "../states/StateContext.h"
 
+#include "Translation.h"
+
 #ifdef __EMSCRIPTEN__
 #include "EmscriptenIOContext.h"
 #endif
@@ -43,6 +45,8 @@ void GeneratorGUI::start() {
 	if (generatorState == GeneratorState::select && cursor.has_value()) {
 		loadLevel();
 	}
+
+	translation = this->generator->getStateContext()->getGameConfiguration()->getTranslation();
 }
 
 void GeneratorGUI::update() {
@@ -55,7 +59,8 @@ void GeneratorGUI::update() {
 	ImGui::SetNextWindowPos(ImVec2(17 * std::get<0>(screenSize) / 25, std::get<0>(screenSize) / 25), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(windowSize);
 
-	ImGui::Begin("Level editor", nullptr, ImGuiWindowFlags_NoResize);
+	std::string editorTitle = translation->getTranslationString("editor") + "####editorWindow";
+	ImGui::Begin(editorTitle.c_str(), nullptr, ImGuiWindowFlags_NoResize);
 
 	switch (generatorState) {
 	case GeneratorState::select:
@@ -85,7 +90,7 @@ void GeneratorGUI::select() {
 		cursor.reset();
 	}
 
-	ImGui::Text("Edit level");
+	ImGui::Text(translation->getTranslationString("editLevel").c_str());
 
 	ImGui::Indent(10.0f);
 
@@ -125,17 +130,17 @@ void GeneratorGUI::select() {
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Edit")) {
+	if (ImGui::Button(translation->getTranslationString("edit").c_str())) {
 		this->generatorState = GeneratorState::edit;
 	}
 
 	ImGui::Unindent(10.0f);
 
-	ImGui::Text("Create new");
+	ImGui::Text(translation->getTranslationString("newText").c_str());
 	
 	ImGui::Indent(10.0f);
 
-	if (ImGui::Button("Duplicate current")) {
+	if (ImGui::Button(translation->getTranslationString("duplicate").c_str())) {
 		this->generatorState = GeneratorState::edit;
 		cursor.reset();
 	}
@@ -146,7 +151,7 @@ void GeneratorGUI::select() {
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Add empty")) {
+	if (ImGui::Button(translation->getTranslationString("empty").c_str())) {
 		cursor.reset();
 		this->generator->setGeneratedLayout();
 
@@ -159,11 +164,11 @@ void GeneratorGUI::select() {
 
 	std::shared_ptr<EmscriptenIOContext> ioContext = std::static_pointer_cast<EmscriptenIOContext>(generator->getStateContext()->getIOContext());
 
-	ImGui::Text("Import levels from file");
+	ImGui::Text(translation->getTranslationString("importText").c_str());
 
 	ImGui::Indent(10.0f);
 
-	if (ImGui::Button("Select level file")) {
+	if (ImGui::Button(translation->getTranslationString("selectFile").c_str())) {
 		EmscriptenHandler::openLevelFilePicker();
 	}
 
@@ -176,15 +181,15 @@ void GeneratorGUI::select() {
 
 	ImGui::Text(fileName.c_str());
 
-	ImGui::Checkbox("Clear existing", &clearExistingWhenImport);
+	ImGui::Checkbox(translation->getTranslationString("clear").c_str(), &clearExistingWhenImport);
 
 	if (ImGui::IsItemHovered()) {
-		ImGui::SetTooltip("Delete existing levels before importing");
+		ImGui::SetTooltip(translation->getTranslationString("clearTip").c_str());
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Import")) {
+	if (ImGui::Button(translation->getTranslationString("import").c_str())) {
 		this->generatorState = GeneratorState::import;
 	}
 
@@ -198,11 +203,11 @@ void GeneratorGUI::select() {
 
 	ImGui::Unindent(10.0f);
 
-	ImGui::Text("Export levels to file");
+	ImGui::Text(translation->getTranslationString("exportText").c_str());
 
 	ImGui::Indent(10.0f);
 
-	if (ImGui::Button("Export")) {
+	if (ImGui::Button(translation->getTranslationString("export").c_str())) {
 		nlohmann::json exportable;
 
 		for (int i = 0; i < generatorLevels.size(); ++i) {
@@ -213,18 +218,19 @@ void GeneratorGUI::select() {
 	}
 	ImGui::Unindent(10.0f);
 	
-	ImGui::Text("Built-in level files:");
+	ImGui::Text(translation->getTranslationString("builtin").c_str());
 	ImGui::SameLine();
-	ImGui::TextLinkOpenURL("Download", LEVEL_URL);
+	ImGui::TextLinkOpenURL(translation->getTranslationString("download").c_str(), LEVEL_URL);
 #endif
 }
 
 void GeneratorGUI::edit() {
-	std::string editableString = cursor.has_value() ? "Editing: " + std::to_string(cursor.value() + 1) : "Editing: new";
+	std::string edited = cursor.has_value() ? std::to_string(cursor.value() + 1) : translation->getTranslationString("new").c_str();
+	std::string editableString = std::vformat(translation->getTranslationString("editing"), std::make_format_args(edited));
 
 	ImGui::Text(editableString.c_str());
 
-	if (ImGui::Button("Save")) {
+	if (ImGui::Button(translation->getTranslationString("save").c_str())) {
 		std::array<std::array<short, 28>, 16> currentLayout = generator->getGeneratedLayout();
 
 		nlohmann::json levelJSON;
@@ -255,7 +261,7 @@ void GeneratorGUI::edit() {
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Cancel")) {
+	if (ImGui::Button(translation->getTranslationString("cancel").c_str())) {
 		this->generatorState = GeneratorState::select;
 
 		if (!cursor.has_value()) {
@@ -274,7 +280,7 @@ void GeneratorGUI::edit() {
 
 	if (cursor.has_value()) {
 		ImGui::SameLine();
-		if (ImGui::Button("Delete")) {
+		if (ImGui::Button(translation->getTranslationString("delete").c_str())) {
 			for (int i = cursor.value(); i < generatorLevels.size() - 1; i++) {
 				generatorLevels[i] = generatorLevels[i + 1];
 			}

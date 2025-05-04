@@ -23,7 +23,7 @@ class GlfwIOContext : public IOContext {
 	bool fullScreen = false;
 	void fullscreenSwitch();
 
-	std::string resourcePath = "./resources/{0}.json";
+	std::string resourcePath = "./{0}/{1}.json";
 protected:
 	nlohmann::json jsonConfiguration;
 	GLFWwindow* window;
@@ -31,8 +31,8 @@ protected:
 
 	std::shared_ptr<GameConfiguration> gameConfiguration;
 
-	virtual nlohmann::json readJson(std::string);
-	virtual void dumpJson(std::string key, nlohmann::json);
+	virtual nlohmann::json readJson(std::string key, std::string folder = "resources");
+	virtual void dumpJson(std::string key, nlohmann::json, std::string folder = "resources");
 public:
 	virtual void initialize() override;
 	virtual void terminate() override;

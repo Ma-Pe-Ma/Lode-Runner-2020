@@ -41,11 +41,9 @@ add_executable(LodeRunner
 
 	"src/loderunner/iocontext/Button.cpp"
 	"src/loderunner/iocontext/GlfwIOContext.cpp"
-	"src/loderunner/iocontext/EmscriptenIOContext.cpp"
 	"src/loderunner/iocontext/rendering/Text.cpp"
 	"src/loderunner/iocontext/rendering/RenderingManager.cpp"
 	"src/loderunner/iocontext/GeneratorGUI.cpp"
-	"src/loderunner/iocontext/Translation.cpp"
 
 	"src/submodules/imgui/backends/imgui_impl_opengl3.cpp"
 	"src/submodules/imgui/backends/imgui_impl_glfw.cpp"
@@ -74,7 +72,7 @@ if(WIN32)
 endif()
 
 # copy resource files needed for installation
-foreach(json "config" "translation")
+foreach(json "config")
 	if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/${json}.json")
 		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/${json}.json" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 	endif()	
@@ -137,6 +135,7 @@ if(EMSCRIPTEN)
 	)
 
 	target_sources(LodeRunner PRIVATE
+		"src/loderunner/iocontext/EmscriptenIOContext.cpp"
 		"src/loderunner/iocontext/rendering/EmscriptenRenderingManager.cpp"
 	)
 
@@ -259,11 +258,11 @@ if(EMSCRIPTEN)
 	)
 elseif(WIN32 OR UNIX)
 	install(TARGETS LodeRunner COMPONENT loderunner RUNTIME DESTINATION ".")
-	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE PATTERN "*.json" EXCLUDE)
+	install(DIRECTORY "assets" COMPONENT loderunner DESTINATION "." PATTERN "*.rc" EXCLUDE PATTERN "config.json" EXCLUDE)
 	install(FILES "ReadMe.md" "LICENSE.md" COMPONENT loderunner DESTINATION ".")
 	
 	install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/screenshots")
-	install(FILES "assets/config.txt" COMPONENT loderunner DESTINATION "./resources/")
+	install(FILES "assets/config.json" COMPONENT loderunner DESTINATION "./resources/")
 	
 	if(VIDEO_RECORDING)
 		install(DIRECTORY COMPONENT loderunner DESTINATION "./resources/gameplay-videos")

@@ -111,21 +111,191 @@
 			"y": 6
 		},
 		"gameTime": {
-			"value": "GAMETIME: {0:.1f} SEC",
+			"value": "GAMETIME: {0:.1f} SEC   ",
 			"x": -5,
 			"y": 0
+		},
+		"controls": {
+			"value": "Controls:"
+		},
+		"arrows": {
+			"value": "arrows - moving"
+		},
+		"leftDig": {
+			"value": "left dig"
+		},
+		"rightDig": {
+			"value": "right dig"
+		},
+		"space": {
+			"value": "previous menu"
+		},
+		"escEnter": {
+			"value": "pause"
+		},
+		"cButton": {
+			"value": "show/hide this window"
+		},
+		"editor": {
+			"value": "Level editor"
+		},
+		"editLevel": {
+			"value": "Edit level"
+		},
+		"edit": {
+			"value": "Edit"
+		},
+		"newText": {
+			"value": "Create new"
+		},
+		"duplicate": {
+			"value": "Duplicate current"
+		},
+		"empty": {
+			"value": "Add empty"
+		},
+		"importText": {
+			"value": "Import levels from file"
+		},
+		"selectFile": {
+			"value": "Select level file"
+		},
+		"clear": {
+			"value": "Clear existing"
+		},
+		"clearTip": {
+			"value": "Delete existing levels before importing"
+		},
+		"import": {
+			"value": "Import"
+		},
+		"exportText": {
+			"value": "Export levels to file"
+		},
+		"export": {
+			"value": "Export"
+		},
+		"builtin": {
+			"value": "Built-in level files:"
+		},
+		"download": {
+			"value": "Download"
+		},
+		"editing": {
+			"value": "Editing: {0}"
+		},
+		"new": {
+			"value": "new"
+		},
+		"save": {
+			"value": "Save"
+		},
+		"cancel": {
+			"value": "Cancel"
+		},
+		"delete": {
+			"value": "Delete"
 		}
 	},
 	"Magyar": {
-		"player1": {
-			"value": "1 JATEKOS",
-			"x": 12,
-			"y": 13
+		"imguiTitle": {
+			"value": "Lode Runner - opciók"
 		},
-		"player2": {
-			"value": "2 JATEKOS",
-			"x": 12,
-			"y": 15
+		"gameVersion": {
+			"value": "Játékverzió"
+		},
+		"level": {
+			"value": "Szint"
+		},
+		"playerSpeed": {
+			"value": "Játékos sebesség"
+		},
+		"enemySpeed": {
+			"value": "Ellenfél sebesség"
+		},
+		"language": {
+			"value": "Nyelv"
+		},
+		"controls": {
+			"value": "Irányítás:"
+		},
+		"arrows": {
+			"value": "nyilak - mozgatás"
+		},
+		"leftDig": {
+			"value": "ásás balra"
+		},
+		"rightDig": {
+			"value": "ásás jobbra"
+		},
+		"space": {
+			"value": "előző menü"
+		},
+		"escEnter": {
+			"value": "szünet"
+		},
+		"cButton": {
+			"value": "ablak mutatása/elrejtése"
+		},
+		"editor": {
+			"value": "Pályaszerkesztő"
+		},
+		"editLevel": {
+			"value": "Szerkesztés"
+		},
+		"edit": {
+			"value": "Szerkeszt"
+		},
+		"newText": {
+			"value": "Új készítése"
+		},
+		"duplicate": {
+			"value": "Jelenlegi megkettőzése"
+		},
+		"empty": {
+			"value": "Üres"
+		},
+		"importText": {
+			"value" : "Import levels from file"
+		},
+		"selectFile": {
+			"value": "Fájl tallózása"
+		},
+		"clear": {
+			"value": "Meglévők törlése"
+		},
+		"clearTip": {
+			"value": "Meglévő pályák törlése importálás előtt"
+		},
+		"import": {
+			"value": "Importálás"
+		},
+		"exportText": {
+			"value": "Pályák exportálása fájlba"
+		},
+		"export": {
+			"value": "Exportálás"
+		},
+		"builtin": {
+			"value": "Beépített pályák:"
+		},
+		"download": {
+			"value": "Letöltés"
+		},
+		"editing": {
+			"value": "Szerkesztve: {0}"
+		},
+		"new": {
+			"value": "új"
+		},
+		"save": {
+			"value": "Mentés"
+		},
+		"cancel": {
+			"value": "Elvet"
+		},
+		"delete": {
+			"value": "Törlés"
 		}
 	}
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <string>
+#include <format>
 #include <fstream>
 
 #if defined __EMSCRIPTEN__
@@ -266,7 +267,7 @@ void GlfwIOContext::loadConfig(std::shared_ptr<GameConfiguration> gameConfigurat
 	
 	dumpJson("config", jsonConfiguration);	
 
-	nlohmann::json translationData = readJson("translation");
+	nlohmann::json translationData = readJson("translation", "assets");
 	gameConfiguration->loadTranslations(jsonConfiguration["language"], translationData);
 }
 
@@ -386,7 +387,15 @@ void GlfwIOContext::initialize()
 	ImGui::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("./assets/Roboto-Medium.ttf", 13, nullptr);
+
+	ImVector<ImWchar> ranges;
+	ImFontGlyphRangesBuilder builder;
+	builder.AddText(reinterpret_cast<const char*>(u8"áéíóöőúüű"));
+
+	builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+	builder.BuildRanges(&ranges);
+
+	io.Fonts->AddFontFromFileTTF("./assets/Roboto-Medium.ttf", 13, nullptr, ranges.Data);
 	io.Fonts->Build();
 
 	//int major, minor, rev;
@@ -487,16 +496,15 @@ void GlfwIOContext::saveGeneratorLevels(nlohmann::json generatorLevels) {
 	dumpJson("generator", generatorLevels);
 }
 
-nlohmann::json GlfwIOContext::readJson(std::string key) {
-	std::string filePath = std::vformat(resourcePath, std::make_format_args(key));
+nlohmann::json GlfwIOContext::readJson(std::string key, std::string folder) {
+	std::string filePath = std::vformat(resourcePath, std::make_format_args(folder, key));
+			
 	std::ifstream file;
 
-	file.open(filePath);
-
-	std::cout << "resou: " << filePath << ", "<<key<<std::endl;
+	file.open(filePath, std::ios::binary);
 
 	if (file.fail()) {
-		std::cout << "Generator does not exist: "<<filePath << std::endl;
+		std::cout << "JSON file does not exist: "<<filePath << std::endl;
 		std::ofstream newFile;
 		file.close();
 		
@@ -512,8 +520,8 @@ nlohmann::json GlfwIOContext::readJson(std::string key) {
 	return data;;
 }
 
-void GlfwIOContext::dumpJson(std::string key, nlohmann::json data) {
-	std::string filePath = std::vformat(resourcePath, std::make_format_args(key));
+void GlfwIOContext::dumpJson(std::string key, nlohmann::json data, std::string folder) {
+	std::string filePath = std::vformat(resourcePath, std::make_format_args(folder, key));
 
 	std::ofstream outFile(filePath);
 	outFile << data.dump(2);

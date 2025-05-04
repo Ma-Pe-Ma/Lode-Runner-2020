@@ -7,6 +7,7 @@
 #include <optional>
 
 class Generator;
+class Translation;
 
 enum class GeneratorState {
 	select = 0,
@@ -16,7 +17,6 @@ enum class GeneratorState {
 
 class InvalidLevelException : public std::exception {
 	std::string message;
-
 public:
 	InvalidLevelException(std::string message) {
 		this->message = message;
@@ -54,6 +54,7 @@ class GeneratorGUI {
 	void select();
 	void edit();
 
+	std::shared_ptr<Translation> translation;
 #ifdef __EMSCRIPTEN__
 	bool clearExistingWhenImport = false;
 	void importLevels();

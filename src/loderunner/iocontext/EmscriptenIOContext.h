@@ -82,8 +82,8 @@ private:
 	void keyboardInput();
 	std::optional<long> gamePadID;
 protected:
-	nlohmann::json readJson(std::string) override;
-	void dumpJson(std::string key, nlohmann::json) override;
+	nlohmann::json readJson(std::string key, std::string folder) override;
+	void dumpJson(std::string key, nlohmann::json, std::string folder) override;
 public:
 	void processInput() override;
 
