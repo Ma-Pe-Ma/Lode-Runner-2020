@@ -32,17 +32,15 @@ void MainMenu::update() {
 	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
 	short& menuCursor = stateContext->getMenuCursor();
 
+	auto maxCursor = stateContext->getGameConfiguration()->getCurrentMaxIndex();
+
 	//changing gamemode
 	if (buttonInputs.down.simple()) {
-		menuCursor = ++menuCursor > 2 ? 0 : menuCursor;
+		menuCursor = ++menuCursor > maxCursor - 1 ? 0 : menuCursor;
 	}
 
 	if (buttonInputs.up.simple()) {
-		menuCursor = --menuCursor < 0 ? 2 : menuCursor;
-	}
-
-	if (stateContext->getGameConfiguration()->getGameVersion() == 1) {
-		menuCursor = 0;
+		menuCursor = --menuCursor < 0 ? maxCursor - 1 : menuCursor;
 	}
 
 	stateContext->getRenderingManager()->renderMainMenu(menuCursor, stateContext->getGameConfiguration()->getCurrentMainTexture());
@@ -72,6 +70,8 @@ void MainMenu::end() {
 }
 
 void MainMenu::setTexts() {
+	stateContext->getMenuCursor() = 0;
+
 	auto textList = stateContext->getGameConfiguration()->getCurrentMainMenuTexts();
 
 	stateContext->getRenderingManager()->setTextList(*textList);

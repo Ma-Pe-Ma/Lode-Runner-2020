@@ -414,13 +414,13 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 
 	//if no player was given, put in one!
 	if (player == nullptr) {
-		for (int j = 1; j < 18; j++) {
+		for (int i = 1; i < 29; i++) {
 			if (player) {
 				break;
 			}
 
-			for (int i = 1; i < 30; i++) {
-				if (layout[i][j] == LayoutBlock::empty && gen[j][i] != 7 && gen[j][i] != 8) {
+			for (int j = 1; j < 17; j++) {
+				if (layout[i][j] == LayoutBlock::empty && gen[j - 1][i - 1] != 7 && gen[j - 1][i - 1] != 8) {
 					Vector2DInt pos = { i, j };
 
 					player = std::make_shared<Player>(pos.x, pos.y);
@@ -467,6 +467,23 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 		renderingManager->initializeCharacters();
 
 		enemies.erase(enemies.end() - 1);
+		
+		#ifndef NDEBUG
+		// Set the first two enemy to controllable when debugging
+		for (auto enemyIt = enemies.begin(); enemyIt != enemies.end(); enemyIt++) {
+			int index = enemyIt - enemies.begin();
+
+			if (index < 2) {
+				(*enemyIt)->setDebugEnemyState(index + 1);
+			}
+			else {
+				break;
+			}
+		}
+#endif
+	}
+	else {
+		//TODO:
 	}
 }
 

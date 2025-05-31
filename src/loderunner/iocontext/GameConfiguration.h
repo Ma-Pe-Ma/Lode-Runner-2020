@@ -28,13 +28,13 @@ class GameConfiguration {
 
 	std::shared_ptr<Translation> translation;
 public:
-	//game version - {filename, maxlevel, textureID, name, mainmenu texts}
-	std::map<int, std::tuple<std::string, short, int, std::string, std::shared_ptr<std::vector<std::shared_ptr<Text>>>>> configurations = {
-		{0, {"assets/levels/original.json", 150, 3, "Original", nullptr} },
-		{1, {"assets/levels/championship.json", 51, 4, "Championship", nullptr} },
-		{2, {"assets/levels/professional.json", 150, 3, "Professional", nullptr} },
-		{3, {"assets/levels/revenge.json", 17, 3, "Revenge", nullptr} },
-		{4, {"assets/levels/fanbook.json", 66, 3, "Fanbook", nullptr} }
+	//game version - {filename, maxlevel, textureID, max main index, name, mainmenu texts}
+	std::map<int, std::tuple<std::string, short, int, short, std::string, std::shared_ptr<std::vector<std::shared_ptr<Text>>>>> configurations = {
+		{0, {"assets/levels/original.json", 150, 3, 3, "Original", nullptr} },
+		{1, {"assets/levels/championship.json", 51, 4, 1, "Championship", nullptr} },
+		{2, {"assets/levels/professional.json", 150, 3, 3, "Professional", nullptr} },
+		{3, {"assets/levels/revenge.json", 17, 3, 3, "Revenge", nullptr} },
+		{4, {"assets/levels/fanbook.json", 66, 3, 3, "Fanbook", nullptr} }
 	};
 
 	float getEnemySpeed() { return this->enemySpeed; }
@@ -71,7 +71,8 @@ public:
 
 	std::string getLevelFileName() { return std::get<0>(this->configurations[gameVersion]); }
 	int getCurrentMainTexture() { return std::get<2>(this->configurations[gameVersion]); }
-	std::shared_ptr<std::vector<std::shared_ptr<Text>>> getCurrentMainMenuTexts() { return std::get<4>(this->configurations[gameVersion]); }
+	short getCurrentMaxIndex() { return std::get<3>(this->configurations[gameVersion]); }
+	std::shared_ptr<std::vector<std::shared_ptr<Text>>> getCurrentMainMenuTexts() { return std::get<5>(this->configurations[gameVersion]); }
 
 	unsigned int getFramesPerSec() { return this->framesPerSec; }
 	void setFramesPerSec(unsigned int framesPerSec) { this->framesPerSec = framesPerSec; }
@@ -107,7 +108,7 @@ public:
 		}
 
 		for (auto i : { 0,2,3,4 }) {
-			std::get<4>(configurations[i]) = mainMenuText;
+			std::get<5>(configurations[i]) = mainMenuText;
 		}
 
 		std::shared_ptr<std::vector<std::shared_ptr<Text>>> championText = std::make_shared<std::vector<std::shared_ptr<Text>>>();
@@ -115,7 +116,7 @@ public:
 		for (auto s : { "cStart", "cCopyRight", "cPublish", "cLicense", "cSoftware" }) {
 			championText->push_back(std::make_shared<Text>(this->translation->getTranslationText(s)));
 		}
-		std::get<4>(configurations[1]) = championText;
+		std::get<5>(configurations[1]) = championText;
 	}
 
 	std::string changeLanguage(int index) {

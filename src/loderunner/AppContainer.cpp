@@ -125,13 +125,16 @@ void AppContainer::handleImGuiConfigurer()
 		int index = 0;
 		ImGui::Indent(10.0f);
 		for (auto it = gameConfiguration->configurations.begin(); it != gameConfiguration->configurations.end(); it++) {
-			std::string name = std::vformat("{0} ({1})", std::make_format_args(std::get<3>(it->second), std::get<1>(it->second)));
+			std::string name = std::vformat("{0} ({1})", std::make_format_args(std::get<4>(it->second), std::get<1>(it->second)));
 
-			if (ImGui::RadioButton(name.c_str(), gameConfiguration->getGameVersionPointer(), index)) {
+			if (ImGui::RadioButton(name.c_str(), gameConfiguration->getGameVersionPointer(), index)) {				
 				gameConfiguration->setGameVersion(index);
 				ioContext->saveConfig("levelset", index);
 				gameConfiguration->validateLevel(stateContext->getCurrentLevel());
-				stateContext->getMainMenu()->setTexts();
+
+				if (stateContext->getCurrentState() == stateContext->getMainMenu()) {
+					stateContext->getMainMenu()->setTexts();
+				}
 			}
 			index += 1;
 		}
@@ -182,7 +185,9 @@ void AppContainer::handleImGuiConfigurer()
 			if (ImGui::RadioButton(language.c_str(), translation->getCurrentLanguageIndex(), index)) {
 				auto newLanguage = gameConfiguration->changeLanguage(index);
 				ioContext->saveConfig("language", newLanguage);
-				//stateContext->getMainMenu()->setTexts();
+				if (stateContext->getCurrentState() == stateContext->getMainMenu()) {
+					stateContext->getMainMenu()->setTexts();
+				}
 			}
 
 			++index;

@@ -754,13 +754,15 @@ void Enemy::freeRun() {
 
 	for (auto& enemy : gameContext->getEnemies()) {
 		if (enemy.get() != this) {
-			if (enemy->current.x == current.x && enemy->current.y == current.y - 1) {
-				enemyUnder = true;
-			}
+			if (enemy->current.y == current.y - 1) {
+				if (std::abs(enemy->pos.x - pos.x) <= 1.0f) {
+					enemyUnder = true;
+				}
 
-			if (directionHelper.x != 0 && enemy->current.x == nextX && enemy->current.y == current.y - 1) {
-				enemyNextUnder = true;
-			}
+				if (std::abs(enemy->current.x - (pos.x + dPos.x)) <= 1.0f) {
+					enemyNextUnder = true;
+				}
+			}			
 		}
 	}
 
