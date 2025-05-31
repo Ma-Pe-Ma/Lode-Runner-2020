@@ -273,7 +273,6 @@ void RenderingManager::setGeneratorParameters(int* generatorDrawables, int* gene
 	levelShader->setInt("textureA", 1);
 }
 
-
 void RenderingManager::render()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

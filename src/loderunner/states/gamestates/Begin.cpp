@@ -14,7 +14,13 @@ void Begin::update() {
 
 	float ellapsedTime = calculateEllapsedTime();
 
-	if (ellapsedTime > 2.0f) {
+#ifndef NDEBUG
+#define WAIT_TIME 0.0f
+#else
+#define WAIT_TIME 2.0f
+#endif
+
+	if (ellapsedTime > WAIT_TIME) {
 		Play* play = gamePlay->getPlay();
 		play->getGameContext()->resetSessionLength();
 		gamePlay->transitionToAtEndOfFrame(play);

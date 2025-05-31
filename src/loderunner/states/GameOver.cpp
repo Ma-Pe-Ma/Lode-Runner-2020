@@ -37,7 +37,9 @@ void GameOver::update() {
 
 	float ellapsedTime = calculateEllapsedTime();
 
-	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(6)->lengthInSec()) {
+	auto& buttonInputs = stateContext->getIOContext()->getButtonInputs();
+
+	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(6)->lengthInSec() || buttonInputs.enter.simple()) {
 		if (stateContext->getMenuCursor() == 0) {
 			stateContext->transitionToAtEndOfFrame(stateContext->getMainMenu());
 		}

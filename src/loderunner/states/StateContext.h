@@ -132,6 +132,11 @@ public:
 		return this->generator;
 	}
 
+	State* getCurrentState()
+	{
+		return this->currentState;
+	}
+
 	void setMenuCursor(int menuCursor) { this->menuCursor = menuCursor; }
 	short& getMenuCursor() { return this->menuCursor; }
 

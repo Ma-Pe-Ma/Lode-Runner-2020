@@ -256,7 +256,7 @@
 			"value": "Üres"
 		},
 		"importText": {
-			"value" : "Import levels from file"
+			"value": "Import levels from file"
 		},
 		"selectFile": {
 			"value": "Fájl tallózása"
@@ -296,6 +296,222 @@
 		},
 		"delete": {
 			"value": "Törlés"
+		}
+	},
+	"Español": {
+		"player1": {
+			"value": "1 JUGADOR",
+			"x": 12,
+			"y": 13
+		},
+		"player2": {
+			"value": "2 JUGADOR",
+			"x": 12,
+			"y": 15
+		},
+		"editMode": {
+			"value": "EDICION",
+			"x": 12,
+			"y": 17
+		},
+		"copyRight": {
+			"value": "COPYRIGHT © 1984 HUDSON SOFT",
+			"x": 2,
+			"y": 23
+		},
+		"permission": {
+			"value": "CON PERMISO DE",
+			"x": 9,
+			"y": 24
+		},
+		"software": {
+			"value": "BRODERBUND SOFTWARE INC",
+			"x": 4.5,
+			"y": 25
+		},
+		"allRights": {
+			"value": "TODOS LOS DERECHOS RESERVADOS",
+			"x": 1.5,
+			"y": 26
+		},
+		"cStart": {
+			"value": "PULSA BOTON START",
+			"x": 8,
+			"y": 20
+		},
+		"cCopyRight": {
+			"value": "COPYRIGHT 1984  DOUG SMITH",
+			"x": 3,
+			"y": 23
+		},
+		"cPublish": {
+			"value": "PUBLICADO POR HUDSON SOFT",
+			"x": 3.5,
+			"y": 24
+		},
+		"cLicense": {
+			"value": "BAJO LICENCIA DE",
+			"x": 8,
+			"y": 25
+		},
+		"cSoftware": {
+			"value": "BRODERBUND SOFTWARE INC",
+			"x": 4.5,
+			"y": 26
+		},
+		"playerID": {
+			"value": "JUGADOR {0}",
+			"x": 12,
+			"y": 6
+		},
+		"stage": {
+			"value": "NIVEL {0:03}",
+			"x": 8,
+			"y": 12
+		},
+		"life": {
+			"value": "VIDA {0}",
+			"x": 19,
+			"y": 12
+		},
+		"score": {
+			"value": "PUNTOS   {0:08}",
+			"x": 8,
+			"y": 18
+		},
+		"hiscore": {
+			"value": "RECORD   {0:08}",
+			"x": 8,
+			"y": 20
+		},
+		"goldPoints": {
+			"value": "{0} PUNTOS",
+			"x": 20,
+			"y": 6.5
+		},
+		"enemyPoints": {
+			"value": "{0} PUNTOS",
+			"x": 20,
+			"y": 12.5
+		},
+		"totalPoints": {
+			"value": "TOTAL {0} PUNTOS",
+			"x": 14.5,
+			"y": 23.25
+		},
+		"gameOver": {
+			"value": "FIN DEL JUEGO",
+			"x": 10,
+			"y": 10
+		},
+		"gameOverPlayer": {
+			"value": "JUGADOR {0}",
+			"x": 12,
+			"y": 6
+		},
+		"gameTime": {
+			"value": "TIEMPO: {0:.1f} SEG   ",
+			"x": -5,
+			"y": 0
+		},
+		"imguiTitle": {
+			"value": "Lode Runner - Opciones"
+		},
+		"gameVersion": {
+			"value": "Version del juego"
+		},
+		"level": {
+			"value": "Nivel"
+		},
+		"playerSpeed": {
+			"value": "Velocidad del jugador"
+		},
+		"enemySpeed": {
+			"value": "Velocidad del enemigo"
+		},
+		"language": {
+			"value": "Idioma"
+		},
+		"controls": {
+			"value": "Controles:"
+		},
+		"arrows": {
+			"value": "Flechas - moverse"
+		},
+		"leftDig": {
+			"value": "Cavar izquierda"
+		},
+		"rightDig": {
+			"value": "Cavar derecha"
+		},
+		"space": {
+			"value": "Menu anterior"
+		},
+		"escEnter": {
+			"value": "Pausa"
+		},
+		"cButton": {
+			"value": "Mostrar/ocultar esta ventana"
+		},
+		"editor": {
+			"value": "Editor de niveles"
+		},
+		"editLevel": {
+			"value": "Editar nivel"
+		},
+		"edit": {
+			"value": "Editar"
+		},
+		"newText": {
+			"value": "Crear nuevo"
+		},
+		"duplicate": {
+			"value": "Duplicar actual"
+		},
+		"empty": {
+			"value": "Agregar vacio"
+		},
+		"importText": {
+			"value": "Importar niveles desde archivo"
+		},
+		"selectFile": {
+			"value": "Seleccionar archivo de nivel"
+		},
+		"clear": {
+			"value": "Eliminar existente"
+		},
+		"clearTip": {
+			"value": "Elimina niveles existentes antes de importar"
+		},
+		"import": {
+			"value": "Importar"
+		},
+		"exportText": {
+			"value": "Exportar niveles a archivo"
+		},
+		"export": {
+			"value": "Exportar"
+		},
+		"builtin": {
+			"value": "Archivos de nivel incorporados:"
+		},
+		"download": {
+			"value": "Descargar"
+		},
+		"editing": {
+			"value": "Editando: {0}"
+		},
+		"new": {
+			"value": "Nuevo"
+		},
+		"save": {
+			"value": "Guardar"
+		},
+		"cancel": {
+			"value": "Cancelar"
+		},
+		"delete": {
+			"value": "Eliminar"
 		}
 	}
 }
