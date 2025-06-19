@@ -4,6 +4,7 @@
 #include "State.h"
 #include <string>
 #include <memory>
+#include <optional>
 
 class RenderingManager;
 class Player;
@@ -17,7 +18,7 @@ private:
 
 	short enemyScore = 0;
 	short goldScore = 0;
-	short fruitID = 0;
+	std::optional<int> fruitID;
 
 	void setupRenderingManager();
 
@@ -29,7 +30,7 @@ public:
 	void update() override;
 	void end() override;
 
-	void setScoreParameters(short, short, short);
+	void setScoreParameters(short, short, std::optional<int>);
 };
 
 #endif

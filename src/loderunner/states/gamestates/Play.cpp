@@ -94,7 +94,7 @@ void Play::transitionToDeath() {
 	gamePlay->transitionToAtEndOfFrame(gamePlay->getDeath());
 }
 
-void Play::transitionToOutro(short killCounter, short goldNr, short fruitID) {
+void Play::transitionToOutro(short killCounter, short goldNr, std::optional<int> fruitID) {
 	auto stateContext = gamePlay->getStateContext();
 	stateContext->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
 	stateContext->transitionToAtEndOfFrame(stateContext->getOutro());

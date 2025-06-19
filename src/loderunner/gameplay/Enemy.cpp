@@ -901,7 +901,8 @@ void Enemy::die() {
 	}
 
 	pos.y = vertical;
-	short randomX = rand() % nonEmptyBlocks.size();
+
+	short randomX = gameContext->getIOContext()->generateRandomNumberBetween(0, nonEmptyBlocks.size() - 1);
 	pos.x = nonEmptyBlocks[randomX];
 	dPos.x = 0;
 	dPos.y = 0;
@@ -1175,7 +1176,7 @@ void Enemy::animateFreeRun() {
 }
 
 void Enemy::animateDying() {
-	*texturePointer = textureMap.death + int(4 * (gameTime - dieTimer)) % 4;
+	*texturePointer = enemyTextureMap.death + int(4 * (gameTime - dieTimer)) % 4;
 }
 
 void Enemy::animateDigging() {
@@ -1183,19 +1184,19 @@ void Enemy::animateDigging() {
 }
 
 void Enemy::animateFalling() {
-	*texturePointer = textureMap.falling + animationTimeFactor;
+	*texturePointer = enemyTextureMap.falling + animationTimeFactor;
 }
 
 void Enemy::animateGoing() {
-	*texturePointer = textureMap.going + animationTimeFactor;
+	*texturePointer = enemyTextureMap.going + animationTimeFactor;
 }
 
 void Enemy::animateOnLadder() {
-	*texturePointer = textureMap.ladder + animationTimeFactor;
+	*texturePointer = enemyTextureMap.ladder + animationTimeFactor;
 }
 
 void Enemy::animateOnPole() {
-	*texturePointer = textureMap.pole + animationTimeFactor;
+	*texturePointer = enemyTextureMap.pole + animationTimeFactor;
 }
 
 void Enemy::animatePitting() {
@@ -1209,7 +1210,7 @@ void Enemy::animatePitting() {
 			animateOnLadder();
 		}
 		else {
-			*texturePointer = textureMap.falling;
+			*texturePointer = enemyTextureMap.falling;
 		}
 			
 		break;
@@ -1230,7 +1231,8 @@ void Enemy::checkGoldCollect() {
 	//if not carryiing and there is one, carry it
 	if (!carriedGold) {
 		if ((carriedGold = gameContext->goldCollectChecker(pos.x, pos.y))) {
-			carriedGold->setReleaseCounter(rand() % 26 + 14);
+			int releaseCounter = gameContext->getIOContext()->generateRandomNumberBetween(14, 39);
+			carriedGold->setReleaseCounter(releaseCounter);
 			carriedGold->setPos(Vector2DInt{-1, -1});
 		}		
 	}

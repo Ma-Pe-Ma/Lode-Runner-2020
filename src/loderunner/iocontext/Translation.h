@@ -20,7 +20,7 @@ class Translation {
 		{"player2", {"2 PLAYERS", 12, 15}},
 		{"editMode", {"EDIT MODE", 12, 17}},
 
-		{"copyRight", {"COPYRIGHT © 1984 HUDSON SOFT", 2, 23}},
+		{"copyRight", {"COPYRIGHT Â© 1984 HUDSON SOFT", 2, 23}},
 		{"permission", {"WITH PERMISSION OF", 7, 24}},
 		{"software", {"BRODERBUND SOFTWARE INC", 4, 25}},
 		{"allRights", {"ALL RIGHTS RESERVED", 7, 26}},
@@ -37,6 +37,7 @@ class Translation {
 		{"score", {"SCORE    {0:08}", 8, 18}},
 		{"hiscore", {"HISCORE  {0:08}", 8, 20}},
 		{"goldPoints", {"{0} POINTS", 20, 6.5f}},
+		{"bonusPoints", {"{0} POINTS", 20, 9.5f}},
 		{"enemyPoints", {"{0} POINTS", 20, 12.5f}},
 		{"totalPoints", {"TOTAL {0} POINTS", 14.5f, 23.25f}},
 		{"gameOver", {"GAME OVER", 12, 10}},
@@ -123,7 +124,7 @@ public:
 
 				std::string value = properties.value("value", std::get<0>(it->second));
 
-				//TODO: Solve encoding problem for character '©'
+				//TODO: Solve encoding problem for character 'ï¿½'
 				value.erase(std::remove(value.begin(), value.end(), -62), value.end());
 
 				float x = properties.value("x", std::get<1>(it->second));

@@ -13,7 +13,6 @@
 #include "Vector2DInt.h"
 
 #include "LayoutBlock.h"
-#include "TextureMap.h"
 
 #include "Trapdoor.h"
 #include "Brick.h"
@@ -22,6 +21,15 @@
 
 class Gold;
 class Play;
+
+struct EnemyTextureMap {
+	short death = 8;
+	short falling = 16;
+	short going = 12;
+	short ladder = 0;
+	short pole = 4;
+	short idle = -1;
+};
 
 class Enemy {
 private:
@@ -99,7 +107,7 @@ protected:
 	Vector2DInt current = { 0, 0 };
 	Vector2DInt directionHelper = { 0, 0 };
 
-	TextureMap textureMap = { 8, 16, 12, 0, 4, -1 };
+	EnemyTextureMap enemyTextureMap;
 
 	std::shared_ptr<Gold> carriedGold;
 
@@ -139,7 +147,7 @@ public:
 	//Getters and setters
 	void setGameContext(GameContext* gameContext) { this->gameContext = gameContext; }
 
-	TextureMap getTextureMap() { return this->textureMap; }
+	EnemyTextureMap getTextureMap() { return this->enemyTextureMap; }
 	virtual void setCharSpeed(float charSpeed) { this->charSpeed = charSpeed; }
 
 	void setPositionPointer(float* positionPointer)	{ this->positionPointer = positionPointer; }

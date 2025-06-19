@@ -187,7 +187,7 @@ void RenderingManager::initializeLevelLayout()
 }
 
 void RenderingManager::initializeEnemies() {
-	enemyDrawableSize = enemyList.size();
+	enemyDrawableSize = enemyList.size() + 1;
 
 #ifdef USE_DYNAMIC_ARRAY
 	enemyDrawables = new float[2 * enemyDrawableSize];
@@ -218,6 +218,14 @@ void RenderingManager::initializeEnemies() {
 
 	enemyShader->use();
 	enemyShader->setInt("textureA", 0);
+}
+
+std::tuple<float*, int*> RenderingManager::setFruitTextureID(int textureID) {
+	enemyTextureIDs[enemyDrawableSize - 1] = textureID;
+	float* fruitPosition = &enemyDrawables[2 * (enemyDrawableSize - 1)];
+	int* fruitDirection = &enemyDirections[enemyDrawableSize - 1];
+
+	return std::make_tuple(fruitPosition, fruitDirection);
 }
 
 void RenderingManager::initializeCharacters()
