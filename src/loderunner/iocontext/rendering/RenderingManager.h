@@ -14,10 +14,13 @@
 #include <tuple>
 #include <map>
 
-#include "gameplay/Brick.h"
-#include "gameplay/Trapdoor.h"
-#include "gameplay/Enemy.h"
-#include "gameplay/Gold.h"
+class Brick;
+class Trapdoor;
+class Enemy;
+class Gold;
+class Text;
+class Enemy;
+class Player;
 
 #include "Text.h"
 
@@ -105,7 +108,9 @@ protected:
 	short levelDrawableSize = 0;
 	short currentLevelDrawableSize = 0;
 
-	std::vector<std::shared_ptr<Brick>> brickList;
+	std::array<std::array<bool, 18>, 30> brickMap;
+	std::array<std::array<int*, 18>, 30> brickTextureMap;
+
 	std::vector<std::shared_ptr<Trapdoor>> trapdoorList;
 	std::vector<std::shared_ptr<Gold>> goldList;
 	std::vector<std::shared_ptr<Enemy>> enemyList;
@@ -157,9 +162,9 @@ protected:
 public:
 	RenderingManager(std::string assetFolder, std::shared_ptr<IOContext> ioContext);
 
-	void setBrickList(std::vector<std::shared_ptr<Brick>> brickList)
+	void setBrickMap(std::array<std::array<bool, 18>, 30> brickMap)
 	{
-		this->brickList = brickList;
+		this->brickMap = brickMap;
 	}
 
 	void setPoleList(std::vector<std::tuple<int, int>> poleList)
@@ -234,7 +239,9 @@ public:
 	int* getPointerToDebrisTexture() { return &this->levelTextureIDs[0]; }
 	int* getPointerToDebrisLocation() { return &this->levelDrawables[0]; }
 
-	std::tuple<float*, int*> setFruitTextureID(int texture);
+	int* getBrickTexture(int x, int y) { return this->brickTextureMap[x][y]; }
+
+	float* setFruitTextureID(int texture);
 };
 
 #endif

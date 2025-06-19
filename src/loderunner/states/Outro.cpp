@@ -3,13 +3,29 @@
 #include "states/StateContext.h"
 
 #include "iocontext/rendering/RenderingManager.h"
-#include "gameplay/Player.h"
+#include "gameplay/Gold.h"
+#include "gameplay/Enemy.h"
+
 #include <memory>
 
-void Outro::setScoreParameters(short killCounter, short goldCounter, std::optional<int> fruitID) {
+void Outro::setScoreParameters(short killCounter, short goldCounter, std::optional<Fruit> fruit) {
 	this->enemyScore = killCounter * 200;
 	this->goldScore = goldCounter * 200;
-	this->fruitID = fruitID;
+	this->fruit = fruit;
+
+	std::map<int, int> bonusMap = {
+			{0, 1200},
+			{1, 800},
+			{2, 2000},
+			{3, 400},
+			{4, 2500},
+			{5, 600},
+			{6, 1600},
+			{7, 1000},
+	};
+
+	std::optional<int> fruitID = fruit.has_value() && fruit.value().collected.has_value() && fruit.value().collected.value() ? std::make_optional(fruit.value().id.value()) : std::nullopt;
+	bonusScore = fruitID.has_value() ? bonusMap[fruitID.value()] : 0;
 }
 
 void Outro::setupRenderingManager()
@@ -19,13 +35,12 @@ void Outro::setupRenderingManager()
 	renderingManager->clearRenderableObjects();
 
 	//add bricks
-	std::vector<std::shared_ptr<Brick>> brickList = {
-		std::make_shared<Brick>(Brick({7, 2})),
-		std::make_shared<Brick>(Brick({8, 2 })),
-		std::make_shared<Brick>(Brick({10, 2 })),
-		std::make_shared<Brick>(Brick({11, 2 })),
-		std::make_shared<Brick>(Brick({12, 2 }))
-	};
+	std::array<std::array<bool, 18>, 30> brickMap = { false };
+	brickMap[7][2] = true;
+	brickMap[8][2] = true;
+	brickMap[10][2] = true;
+	brickMap[11][2] = true;
+	brickMap[12][2] = true;	
 
 	//add ladders
 	std::vector<std::tuple<int, int>> ladderList{
@@ -41,12 +56,12 @@ void Outro::setupRenderingManager()
 
 	//add enemy indicator
 	std::vector<std::shared_ptr<Enemy>> enemyList{
-		std::make_shared<Player>(Player({ 9.0f, 0.0f })),
-		std::make_shared<Enemy>(Enemy({11.0f, 9.0f}))
+		std::make_shared<Enemy>(Enemy( 9.0f, 0.0f, true)),
+		std::make_shared<Enemy>(Enemy(11.0f, 9.0f))
 	};
 
 	//climbing runner
-	this->player = std::static_pointer_cast<Player>(enemyList[0]);
+	this->player = enemyList[0];
 
 	std::vector<std::shared_ptr<Text>> textList{
 		goldPoints,
@@ -54,25 +69,31 @@ void Outro::setupRenderingManager()
 		totalPoints
 	};
 
-	renderingManager->setBrickList(brickList);
+	renderingManager->setBrickMap(brickMap);
 	renderingManager->setLadderList(ladderList);
 	renderingManager->setGoldList(goldList);
 
 	renderingManager->setEnemyList(enemyList);
 	renderingManager->initializeEnemies();
 
-	if (fruitID.has_value()) {
-		std::tuple<float*, int*> position = renderingManager->setFruitTextureID(60 + fruitID.value());
-		std::get<0>(position)[0] = 11.0f;
-		std::get<0>(position)[1] = 11.0f;
+	if (fruit.has_value()) {		
+		float* position = renderingManager->setFruitTextureID(60 + fruit.value().id.value());
+		
+		position[0] = 11.0f;
+		position[1] = 5.2f;
 
-		int bonusScore = 300;
 		auto translation = stateContext->getGameConfiguration()->getTranslation();
 		auto bonusPointsTranslation = translation->getTranslationText("bonusPoints");
-		
+
 		std::get<0>(bonusPointsTranslation) = std::vformat(std::get<0>(bonusPointsTranslation), std::make_format_args(bonusScore));
 		std::shared_ptr<Text> bonusPoints = std::make_shared<Text>(bonusPointsTranslation);
+
 		textList.push_back(bonusPoints);
+	}
+	else {
+		float* position = renderingManager->setFruitTextureID(60);
+		position[0] = -1.0f;
+		position[1] = -1.0f;
 	}
 
 	renderingManager->setTextList(textList);
@@ -93,11 +114,7 @@ void Outro::start() {
 	enemyPoints = std::make_shared<Text>(enemyPointsTranslation);
 
 	auto totalPointsTranslation = translation->getTranslationText("totalPoints");
-	int totalScore = goldScore + enemyScore;
-
-	if (fruitID.has_value()) {
-		totalScore += 300;
-	}
+	int totalScore = goldScore + enemyScore + bonusScore;
 
 	std::get<0>(totalPointsTranslation) = std::vformat(std::get<0>(totalPointsTranslation), std::make_format_args(totalScore));
 	totalPoints = std::make_shared<Text>(totalPointsTranslation);
@@ -137,13 +154,13 @@ void Outro::update() {
 	renderingManager->render();
 
 	//runner climbs ladder
-	if (this->player->getPos().y < 3.0f) {
+	if (this->player->pos.y < 3.0f) {
 		
-		if (this->player->getPos().y + frameDelta * 0.5f >= 3.0f) {
-			this->player->setPosition({ this->player->getPos().x, 3.0f});
+		if (this->player->pos.y + frameDelta * 0.5f >= 3.0f) {
+			this->player->setPosition({ this->player->pos.x, 3.0f});
 		}
 		else {
-			this->player->setPosition({ this->player->getPos().x, this->player->getPos().y + frameDelta * 0.5f });
+			this->player->setPosition({ this->player->pos.x, this->player->pos.y + frameDelta * 0.5f });
 		}
 		
 		int timeFactor = ellapsedTime * 4;

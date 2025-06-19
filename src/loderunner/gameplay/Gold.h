@@ -10,14 +10,12 @@
 class Enemy;
 
 class Gold {
-	short releaseCounter = 0;
 	Vector2DInt pos;
 	int* positionPointer;
 
 public:
 	Gold(Vector2DInt pos) { this->pos = { pos.x, pos.y}; }
 
-	void setReleaseCounter(short releaseCounter) { this->releaseCounter = releaseCounter; }
 	Vector2DInt getPos() { return this->pos; }
 
 	void setPos(Vector2DInt pos) { 
@@ -31,13 +29,8 @@ public:
 		this->positionPointer = positionPointer;
 	}
 
-	bool shouldBeReleased() {
-		if (releaseCounter-- <= 0) {
-			return true;
-		}
-
-		return false;
-	}
+	friend class GameContext;
+	friend class GameElements;
 };
 
 #endif // !GOLD_H

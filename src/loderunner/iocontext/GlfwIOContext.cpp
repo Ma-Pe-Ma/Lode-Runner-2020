@@ -473,7 +473,7 @@ std::array<std::array<char, 28>, 16> GlfwIOContext::loadLevel(std::string fileNa
 			short key = std::stoi(levelIt.key());
 
 			for (auto lineIt = levelIt->begin(); lineIt != levelIt->end(); lineIt++) {
-				int index = lineIt - levelIt->begin();
+				int index = 15 - (lineIt - levelIt->begin());
 
 				std::array<char, 28> lineArray;
 
@@ -531,7 +531,7 @@ void GlfwIOContext::dumpJson(std::string key, nlohmann::json data, std::string f
 }
 
 int GlfwIOContext::generateRandomNumberBetween(int down, int up) {
-	std::uniform_int_distribution<> dist(down, up);
+	std::uniform_int_distribution<int> dist(down, up);
 	return dist(randGen);
 }
 

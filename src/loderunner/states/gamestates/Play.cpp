@@ -6,7 +6,6 @@
 #include "states/StateContext.h"
 
 #include "gameplay/Enemy.h"
-#include "gameplay/Player.h"
 #include "gameplay/Gold.h"
 
 #include <vector>
@@ -94,8 +93,8 @@ void Play::transitionToDeath() {
 	gamePlay->transitionToAtEndOfFrame(gamePlay->getDeath());
 }
 
-void Play::transitionToOutro(short killCounter, short goldNr, std::optional<int> fruitID) {
+void Play::transitionToOutro(short killCounter, short goldNr, std::optional<Fruit> fruit) {
 	auto stateContext = gamePlay->getStateContext();
-	stateContext->getOutro()->setScoreParameters(killCounter, goldNr, fruitID);
+	stateContext->getOutro()->setScoreParameters(killCounter, goldNr, fruit);
 	stateContext->transitionToAtEndOfFrame(stateContext->getOutro());
 }

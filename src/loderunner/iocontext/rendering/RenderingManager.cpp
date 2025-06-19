@@ -1,5 +1,10 @@
 #include "RenderingManager.h"
 
+#include "gameplay/Brick.h"
+#include "gameplay/Trapdoor.h"
+#include "gameplay/Enemy.h"
+#include "gameplay/Gold.h"
+
 RenderingManager::RenderingManager(std::string assetFolder, std::shared_ptr<IOContext> ioContext) {
 	Text::initCharMap();
 	this->assetFolder = assetFolder;
@@ -93,7 +98,17 @@ void RenderingManager::loadTexture(unsigned int textureID, unsigned int& texture
 
 void RenderingManager::initializeLevelLayout()
 {
-	levelDrawableSize = 1 + poleList.size() + concreteList.size() + brickList.size() + trapdoorList.size() + goldList.size() + ladderList.size() + finishingLadderList.size();
+	int brickNumber = 0;
+
+	for (int i = 0; i < brickMap.size(); i++) {
+		for (int j = 0; j < brickMap[i].size(); j++) {
+			if (brickMap[i][j]) {
+				brickNumber += 1;
+			}
+		}
+	}
+
+	levelDrawableSize = 1 + poleList.size() + concreteList.size() + brickNumber + trapdoorList.size() + goldList.size() + ladderList.size() + finishingLadderList.size();
 	currentLevelDrawableSize = levelDrawableSize - finishingLadderList.size();
 
 #ifdef USE_DYNAMIC_ARRAY
@@ -101,41 +116,49 @@ void RenderingManager::initializeLevelLayout()
 	levelTextureIDs = new int[levelDrawableSize];
 #endif // USE_DYNAMIC_ARRAY		
 
-	for (auto iterator = brickList.begin(); iterator != brickList.end(); iterator++)
-	{
-		int index = iterator - brickList.begin() + 1;
+	//draw brick debris off-screen first
+	levelDrawables[0] = -1.0f;
+	levelDrawables[1] = -1.0f;
 
-		levelDrawables[2 * index + 0] = (*iterator)->getPosition().x;
-		levelDrawables[2 * index + 1] = (*iterator)->getPosition().y;
+	brickNumber = 0;
+	for (int i = 0; i < brickMap.size(); i++) {
+		for (int j = 0; j < brickMap[i].size(); j++) {
+			if (brickMap[i][j]) {
+				brickNumber += 1;
 
-		(*iterator)->setTexturePointer(&levelTextureIDs[index]);
+				levelDrawables[2 * brickNumber + 0] = i;
+				levelDrawables[2 * brickNumber + 1] = j;
+
+				brickTextureMap[i][j] = &levelTextureIDs[brickNumber];
+			}
+		}
 	}
 
-	std::fill_n(levelTextureIDs + 1, brickList.size(), 0);
+	std::fill_n(levelTextureIDs + 1, brickNumber, 0);
 
 	for (auto iterator = poleList.begin(); iterator != poleList.end(); iterator++)
 	{
-		int index = iterator - poleList.begin() + brickList.size() + 1;
+		int index = iterator - poleList.begin() + brickNumber + 1;
 
 		levelDrawables[2 * index + 0] = std::get<0>(*iterator);
 		levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 	}
 
-	std::fill_n(levelTextureIDs + brickList.size() + 1, poleList.size(), 18);
+	std::fill_n(levelTextureIDs + brickNumber + 1, poleList.size(), 18);
 
 	for (auto iterator = concreteList.begin(); iterator != concreteList.end(); iterator++)
 	{
-		int index = iterator - concreteList.begin() + brickList.size() + poleList.size() + 1;
+		int index = iterator - concreteList.begin() + brickNumber + poleList.size() + 1;
 
 		levelDrawables[2 * index + 0] = std::get<0>(*iterator);
 		levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 	}
 
-	std::fill_n(levelTextureIDs + brickList.size() + poleList.size() + 1, concreteList.size(), 6);
+	std::fill_n(levelTextureIDs + brickNumber + poleList.size() + 1, concreteList.size(), 6);
 
 	for (auto iterator = trapdoorList.begin(); iterator != trapdoorList.end(); iterator++)
 	{
-		int index = iterator - trapdoorList.begin() + brickList.size() + poleList.size() + concreteList.size() + 1;
+		int index = iterator - trapdoorList.begin() + brickNumber + poleList.size() + concreteList.size() + 1;
 
 		levelDrawables[2 * index + 0] = (*iterator)->getPos().x;
 		levelDrawables[2 * index + 1] = (*iterator)->getPos().y;
@@ -143,9 +166,9 @@ void RenderingManager::initializeLevelLayout()
 		(*iterator)->setTexturePointer(&levelTextureIDs[index]);
 	}
 
-	std::fill_n(levelTextureIDs + brickList.size() + poleList.size() + concreteList.size() + 1, trapdoorList.size(), 0);
+	std::fill_n(levelTextureIDs + brickNumber + poleList.size() + concreteList.size() + 1, trapdoorList.size(), 0);
 
-	goldStartIndex = brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + 1;
+	goldStartIndex = brickNumber + poleList.size() + concreteList.size() + trapdoorList.size() + 1;
 	goldSize = goldList.size();
 
 	for (auto iterator = goldList.begin(); iterator != goldList.end(); iterator++)
@@ -159,18 +182,16 @@ void RenderingManager::initializeLevelLayout()
 
 	std::fill_n(levelTextureIDs + goldStartIndex, goldList.size(), 36);
 
-	ladderStartIndex = brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
+	ladderStartIndex = brickNumber + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
 	ladderSize = ladderList.size();
 
 	for (auto iterator = ladderList.begin(); iterator != ladderList.end(); iterator++)
 	{
-		int index = iterator - ladderList.begin() + brickList.size() + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
+		int index = iterator - ladderList.begin() + brickNumber + poleList.size() + concreteList.size() + trapdoorList.size() + goldList.size() + 1;
 
 		levelDrawables[2 * index + 0] = std::get<0>(*iterator);
 		levelDrawables[2 * index + 1] = std::get<1>(*iterator);
 	}
-
-	std::fill_n(levelTextureIDs + ladderStartIndex, ladderSize, 12);
 
 	for (auto iterator = finishingLadderList.begin(); iterator != finishingLadderList.end(); iterator++)
 	{
@@ -181,6 +202,8 @@ void RenderingManager::initializeLevelLayout()
 	}
 
 	finishingLadderSize = finishingLadderList.size();
+
+	std::fill_n(levelTextureIDs + ladderStartIndex, ladderSize + finishingLadderSize, 12);
 
 	levelShader->use();
 	levelShader->setInt("textureA", 1);
@@ -207,8 +230,8 @@ void RenderingManager::initializeEnemies() {
 		enemy->setDirectionPointer(&enemyDirections[index]);
 		enemy->setCarryGoldPointer(&enemyGoldIndicator[index]);
 
-		enemyDrawables[2 * index + 0] = enemy->getPos().x;
-		enemyDrawables[2 * index + 1] = enemy->getPos().y;
+		enemyDrawables[2 * index + 0] = enemy->pos.x;
+		enemyDrawables[2 * index + 1] = enemy->pos.y;
 
 		enemyGoldIndicator[index] = false;
 		enemyDirections[index] = false;
@@ -220,12 +243,12 @@ void RenderingManager::initializeEnemies() {
 	enemyShader->setInt("textureA", 0);
 }
 
-std::tuple<float*, int*> RenderingManager::setFruitTextureID(int textureID) {
+float* RenderingManager::setFruitTextureID(int textureID) {
 	enemyTextureIDs[enemyDrawableSize - 1] = textureID;
 	float* fruitPosition = &enemyDrawables[2 * (enemyDrawableSize - 1)];
 	int* fruitDirection = &enemyDirections[enemyDrawableSize - 1];
 
-	return std::make_tuple(fruitPosition, fruitDirection);
+	return fruitPosition;
 }
 
 void RenderingManager::initializeCharacters()
@@ -313,7 +336,6 @@ void RenderingManager::clearRenderableObjects()
 	currentLevelDrawableSize = 0;
 
 	enemyDrawableSize = 0;
-
 	characterDrawableSize = 0;
 
 	goldStartIndex = 0;
@@ -336,7 +358,7 @@ void RenderingManager::clearRenderableObjects()
 	checkAndDeleteArray(characterDrawables);
 #endif
 
-	brickList.clear();
+	brickMap = { false };
 	trapdoorList.clear();
 	goldList.clear();
 

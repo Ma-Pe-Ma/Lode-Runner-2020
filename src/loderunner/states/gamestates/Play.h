@@ -25,7 +25,7 @@ public:
 	void end() override;
 
 	void transitionToDeath();
-	void transitionToOutro(short, short, std::optional<int>);
+	void transitionToOutro(short, short, std::optional<Fruit>);
 
 	void setGameContext(std::shared_ptr<GameContext> gameContext) override
 	{

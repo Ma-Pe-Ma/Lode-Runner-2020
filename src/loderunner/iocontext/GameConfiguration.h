@@ -23,7 +23,7 @@ class GameConfiguration {
 	unsigned int framesPerSec = 60;	
 
 #ifndef NDEBUG
-	bool debugEnemy = false;
+	bool debugEnemy = true;
 #endif
 
 	std::shared_ptr<Translation> translation;

@@ -3,17 +3,10 @@
 
 #include "State.h"
 #include <map>
-
 #include <json.hpp>
 
 #include "gamestates/Play.h"
-
-#include "gameplay/LayoutBlock.h"
-#include "gameplay/Brick.h"
-#include "gameplay/Trapdoor.h"
-
 #include "iocontext/rendering/RenderingManager.h"
-
 #include "iocontext/GeneratorGUI.h"
 
 class Generator : public State {

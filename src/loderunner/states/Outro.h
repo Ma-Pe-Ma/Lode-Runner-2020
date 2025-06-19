@@ -1,13 +1,16 @@
 #ifndef OUTRO_H
 #define OUTRO_H
 
-#include "State.h"
+#include <optional>
 #include <string>
 #include <memory>
-#include <optional>
+
+#include "State.h"
+
+#include "gameplay/GameElements.h"
 
 class RenderingManager;
-class Player;
+class Enemy;
 class Text;
 
 class Outro : public State {
@@ -18,11 +21,12 @@ private:
 
 	short enemyScore = 0;
 	short goldScore = 0;
-	std::optional<int> fruitID;
+	short bonusScore = 0;
+	std::optional<Fruit> fruit;
 
 	void setupRenderingManager();
 
-	std::shared_ptr<Player> player;
+	std::shared_ptr<Enemy> player;
 
 	std::chrono::system_clock::time_point previousFrame;
 public:
@@ -30,7 +34,7 @@ public:
 	void update() override;
 	void end() override;
 
-	void setScoreParameters(short, short, std::optional<int>);
+	void setScoreParameters(short, short, std::optional<Fruit>);
 };
 
 #endif

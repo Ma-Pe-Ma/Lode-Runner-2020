@@ -95,6 +95,11 @@
 			"x": 20,
 			"y": 12.5
 		},
+		"bonusPoints": {
+			"value": "{0} POINTS",
+			"x": 20,
+			"y": 18.5
+		},
 		"totalPoints": {
 			"value": "TOTAL {0} POINTS",
 			"x": 14.5,
@@ -393,6 +398,11 @@
 			"value": "{0} PUNTOS",
 			"x": 20,
 			"y": 12.5
+		},
+		"bonusPoints": {
+			"value": "{0} PUNTOS",
+			"x": 20,
+			"y": 18.5
 		},
 		"totalPoints": {
 			"value": "TOTAL {0} PUNTOS",

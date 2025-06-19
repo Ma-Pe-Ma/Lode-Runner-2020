@@ -5,7 +5,7 @@
 
 cmake_minimum_required (VERSION 3.20)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -21,7 +21,8 @@ add_executable(LodeRunner
 	"src/loderunner/gameplay/Brick.cpp"
 	"src/loderunner/gameplay/Enemy.cpp"
 	"src/loderunner/gameplay/GameContext.cpp"
-	"src/loderunner/gameplay/Player.cpp"
+	"src/loderunner/gameplay/LevelLoader.cpp"
+	"src/loderunner/gameplay/GameElements.cpp"
 
 	"src/loderunner/states/GameOver.cpp"
 	"src/loderunner/states/GamePlay.cpp"
@@ -140,7 +141,7 @@ if(EMSCRIPTEN)
 	)
 
 	if(NOT DEFINED LEVEL_URL)
-		message(FATAL_ERROR "LEVEL_URL is not set. Please specify it with: -DLEVEL_URL=http://...")
+		message(FATAL_ERROR "LEVEL_URL is not set. Please specify it with: -DLEVEL_URL=https://...")
 	else()
 		message("Levelset URL is set as: ${LEVEL_URL}")
 	endif()
