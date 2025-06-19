@@ -411,6 +411,8 @@ void GlfwIOContext::initialize()
 #endif
 
 	ImGui::StyleColorsDark();
+
+	this->randGen = std::mt19937(rd());
 }
 
 void GlfwIOContext::terminate()
@@ -526,6 +528,11 @@ void GlfwIOContext::dumpJson(std::string key, nlohmann::json data, std::string f
 	std::ofstream outFile(filePath);
 	outFile << data.dump(2);
 	outFile.close();
+}
+
+int GlfwIOContext::generateRandomNumberBetween(int down, int up) {
+	std::uniform_int_distribution<> dist(down, up);
+	return dist(randGen);
 }
 
 #ifdef VIDEO_RECORDING

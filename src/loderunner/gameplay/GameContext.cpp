@@ -3,6 +3,8 @@
 #include "iocontext/rendering/RenderingManager.h"
 #include "states/gamestates/Play.h"
 
+#include <set>
+
 #include "Player.h"
 #include "Gold.h"
 
@@ -128,6 +130,16 @@ void GameContext::generateFinishingLadders() {
 	}
 
 	finishingLadders.clear();
+
+	int probabilityFactor = ioContext->generateRandomNumberBetween(0, 1);
+	
+	if (probabilityFactor < 1) {
+		std::get<0>(fruit.time) = std::chrono::system_clock::now();
+		std::get<1>(fruit.time) = 15 + ioContext->generateRandomNumberBetween(0, 10);
+
+		std::get<0>(fruit.position)[0] = -std::get<0>(fruit.position)[0];
+		std::get<0>(fruit.position)[1] = -std::get<0>(fruit.position)[1];
+	}	
 }
 
 void GameContext::transitionToDeath()
@@ -137,7 +149,9 @@ void GameContext::transitionToDeath()
 
 void GameContext::transitionToOutro()
 {
-	play->transitionToOutro(killCounter, getCollectedGoldSize(), 0);
+	auto fruitVal = fruit.collected ? std::make_optional<int>(fruit.id) : std::make_optional<int>();
+
+	play->transitionToOutro(killCounter, getCollectedGoldSize(), fruitVal);
 }
 
 void GameContext::clearContainers()
@@ -287,6 +301,9 @@ void GameContext::loadLevel(int levelNumber)
 
 	enemies.insert(enemies.end(), player);
 
+	fruit.id = ioContext->generateRandomNumberBetween(0, 11);
+	fruit.collected = false;
+
 	renderingManager->clearRenderableObjects();
 	renderingManager->setPoleList(poleList);
 	renderingManager->setConcreteList(concreteList);
@@ -301,11 +318,48 @@ void GameContext::loadLevel(int levelNumber)
 
 	renderingManager->setEnemyList(enemies);
 	renderingManager->initializeEnemies();
+	
+	fruit.position = renderingManager->setFruitTextureID(60 + fruit.id);
 
 	renderingManager->setTextList(textList);
 	renderingManager->initializeCharacters();
 
 	enemies.erase(enemies.end() - 1);
+
+	std::vector<int> rows(16);
+	std::iota(rows.begin(), rows.end(), 1);
+
+	while (rows.size() > 0) {
+		int rowID = ioContext->generateRandomNumberBetween(0, rows.size() - 1);
+		int row = rows[rowID];
+
+		rows.erase(rows.begin() + rowID);
+
+		std::vector<int> cols(28);
+		std::iota(cols.begin(), cols.end(), 1);
+
+		bool breakOuter = false;
+
+		while (cols.size() > 0) {
+			int colID = ioContext->generateRandomNumberBetween(0, cols.size() - 1);
+			int col = cols[colID];
+
+			cols.erase(cols.begin() + colID);
+
+			std::set<LayoutBlock> solids = std::set<LayoutBlock>({LayoutBlock::concrete, LayoutBlock::brick, LayoutBlock::ladder, LayoutBlock::finishLadder});
+
+			if (layout[col][row] == LayoutBlock::empty && solids.contains(layout[col][row - 1])) {
+				std::get<0>(fruit.position)[0] = -col;
+				std::get<0>(fruit.position)[1] = -row;
+
+				breakOuter = true;
+			}
+		}
+
+		if (breakOuter) {
+			break;
+		}
+	}
 
 #ifndef NDEBUG
 	// Set the first two enemy to controllable when debugging
@@ -321,6 +375,13 @@ void GameContext::loadLevel(int levelNumber)
 		}
 	}
 #endif
+}
+
+void GameContext::notifyFruitCollect(bool collected, bool direction) {
+	fruit.collected = collected;
+	std::get<0>(fruit.position)[0] = -1.0f;
+	std::get<0>(fruit.position)[1] = -1.0f;
+	std::get<1>(fruit.position)[0] = direction;
 }
 
 void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
@@ -434,6 +495,7 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 	}
 
 	if (player) {
+		fruit.id = ioContext->generateRandomNumberBetween(0, 11);
 		highestLadder = highestLadder < 15 ? 15 : highestLadder;
 
 		auto translation = gameConfiguration->getTranslation();
@@ -461,6 +523,10 @@ void GameContext::generateLevel(std::array<std::array<short, 28>, 16> gen)
 		this->pointerToDebrisLocation = renderingManager->getPointerToDebrisLocation();
 
 		renderingManager->setEnemyList(enemies);
+		fruit.position = renderingManager->setFruitTextureID(60 + fruit.id);
+		std::get<0>(fruit.position)[0] = 3.0f;
+		std::get<0>(fruit.position)[1] = 3.0f;
+
 		renderingManager->initializeEnemies();
 
 		renderingManager->setTextList(textList);

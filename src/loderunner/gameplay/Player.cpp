@@ -6,7 +6,7 @@
 #include "states/gamestates/Play.h"
 
 Player::Player(float x, float y) : Enemy(x, y) {
-	this->textureMap = {28, 52, 48, 36, 40, 26};
+	this->enemyTextureMap = {28, 52, 48, 36, 40, 26};
 }
 
 void Player::setCharSpeed(float charSpeed) {
@@ -150,7 +150,7 @@ void Player::animateFreeRun() {
 
 	//runner idle animation
 	if (pos.x - prevPos.x == 0 && pos.y - prevPos.y == 0 && gameTime - idleTimeStart > 1 && (middle != LayoutBlock::pole) && pos.y == current.y) {
-		*texturePointer = textureMap.idle + (int (gameTime)) % 2;
+		*texturePointer = enemyTextureMap.idle + (int (gameTime)) % 2;
 	}
 
 	Enemy::animateFreeRun();
@@ -158,10 +158,10 @@ void Player::animateFreeRun() {
 
 void Player::animateDigging() {
 	if (middle == LayoutBlock::pole) {
-		*texturePointer = textureMap.pole;
+		*texturePointer = enemyTextureMap.pole;
 	}
 	else if (middle == LayoutBlock::ladder) {
-		*texturePointer = textureMap.ladder;
+		*texturePointer = enemyTextureMap.ladder;
 	}
 }
 
@@ -210,6 +210,28 @@ void Player::checkGoldCollect() {
 	
 	//if every gold collected!
 	if (gameContext->getUncollectedGoldSize() == 0 && !gameContext->enemyCarriesGold()) {
+		float* fruitPosition = gameContext->getFruitLocation(); 
+
+		std::tuple<std::chrono::system_clock::time_point, float> fruitTime = gameContext->getFruitTime();
+		std::chrono::duration<float, std::milli> ellapsedFruitTime = std::chrono::system_clock::now() - std::get<0>(fruitTime);
+
+		bool inTime = ellapsedFruitTime.count() / 1000 <= std::get<1>(fruitTime);
+
+		if (inTime) {
+			if (std::abs(pos.x - fruitPosition[0]) < 0.75f && std::abs(pos.y - fruitPosition[1]) < 0.75f) {
+				if (gameContext->getAudio()->getAudioFileByID(0)->getPlayStatus() == AudioStatus::playing) {
+					gameContext->getAudio()->getAudioFileByID(0)->stopAndRewind();
+				}
+
+				gameContext->getAudio()->getAudioFileByID(0)->playPause();
+				
+				gameContext->notifyFruitCollect(inTime, pos.x > fruitPosition[0]);
+			}
+		}
+		else {
+			gameContext->notifyFruitCollect(inTime, false);
+		}		
+		
 		//top of level reached
 		if (current.y >= gameContext->getHighestLadder() + 1) {
 			gameContext->transitionToOutro();
@@ -226,5 +248,5 @@ void Player::dying() {
 	float deathLength = gameContext->getAudio()->getAudioFileByID(3)->lengthInSec();
 	int timeFactor = ((int)(9 * (gameTime - dieTimer) / deathLength)) % 9;
 	timeFactor = (timeFactor == 8) ? 31 : timeFactor;
-	*texturePointer = textureMap.death + timeFactor;
+	*texturePointer = enemyTextureMap.death + timeFactor;
 }

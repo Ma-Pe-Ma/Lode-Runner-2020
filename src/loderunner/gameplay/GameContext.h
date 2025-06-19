@@ -24,6 +24,13 @@ class IOContext;
 #include "LayoutBlock.h"
 #include "Vector2DInt.h"
 
+struct Fruit {
+	int id;
+	std::tuple<float*, int*> position;
+	std::tuple<std::chrono::system_clock::time_point, float> time;
+	bool collected = false;
+};
+
 class GameContext {
 	std::shared_ptr<RenderingManager> renderingManager;
 	std::shared_ptr<GameConfiguration> gameConfiguration;
@@ -52,6 +59,8 @@ class GameContext {
 
 	int* pointerToDebrisTexture;
 	int* pointerToDebrisLocation;
+
+	Fruit fruit;
 
 	Play* play;
 
@@ -103,6 +112,10 @@ public:
 
 	std::vector<std::shared_ptr<Gold>> getCollectedGoldList() { return this->collectedGoldList; }
 	void setCollectedGoldList(std::vector<std::shared_ptr<Gold>> collectedGoldList) { this->collectedGoldList = collectedGoldList; }
+
+	float* getFruitLocation() { return std::get<0>(fruit.position); }
+	std::tuple<std::chrono::system_clock::time_point, float> getFruitTime() {return fruit.time;}
+	void notifyFruitCollect(bool, bool);
 
 	short getCollectedGoldSize() { return collectedGoldList.size(); }
 	short getUncollectedGoldSize() { return uncollectedGoldList.size(); }

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <map>
+#include <random>
 
 #ifdef VIDEO_RECORDING
 #include "MultiMediaRecording/MultiMedia.h"
@@ -30,6 +31,9 @@ protected:
 	std::map<std::string, std::string> configMap;
 
 	std::shared_ptr<GameConfiguration> gameConfiguration;
+
+	std::random_device rd;
+	std::mt19937 randGen;
 
 	virtual nlohmann::json readJson(std::string key, std::string folder = "resources");
 	virtual void dumpJson(std::string key, nlohmann::json, std::string folder = "resources");
@@ -57,6 +61,9 @@ public:
 
 	virtual nlohmann::json loadGeneratorLevels() override;
 	void saveGeneratorLevels(nlohmann::json) override;
+
+	int generateRandomNumberBetween(int, int) override;
+
 #ifdef VIDEO_RECORDING
 	std::shared_ptr<MultiMedia> initializeMultimedia();
 #endif

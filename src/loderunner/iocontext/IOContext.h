@@ -53,6 +53,8 @@ public:
 	virtual nlohmann::json loadGeneratorLevels() = 0;
 	virtual void saveGeneratorLevels(nlohmann::json) = 0;
 
+	virtual int generateRandomNumberBetween(int, int) = 0;
+
 #ifdef VIDEO_RECORDING
 	void setAudioContext(std::shared_ptr<AudioContext> audio) { this->audio = audio; }
 #endif

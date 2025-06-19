@@ -48,10 +48,10 @@ protected:
 		-14.0f / 15,	-8.0f / 9,
 		-1.0f,			-8.0f / 9,
 
-		0.0f,			0.0f / 5,
-		1.0f / 12,		0.0f / 5,
-		1.0f / 12,		1.0f / 5,
-		0.0f,			1.0f / 5
+		0.0f,			0.0f / 6,
+		1.0f / 12,		0.0f / 6,
+		1.0f / 12,		1.0f / 6,
+		0.0f,			1.0f / 6
 	};
 
 	const float characterVertices[16] = {
@@ -233,6 +233,8 @@ public:
 
 	int* getPointerToDebrisTexture() { return &this->levelTextureIDs[0]; }
 	int* getPointerToDebrisLocation() { return &this->levelDrawables[0]; }
+
+	std::tuple<float*, int*> setFruitTextureID(int texture);
 };
 
 #endif

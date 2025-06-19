@@ -6,7 +6,7 @@
 #include "gameplay/Player.h"
 #include <memory>
 
-void Outro::setScoreParameters(short killCounter, short goldCounter, short fruitID) {
+void Outro::setScoreParameters(short killCounter, short goldCounter, std::optional<int> fruitID) {
 	this->enemyScore = killCounter * 200;
 	this->goldScore = goldCounter * 200;
 	this->fruitID = fruitID;
@@ -59,12 +59,24 @@ void Outro::setupRenderingManager()
 	renderingManager->setGoldList(goldList);
 
 	renderingManager->setEnemyList(enemyList);
-
-	renderingManager->setTextList(textList);
-
-	renderingManager->initializeLevelLayout();
 	renderingManager->initializeEnemies();
 
+	if (fruitID.has_value()) {
+		std::tuple<float*, int*> position = renderingManager->setFruitTextureID(60 + fruitID.value());
+		std::get<0>(position)[0] = 11.0f;
+		std::get<0>(position)[1] = 11.0f;
+
+		int bonusScore = 300;
+		auto translation = stateContext->getGameConfiguration()->getTranslation();
+		auto bonusPointsTranslation = translation->getTranslationText("bonusPoints");
+		
+		std::get<0>(bonusPointsTranslation) = std::vformat(std::get<0>(bonusPointsTranslation), std::make_format_args(bonusScore));
+		std::shared_ptr<Text> bonusPoints = std::make_shared<Text>(bonusPointsTranslation);
+		textList.push_back(bonusPoints);
+	}
+
+	renderingManager->setTextList(textList);
+	renderingManager->initializeLevelLayout();
 	renderingManager->initializeCharacters();
 }
 
@@ -82,6 +94,11 @@ void Outro::start() {
 
 	auto totalPointsTranslation = translation->getTranslationText("totalPoints");
 	int totalScore = goldScore + enemyScore;
+
+	if (fruitID.has_value()) {
+		totalScore += 300;
+	}
+
 	std::get<0>(totalPointsTranslation) = std::vformat(std::get<0>(totalPointsTranslation), std::make_format_args(totalScore));
 	totalPoints = std::make_shared<Text>(totalPointsTranslation);
 
@@ -96,7 +113,8 @@ void Outro::start() {
 	playerLife = ++playerLife > 9 ? 9 : playerLife;
 
 	unsigned int& playerScore = stateContext->getPlayerScore()[stateContext->getPlayerNr()];
-	playerScore += enemyScore + goldScore;
+	playerScore += totalScore;
+	
 	stateContext->getHighScore() = playerScore > stateContext->getHighScore() ? playerScore : stateContext->getHighScore();
 
 	startTimePoint = std::chrono::system_clock::now();
