@@ -3,10 +3,6 @@
 #include "iocontext/audio/AudioFile.h"
 #include "states/StateContext.h"
 
-#include "gameplay/Enemy.h"
-#include "gameplay/Gold.h"
-#include "gameplay/Player.h"
-
 Generator::Generator() {
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 18; j++) {
@@ -37,7 +33,6 @@ void Generator::start() {
 	stateContext->getRenderingManager()->setGeneratorParameters(&pos[0][0][0], &texture[0][0]);
 	stateContext->getShowImGuiWindow() = false;
 
-	getStateContext()->getGamePlay()->getGameContext()->clearContainers();
 	startTimePoint = std::chrono::system_clock::now();
 
 	generatorGUI.start();

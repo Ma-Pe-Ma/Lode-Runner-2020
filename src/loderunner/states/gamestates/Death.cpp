@@ -5,8 +5,6 @@
 
 #include "iocontext/audio/AudioFile.h"
 
-#include "gameplay/Player.h"
-
 void Death::start() {	
 	auto audio = gameContext->getAudio();
 
@@ -27,8 +25,7 @@ void Death::update() {
 	float ellapsedTime = calculateEllapsedTime();
 
 	if (ellapsedTime < deathLength) {
-		gameContext->getPlayer()->setGameTime(calculateEllapsedTime());
-		gameContext->handlePlayerDying();
+		gameContext->handlePlayerDying(ellapsedTime);
 	}
 	else {
 		auto stateContext = gamePlay->getStateContext();

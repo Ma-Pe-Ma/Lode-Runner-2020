@@ -11,4 +11,12 @@ enum class LayoutBlock {
 	finishLadder,
 };
 
+enum class EnemyState {
+	freeRun,
+	falling,
+	digging,
+	pitting,
+	dying
+};
+
 #endif // !LAYOUTBLOCK_H

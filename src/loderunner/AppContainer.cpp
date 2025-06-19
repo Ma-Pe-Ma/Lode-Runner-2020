@@ -4,8 +4,6 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include "gameplay/Player.h"
-
 #ifdef __EMSCRIPTEN__
 #include "iocontext/EmscriptenIOContext.h"
 #include "iocontext/rendering/EmscriptenRenderingManager.h"
@@ -146,18 +144,8 @@ void AppContainer::handleImGuiConfigurer()
 			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
 		}
 
-		if (ImGui::SliderFloat(translation->getTranslationString("playerSpeed").c_str(), gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f")) {
-
-			if (gameContext->getPlayer()) {
-				gameContext->getPlayer()->setCharSpeed(gameConfiguration->getPlayerSpeed());
-			}
-		}
-
-		if (ImGui::SliderFloat(translation->getTranslationString("enemySpeed").c_str(), gameConfiguration->getEnemySpeedPointer(), 0.0f, 1.0f, "%.2f")) {
-			for (auto& enemy : gameContext->getEnemies()) {
-				enemy->setCharSpeed(gameConfiguration->getEnemySpeed());
-			}
-		}
+		ImGui::SliderFloat(translation->getTranslationString("playerSpeed").c_str(), gameConfiguration->getPlayerSpeedPointer(), 0.0f, 1.0f, "%.2f");
+		ImGui::SliderFloat(translation->getTranslationString("enemySpeed").c_str(), gameConfiguration->getEnemySpeedPointer(), 0.0f, 1.0f, "%.2f");
 
 #ifndef NDEBUG	
 		ImGui::Checkbox("Control enemies", gameConfiguration->getEnemyDebugState());

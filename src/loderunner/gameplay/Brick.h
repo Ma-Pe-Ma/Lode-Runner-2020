@@ -2,24 +2,19 @@
 #define BRICK_H
 
 #include "Vector2DInt.h"
-#include "LayoutBlock.h"
-
-#include <memory>
-
-class GameContext;
 
 enum class BrickState {
-	original,
 	digging,
 	watiting,
-	building
+	building,
+	rebuilt
 };
 
 class Brick {
 private:
 	Vector2DInt position;
 	float timer;
-	BrickState brickState = BrickState::original;
+	BrickState brickState = BrickState::digging;
 
 	const float diggingTime = 7.15f;
 	const float destroyTime = 0.5f;
@@ -29,21 +24,15 @@ private:
 	inline void waiting(float);
 	inline void building(float);
 
-	int* pointerToTexture;
-
-	GameContext* gameContext;
+	int textureState = 0;
 public:
-	Brick(Vector2DInt);
+	Brick(Vector2DInt position, float gameTime);
 	void handle(float);
-	bool initiateDig(float);
+
 	Vector2DInt getPosition() { return position; }
 
-	void setTexturePointer(int* pointerToTexture)
-	{
-		this->pointerToTexture = pointerToTexture;
-	}
-
-	void setGameContext(GameContext* gameContext);
+	friend class GameContext;
+	friend class GameElements;
 };
 
 #endif // !BRICK_H

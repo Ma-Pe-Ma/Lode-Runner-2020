@@ -4,23 +4,24 @@
 #include <cstdlib>
 
 #include <iostream>
-
-#include "Direction.h"
-#include "EnemyState.h"
-#include "PitState.h"
+#include <optional>
 
 #include "Vector2D.h"
 #include "Vector2DInt.h"
 
 #include "LayoutBlock.h"
+#include "GameElements.h"
 
 #include "Trapdoor.h"
-#include "Brick.h"
 
-#include "GameContext.h"
-
-class Gold;
+class GameElements;
+class GameContext;
 class Play;
+
+enum class Direction {
+	right,
+	left
+};
 
 struct EnemyTextureMap {
 	short death = 8;
@@ -42,83 +43,32 @@ private:
 	float bestRating = 0.0f;
 
 	//PathFinding
-	void scanFloor();
-	void scanDown(int, int);
-	void scanUp(int, int);
+	Vector2DInt scanFloor(std::shared_ptr<GameElements>&);
+	void scanDown(int, int, std::shared_ptr<GameElements>&);
+	void scanUp(int, int, std::shared_ptr<GameElements>&);
 
-	bool enemyChecker(float, float);
-	virtual void checkCollisionWithOthers();
-
-	void fallingToPit();
-	void movingInPit();
-	void climbing();
-
-	Brick* holeBrick = nullptr;
-	
+	std::optional<int> goldCounter;	
+	std::optional<Vector2D> hole;
 protected:
-	//factor to slow or fasten animationSpeed
-	int animationFactor = 4;
-	int animationTimeFactor;
-
-	GameContext* gameContext;
-
-	void determineNearbyObjects();
-	void ladderTransformation();
-	void checkCollisionsWithEnvironment();
-
-	virtual void checkGoldCollect();
-	virtual void checkGoldDrop();
-
-	virtual void releaseFromDigging() {};
-	virtual bool checkHole();
-
-	virtual void initiateFallingStart();
-	virtual void initiateFallingStop();	
-
-	virtual void findPath();
-	void move();
-	virtual void dying();
-
-	//Moving 
-	virtual void freeRun();
-	virtual void digging();
-	virtual void falling();
-	void pitting();
-	void startingToFall();
-
-	//Animating
-	void animate();
-	virtual void animateFreeRun();
-	virtual void animateGoing();
-	virtual void animateOnLadder();
-	virtual void animateOnPole();
-
-	virtual void animateDigging();
-	virtual void animateDying();
-	virtual void animateFalling();
-	virtual void animatePitting();
+	virtual Vector2DInt findPath(std::shared_ptr<GameElements>&);
 	
-	float gameTime;
-	float frameDelta;
+	Vector2D ladderTransformation(Vector2D, std::shared_ptr<GameElements>&);
+	Vector2D checkCollisionsWithEnvironment(Vector2D, std::shared_ptr<GameElements>&);
+	virtual Vector2D handleDropping(Vector2D, std::shared_ptr<GameElements>&);
+
+	virtual Vector2D falling(float, std::shared_ptr<GameElements>&);
+	Vector2D pitting(Vector2D, float, float, std::shared_ptr<GameElements>&);
 
 	LayoutBlock middle;
 	LayoutBlock downBlock;
-
 	Vector2DInt current = { 0, 0 };
-	Vector2DInt directionHelper = { 0, 0 };
 
 	EnemyTextureMap enemyTextureMap;
 
-	std::shared_ptr<Gold> carriedGold;
-
 	EnemyState state = EnemyState::freeRun;
-	float holeTimer = 0.0f;
-	float dieTimer = 0.0f;
-	float actualSpeed = 0.0f;
-	float charSpeed = 0.0f;
+	float timer = 0.0f;
 
-	Direction direction;
-	PitState pitState;	
+	Direction direction = Direction::right;
 
 	float* positionPointer;
 	int* texturePointer;
@@ -127,44 +77,29 @@ protected:
 
 	Vector2D pos;
 	Vector2D dPos;
-	Vector2D prevPos;
-	Vector2D dPrevPos;
-
-#ifndef NDEBUG
-	int debugEnemy = 0;
-#endif
 public:
-	virtual ~Enemy() {}
-	Enemy(float, float);
-
-	void handle(float, float);
-
-	bool carriesGold() { return carriedGold != nullptr; }
-	void checkDeath(int, int);
-
-	virtual void die();
-
-	//Getters and setters
-	void setGameContext(GameContext* gameContext) { this->gameContext = gameContext; }
+	Enemy(float, float, bool player = false);
 
 	EnemyTextureMap getTextureMap() { return this->enemyTextureMap; }
-	virtual void setCharSpeed(float charSpeed) { this->charSpeed = charSpeed; }
 
 	void setPositionPointer(float* positionPointer)	{ this->positionPointer = positionPointer; }
 	void setTexturePointer(int* texturePointer) { this->texturePointer = texturePointer; }
 	void setDirectionPointer(int* directionPointer) { this->directionPointer = directionPointer; }
 	void setCarryGoldPointer(int* carryGoldPointer)	{ this->carryGoldPointer = carryGoldPointer; }
-	
 	void setTexture(int texture) { *texturePointer = texture; }
 
-	Vector2D getPos() {	return this->pos; }
-	void setDPos(Vector2D dPos) { this->dPos = dPos; }	
+	void setPosition(Vector2D pos) {
+		this->pos = pos;
+		positionPointer[0] = pos.x;
+		positionPointer[1] = pos.y;
+	}
 
-	void setGameTime(float gameTime) { this->gameTime = gameTime; }
+	void determineNearbyObjects(std::shared_ptr<GameElements>&, Vector2D = {0.0f, 0.0f});
 
-#ifndef NDEBUG
-	void setDebugEnemyState(int debugEnemy) { this->debugEnemy = debugEnemy; }
-#endif
+	friend class GameContext;
+	friend class GameElements;
+	friend class Outro;
+	friend class RenderingManager;
 };
 
 #endif // !ENEMY_H
