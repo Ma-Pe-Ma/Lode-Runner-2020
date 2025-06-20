@@ -121,10 +121,11 @@ if(EMSCRIPTEN)
 	target_compile_options(LodeRunner PUBLIC 
 		"-pthread;"
 		"-fexceptions"
+		"--use-port=contrib.glfw3"
 	)
 
 	target_link_options(LodeRunner PUBLIC
-		"-sUSE_GLFW=3;"
+		"--use-port=contrib.glfw3"
 		"-sMAX_WEBGL_VERSION=2;-sMIN_WEBGL_VERSION=2;-lopenal"
 		"-std=c++23;-fexperimental-library;"
 		"-sPTHREAD_POOL_SIZE=4;-sALLOW_MEMORY_GROWTH;"
