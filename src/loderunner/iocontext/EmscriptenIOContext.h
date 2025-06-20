@@ -78,22 +78,16 @@ private:
 
 	std::tuple<Button*, Button*> getAnalogButtonByTouch(int x, int y);
 	std::shared_ptr<EmscriptenRenderingManager> emscriptenRenderingManager;
-
-	void keyboardInput();
-	std::optional<long> gamePadID;
 protected:
 	nlohmann::json readJson(std::string key, std::string folder) override;
 	void dumpJson(std::string key, nlohmann::json, std::string folder) override;
 public:
 	void processInput() override;
 
-	void handleTouch();
-
 	void initializeEmscriptenCanvas() {
 		bool isMobile = EmscriptenHandler::is_mobile();
 
-		if (isMobile)
-		{
+		if (isMobile) {
 			std::get<0>(screenParameters.screenSize) = EmscriptenHandler::screen_get_width() * 0.9f;
 		}
 		else {

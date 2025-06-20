@@ -52,7 +52,7 @@ void GlfwIOContext::finalizeFrame()
 void GlfwIOContext::processInput() {
 	buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
 	buttonInputs.pause.detect(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
-#ifndef __EMSCRIPTEN__
+
 	GLFWgamepadstate state;
 	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
@@ -66,16 +66,18 @@ void GlfwIOContext::processInput() {
 	buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
 
 	buttonInputs.screenshot.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
-	lAlt.detect(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS);
-#endif
 
 #ifdef VIDEO_RECORDING
 	buttonInputs.videoButton.detect(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
 #endif
 
+#ifndef __EMSCRIPTEN__
+	lAlt.detect(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS);
+
 	if (lAlt.continuous() && buttonInputs.enter.simple()) {
 		fullscreenSwitch();
 	}
+#endif	
 
 #ifndef NDEBUG
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

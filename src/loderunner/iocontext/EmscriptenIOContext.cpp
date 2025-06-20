@@ -143,19 +143,6 @@ namespace EmscriptenHandler {
 	std::optional<std::tuple<std::string, std::string>> rawImportableLevels;
 }
 
-void EmscriptenIOContext::keyboardInput() {
-	buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
-
-	buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
-	buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
-	buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
-	buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
-	buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-	buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
-	buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
-	buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-}
-
 void EmscriptenIOContext::processInput() {
 	if (EmscriptenHandler::is_mobile()) {
 		for (auto it = buttonStateMap.begin(); it != buttonStateMap.end(); it++)
@@ -164,29 +151,7 @@ void EmscriptenIOContext::processInput() {
 		}
 	}
 	else {
-		if (gamePadID.has_value() && emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) {
-			EmscriptenGamepadEvent gamepadState;
-			emscripten_get_gamepad_status(gamePadID.value(), &gamepadState);
-
-			if (gamepadState.connected == EM_TRUE) {
-				buttonInputs.config.detect(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS || gamepadState.digitalButton[3] == EM_TRUE);
-
-				buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || gamepadState.digitalButton[14] == EM_TRUE || gamepadState.axis[0] < -0.5);
-				buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || gamepadState.digitalButton[15] == EM_TRUE || gamepadState.axis[0] > 0.5);
-				buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || gamepadState.digitalButton[12] == EM_TRUE || gamepadState.axis[1] < -0.5);
-				buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || gamepadState.digitalButton[13] == EM_TRUE || gamepadState.axis[1] > 0.5);
-				buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || gamepadState.digitalButton[5] == EM_TRUE || gamepadState.digitalButton[7] == EM_TRUE);
-				buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || gamepadState.digitalButton[4] == EM_TRUE || gamepadState.digitalButton[6] == EM_TRUE);
-				buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || gamepadState.digitalButton[9] == EM_TRUE);
-				buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || gamepadState.digitalButton[8] == EM_TRUE);
-			}
-			else {
-				keyboardInput();
-			}
-		}
-		else {
-			keyboardInput();
-		}
+		GlfwIOContext::processInput();
 	}
 }
 
@@ -374,29 +339,6 @@ void EmscriptenIOContext::initialize() {
 
 		glViewport(std::get<0>(self->screenParameters.viewPortPosition), std::get<1>(self->screenParameters.viewPortPosition), std::get<0>(self->screenParameters.viewPortSize), std::get<1>(self->screenParameters.viewPortSize));
 	});
-
-
-	if (emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) {		
-		emscripten_set_gamepadconnected_callback(this, true, [](int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) -> EM_BOOL {
-			EmscriptenIOContext* self = static_cast<EmscriptenIOContext*>(userData);
-
-			if (!self->gamePadID.has_value()) {
-				self->gamePadID.emplace(gamepadEvent->index);
-			}			
-
-			return true;
-		});
-
-		emscripten_set_gamepaddisconnected_callback(this, true, [](int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) -> EM_BOOL {
-			EmscriptenIOContext* self = static_cast<EmscriptenIOContext*>(userData);
-
-			if (self->gamePadID.has_value() && self->gamePadID.value() == gamepadEvent->index) {
-				self->gamePadID.reset();
-			}
-
-			return true;
-		});
-	}
 }
 
 std::tuple<Button*, Button*> EmscriptenIOContext::getAnalogButtonByTouch(int absX, int absY) {

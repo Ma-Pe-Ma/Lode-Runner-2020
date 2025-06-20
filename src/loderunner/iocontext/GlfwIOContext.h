@@ -14,7 +14,9 @@
 struct GLFWwindow;
 
 class GlfwIOContext : public IOContext {
+#ifndef __EMSCRIPTEN__
 	Button lAlt;
+#endif
 
 	void saveImage(unsigned char*);
 	unsigned int findScreenShotCount();
