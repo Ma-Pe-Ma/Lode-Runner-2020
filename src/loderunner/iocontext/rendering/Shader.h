@@ -1,10 +1,12 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#if defined __EMSCRIPTEN__
+#if defined __EMSCRIPTEN__ || defined POCKET_CHIP
 #include <GLES3/gl3.h>
+#if defined __EMSCRIPTEN__
 #include "emscripten.h"
-#else 
+#endif
+#else
 #include <glad/glad.h>
 #endif
 
@@ -77,14 +79,14 @@ public:
             
             unsigned int vertex, fragment;
 
-#if defined __EMSCRIPTEN__ || defined ANDROID_VERSION
+#if defined __EMSCRIPTEN__ || defined ANDROID_VERSION || defined POCKET_CHIP
             const GLchar* vertex_shader_with_version[2] = { "#version 300 es\nprecision highp float;\n", vertexCode.c_str() };
             const GLchar* fragment_shader_with_version[2] = { "#version 300 es\nprecision highp float;\n", fragmentCode.c_str() };
 #else
             const GLchar* vertex_shader_with_version[2] = { "#version 460 core\n", vertexCode.c_str() };
             const GLchar* fragment_shader_with_version[2] = { "#version 460 core\n", fragmentCode.c_str() };
 
-#endif // __EMSCRIPTEN__
+#endif
 
             // vertex shader
             vertex = glCreateShader(GL_VERTEX_SHADER);
