@@ -66,7 +66,7 @@ private:
 		{&buttonInputs.right, false},
 		{&buttonInputs.up, false},
 		{&buttonInputs.down, false},
-		//{&configButton, false},
+		{&buttonInputs.config, false}
 	};
 	std::map <Button*, std::tuple<int, int, int, int>> sizedPositionMap;
 	//TODO: replace this with optional

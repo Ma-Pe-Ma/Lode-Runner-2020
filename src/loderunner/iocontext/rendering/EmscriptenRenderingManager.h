@@ -13,16 +13,6 @@ class EmscriptenRenderingManager : public RenderingManager {
 	unsigned int touchTexture;
 	unsigned int touchIndices[6 * TOUCH_BUTTON_NR];
 
-	int maxVertexUniformNumber;
-	int maxFragmentUniformNumber;
-
-	std::vector<int> levelRenderableCount;
-	std::vector<int> enemyRenderableCount;
-	std::vector<int> characterRenderableCount;
-	std::vector<int> generatorRenderableCount;
-
-	void setUpRenderableCount(std::vector<int>& renderableCount, int drawableSize, int divider);
-	void enableFinishingLadderDrawing() override;
 
 	void setupTouchButtonRenderer();
 
@@ -40,12 +30,7 @@ public:
 	void renderGenerator() override;
 	void renderMainMenu(int menuCursor, int gameVersion) override;
 
-	void initializeLevelLayout() override;
-	void initializeEnemies() override;
-	void initializeCharacters() override;
-
 	void terminate() override;
-	void clearRenderableObjects() override;
 
 	void updateTouchButtonRenderer(float[TOUCH_BUTTON_NR *16]);
 };

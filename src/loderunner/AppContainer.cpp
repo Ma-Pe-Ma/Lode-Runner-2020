@@ -82,25 +82,7 @@ void AppContainer::terminate()
 void AppContainer::handleImGuiConfigurer()
 {
 	if (ioContext->getButtonInputs().config.simple()) {
-#ifdef __EMSCRIPTEN__
-		if (EmscriptenHandler::is_mobile()) {
-			int* gameVersion = gameConfiguration->getGameVersionPointer();
-			++(*gameVersion);
-
-			if (*gameVersion == 1) {
-				stateContext->getMenuCursor() = 0;
-			}
-
-			gameConfiguration->setGameVersion(*gameVersion);
-			ioContext->saveConfig("levelset", *gameVersion);
-			gameConfiguration->validateLevel(stateContext->getCurrentLevel());
-		}
-		else {
-			stateContext->getShowImGuiWindow() = !stateContext->getShowImGuiWindow();
-		}		
-#else
 		stateContext->getShowImGuiWindow() = !stateContext->getShowImGuiWindow();
-#endif // __EMSCRIPTEN__
 	}
 
 	if (stateContext->getShowImGuiWindow()) {

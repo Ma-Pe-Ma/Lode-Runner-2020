@@ -154,7 +154,7 @@ void GameContext::checkGoldCollecting() {
 
 						if (prevBlock == LayoutBlock::empty && !gameElements->isGold(prevX, prevY) && !gameElements->isBrick(prevX, prevY) && solidUnder) {
 							auto& droppedGold = gameElements->enemyGoldList[0];
-							droppedGold->setPos({ prevX, prevY });
+							droppedGold->setPos({ float(prevX), float(prevY) });
 							gameElements->uncollectedGoldList.push_back(droppedGold);
 							gameElements->enemyGoldList.erase(gameElements->enemyGoldList.begin());
 							enemy->goldCounter.reset();
@@ -188,7 +188,7 @@ void GameContext::handleDigging() {
 		if (enemy->goldCounter.has_value()) {
 			if (gameElements->layout[x][y + 1] != LayoutBlock::brick && !gameElements->isBrick(x, y + 1)) {
 				auto carriedGold = gameElements->enemyGoldList[0];
-				carriedGold->setPos({ x, y + 1 });
+				carriedGold->setPos({ float(x), float(y + 1) });
 
 				gameElements->enemyGoldList.erase(gameElements->enemyGoldList.begin());
 				gameElements->uncollectedGoldList.push_back(carriedGold);
@@ -209,8 +209,7 @@ void GameContext::handleDigging() {
 	while (brick != gameElements->brickList.end()) {
 		auto brickState = (*brick)->brickState;
 		(*brick)->handle(gameTime);
-		int* brickTexture = renderingManager->getBrickTexture((*brick)->position.x, (*brick)->position.y);
-		*brickTexture = (*brick)->textureState;
+		renderingManager->setBrickTextureState((*brick)->position.x, (*brick)->position.y, (*brick)->textureState);
 
 		auto x = (*brick)->position.x;
 		auto y = (*brick)->position.y;		
@@ -285,7 +284,7 @@ void GameContext::handleDigging() {
 	}
 
 	if (!gameElements->diggedBrick) {
-		if (gameElements->player->state == EnemyState::freeRun){
+		if (gameElements->player->state == EnemyState::freeRun) {
 			auto& buttonInputs = ioContext->getButtonInputs();
 
 			std::function<void(int, int, Direction)> startDig = [this](int x, int y, Direction direction) -> void {
@@ -338,9 +337,8 @@ void GameContext::handleDigging() {
 			gameElements->layout[gameElements->diggedBrick->position.x][gameElements->diggedBrick->position.y] = LayoutBlock::empty;
 			gameElements->diggedBrick = nullptr;
 
-			*(gameElements->pointerToDebrisTexture) = 15;
-			gameElements->pointerToDebrisLocation[0] = -1;
-			gameElements->pointerToDebrisLocation[1] = -1;
+			renderingManager->setDebrisState(15);
+			renderingManager->setDebrisLocation(-1, -1);
 		}
 		// brick being destroyed
 		else {
@@ -367,9 +365,8 @@ void GameContext::handleDigging() {
 			//drawing debris above hole
 			if (gameElements->layout[x][y + 1] != LayoutBlock::brick) {
 				int timeFactor = int(5 * (gameTime - gameElements->player->timer) / 0.5f) % 5;
-				*(gameElements->pointerToDebrisTexture) = 19 + gameElements->randomDebris * 6  + timeFactor;
-				gameElements->pointerToDebrisLocation[0] = x;
-				gameElements->pointerToDebrisLocation[1] = y + 1;				
+				renderingManager->setDebrisState(19 + gameElements->randomDebris * 6 + timeFactor);
+				renderingManager->setDebrisLocation(x, y + 1);
 			}
 
 			// checking if enemy should prevent digging
@@ -382,14 +379,13 @@ void GameContext::handleDigging() {
 					gameElements->player->state = EnemyState::freeRun;
 					gameElements->player->timer = gameTime;
 
-					int* brickTexture = renderingManager->getBrickTexture(x, y);
-					*brickTexture = 0;
+					renderingManager->setBrickTextureState(x, y, 0);
+					
 					std::erase(gameElements->brickList, gameElements->diggedBrick);
 					gameElements->diggedBrick = nullptr;					
 
-					*(gameElements->pointerToDebrisTexture) = 0;
-					gameElements->pointerToDebrisLocation[0] = -1;
-					gameElements->pointerToDebrisLocation[1] = -1;
+					renderingManager->setDebrisState(0);
+					renderingManager->setDebrisLocation(-1, -1);
 					break;
 				}
 			}		

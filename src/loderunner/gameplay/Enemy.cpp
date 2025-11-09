@@ -24,8 +24,8 @@ void Enemy::determineNearbyObjects(std::shared_ptr<GameElements>& gameElements, 
 
 	direction = dPos.x > 0 ? Direction::right : (dPos.x < 0 ? Direction::left : direction);
 
-	*directionPointer = direction == Direction::left;
-	*carryGoldPointer = goldCounter.has_value();
+	propertyPointer[0] = direction == Direction::left;
+	propertyPointer[1] = goldCounter.has_value();
 }
 
 Vector2DInt Enemy::findPath(std::shared_ptr<GameElements>& gameElements) {

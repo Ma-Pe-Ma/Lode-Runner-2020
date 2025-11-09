@@ -188,12 +188,13 @@ void EmscriptenIOContext::initialize() {
 			const EmscriptenTouchPoint& tp = touchEvent->touches[i];
 
 			if (self->analogID == -1) {
-				auto analogInput = self->getAnalogButtonByTouch(tp.clientX, tp.clientY);
+
+				auto analogInput = self->getAnalogButtonByTouch(tp.targetX * emscripten_get_device_pixel_ratio(), tp.targetY * emscripten_get_device_pixel_ratio());
 
 				auto xButton = std::get<0>(analogInput);
 				auto yButton = std::get<1>(analogInput);
 
-				if (xButton != nullptr || yButton != nullptr) {
+				if (xButton != nullptr || yButton != nullptr) {					
 					if (xButton) {
 						self->buttonStateMap[xButton] = true;
 					}
@@ -207,6 +208,7 @@ void EmscriptenIOContext::initialize() {
 				}
 			}
 
+
 			for (auto it = self->sizedPositionMap.begin(); it != self->sizedPositionMap.end(); it++) {					
 				auto borders = it->second;
 
@@ -214,9 +216,9 @@ void EmscriptenIOContext::initialize() {
 				int right = std::get<1>(borders);
 
 				int up = std::get<2>(borders);
-				int down = std::get<3>(borders);				
+				int down = std::get<3>(borders);
 
-				if (left < tp.clientX && tp.clientX < right && up < tp.clientY && tp.clientY < down) {
+				if (left < tp.targetX * emscripten_get_device_pixel_ratio() && tp.targetX * emscripten_get_device_pixel_ratio() < right && up < tp.targetY * emscripten_get_device_pixel_ratio() && tp.targetY * emscripten_get_device_pixel_ratio() < down) {
 					self->buttonMap[tp.identifier] = it->first;
 					self->buttonStateMap[it->first] = true;
 					break;
@@ -263,7 +265,7 @@ void EmscriptenIOContext::initialize() {
 			
 			if (tp.identifier == self->analogID)
 			{
-				auto analog = self->getAnalogButtonByTouch(tp.clientX, tp.clientY);
+				auto analog = self->getAnalogButtonByTouch(tp.targetX * emscripten_get_device_pixel_ratio(), tp.targetY * emscripten_get_device_pixel_ratio());
 				auto x = std::get<0>(analog);
 				auto y = std::get<1>(analog);
 
@@ -287,7 +289,7 @@ void EmscriptenIOContext::initialize() {
 					int up = std::get<2>(borders);
 					int down = std::get<3>(borders);
 
-					if (left < tp.clientX && tp.clientX < right && up < tp.clientY && tp.clientY < down) {
+					if (left < tp.targetX * emscripten_get_device_pixel_ratio() && tp.targetX * emscripten_get_device_pixel_ratio() < right && up < tp.targetY * emscripten_get_device_pixel_ratio() && tp.targetY * emscripten_get_device_pixel_ratio() < down) {
 						self->buttonMap[tp.identifier] = it->second;
 						self->buttonStateMap[it->second] = true;
 					}
@@ -331,13 +333,7 @@ void EmscriptenIOContext::initialize() {
 
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		auto self = static_cast<EmscriptenIOContext*>(glfwGetWindowUserPointer(window));
-		self->screenParameters.updateViewPortValues(width, height);
-
-		if (EmscriptenHandler::is_mobile()) {
-			self->framebufferSizeCallback(width, height);
-		}
-
-		glViewport(std::get<0>(self->screenParameters.viewPortPosition), std::get<1>(self->screenParameters.viewPortPosition), std::get<0>(self->screenParameters.viewPortSize), std::get<1>(self->screenParameters.viewPortSize));
+		self->framebufferSizeCallback(width, height);		
 	});
 }
 
@@ -368,6 +364,13 @@ void EmscriptenIOContext::activateDisplayViewPort() {
 }
 
 void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
+	screenParameters.updateViewPortValues(width, height);
+	glViewport(std::get<0>(this->screenParameters.viewPortPosition), std::get<1>(this->screenParameters.viewPortPosition), std::get<0>(this->screenParameters.viewPortSize), std::get<1>(this->screenParameters.viewPortSize));
+
+	if (!EmscriptenHandler::is_mobile()) {
+		return;
+	}
+
 	analogCenterX = 0.2f * width;
 	analogCenterY = 0.5f * height;
 	analogRadius = 0.1f * 1.5f * width;
@@ -390,7 +393,7 @@ void EmscriptenIOContext::framebufferSizeCallback(int width, int height) {
 		{&buttonInputs.rightDig, 5},
 		{&buttonInputs.select, 6},
 		{&buttonInputs.enter, 6},
-		{&buttonInputs.config, 7},
+				{&buttonInputs.config, 7},
 	};
 
 	float touchRenderVertices[TOUCH_BUTTON_NR * 16] = {};

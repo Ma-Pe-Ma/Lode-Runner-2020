@@ -1,15 +1,13 @@
 out vec4 FragColor;
 
 in vec2 aTexCoord;
-flat in int instanceID;
+flat in int textureID;
 
 uniform sampler2D textureA;
 
-uniform int textureID[{0}];
-
 void main() {
 
-	vec2 pTexCoord = vec2(aTexCoord.x + float(textureID[instanceID] % 16) / 16.0, aTexCoord.y - float(textureID[instanceID] / 16) / 4.0);
+	vec2 pTexCoord = vec2(aTexCoord.x + float(textureID % 16) / 16.0, aTexCoord.y - float(textureID / 16) / 4.0);
 
 	FragColor = texture(textureA, pTexCoord);
 } 

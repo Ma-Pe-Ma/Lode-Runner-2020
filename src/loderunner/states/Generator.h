@@ -13,7 +13,7 @@ class Generator : public State {
 private:
 	std::array<std::array<short, 28>, 16> gen;
 	std::array<std::array<int, 18>, 30> texture;
-	std::array<std::array<std::array<int, 2>, 18>, 30> pos;	
+	std::array<std::array<std::array<float, 2>, 18>, 30> pos;	
 
 	short geX = 1;
 	short geY = 16;

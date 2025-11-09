@@ -29,9 +29,6 @@ class GameElements {
 	short randomDebris = 0;
 	int going = 0;
 
-	int* pointerToDebrisTexture;
-	int* pointerToDebrisLocation;
-
 	int highestLadder = 0;
 	int killCounter = 0;
 

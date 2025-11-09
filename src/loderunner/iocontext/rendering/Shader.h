@@ -26,12 +26,12 @@ public:
     std::string vertexPath;
     std::string fragmentPath;
 
-    Shader(std::string vertexPath, std::string fragmentPath, std::basic_format_args<std::format_context> v, std::basic_format_args<std::format_context> f) : Shader(vertexPath.c_str(), fragmentPath.c_str(), v, f)
+    Shader(std::string vertexPath, std::string fragmentPath) : Shader(vertexPath.c_str(), fragmentPath.c_str())
     {
 
     }
 
-    Shader(const char* vertexPath, const char* fragmentPath, std::basic_format_args<std::format_context> v, std::basic_format_args<std::format_context> f)
+    Shader(const char* vertexPath, const char* fragmentPath)
     {
         this->vertexPath = vertexPath;
         this->fragmentPath = fragmentPath;
@@ -61,19 +61,6 @@ public:
             // convert stream into string
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
-
-            const std::function<std::string(std::string)> escapeShaderSource = [](std::string source) -> std::string {
-                source = std::regex_replace(source, std::regex("\\{\\D"), "{{");
-                source = std::regex_replace(source, std::regex("(\\D)\\}"), "$1}}");
-                //source = std::regex_replace(source, std::regex("^\\}"), "}}");
-                return source;
-            };
-            
-            vertexCode = escapeShaderSource(vertexCode);
-            vertexCode = std::vformat(vertexCode, v);
-            
-            fragmentCode = escapeShaderSource(fragmentCode);
-            fragmentCode = std::vformat(fragmentCode, f);
             
             unsigned int vertex, fragment;
 
