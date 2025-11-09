@@ -107,7 +107,7 @@ void LevelLoader::loadLevel(std::array<std::array<char, 28>, 16> levelLayout, bo
 			case '$':	//gold
 				gameElements->layout[i][j] = LayoutBlock::empty;
 
-				gold = std::make_shared<Gold>(Gold({ i, j }));
+				gold = std::make_shared<Gold>(Gold({ float(i), float(j) }));
 				gameElements->uncollectedGoldList.push_back(gold);
 				break;
 			default:
@@ -143,8 +143,6 @@ void LevelLoader::loadLevel(std::array<std::array<char, 28>, 16> levelLayout, bo
 	renderingManager->setFinishingLadderList(gameElements->finishingLadders);
 	renderingManager->setGoldList(gameElements->uncollectedGoldList);
 	renderingManager->initializeLevelLayout();
-	this->gameElements->pointerToDebrisTexture = renderingManager->getPointerToDebrisTexture();
-	this->gameElements->pointerToDebrisLocation = renderingManager->getPointerToDebrisLocation();
 
 	renderingManager->setEnemyList(gameElements->enemies);
 	renderingManager->initializeEnemies();

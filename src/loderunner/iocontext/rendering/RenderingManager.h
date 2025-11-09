@@ -85,10 +85,10 @@ protected:
 		0,2,3
 	};
 
-	unsigned int levelVAO, levelVBO, levelEBO;
-	unsigned int enemyVAO, enemyVBO, enemyEBO;
-	unsigned int characterVAO, characterVBO, characterEBO;
-	unsigned int mainVAO, mainVBO, mainEBO;
+	unsigned int levelVAO, levelVBO, levelEBO, levelPositionIBO, levelTextureIBO;
+	unsigned int enemyVAO, enemyVBO, enemyEBO, enemyPositionIBO, enemyTextureIBO, enemyPropertiesIBO;
+	unsigned int characterVAO, characterVBO, characterEBO, characterPositionIBO, characterTextureIBO;
+	unsigned int mainVAO, mainVBO, mainEBO, mainPositionIBO, mainTextureIBO;
 
 	unsigned int levelTexture, enemyTexture, characterTexture, originalMainTexture, championshipMainTexture;
 
@@ -99,9 +99,8 @@ protected:
 
 #ifdef USE_DYNAMIC_ARRAY
 	int* levelTextureIDs = nullptr;
-	int* levelDrawables = nullptr;
+	float* levelDrawables = nullptr;
 #else
-	int levelTextureIDs[540];
 	int levelDrawables[540 * 2];
 #endif //  USE_DYNAMIC_ARRAY
 	
@@ -130,13 +129,11 @@ protected:
 #ifdef USE_DYNAMIC_ARRAY
 	float* enemyDrawables = nullptr;
 	int* enemyTextureIDs = nullptr;
-	int* enemyDirections = nullptr;
-	int* enemyGoldIndicator = nullptr;
+	int* enemyProperties = nullptr;
 #else
 	float enemyDrawables[340 * 2];
 	int enemyTextureIDs[340];
-	int enemyDirections[340];
-	int enemyGoldIndicator[340];
+	int enemyProperties[340];
 #endif
 	short enemyDrawableSize = 0;
 
@@ -152,10 +149,10 @@ protected:
 	
 	short characterDrawableSize = 0;
 
-	int* generatorDrawables;
+	float* generatorDrawables;
 	int* generatorTextures;
 
-	void initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, const float* vertices);
+	void initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, unsigned int& positionIBO, unsigned int& textureIBO, const float* vertices);
 
 	std::string assetFolder;
 
@@ -215,7 +212,7 @@ public:
 	void setupMainMenuRenderer();
 	void setLadderFlashFactor(int factor);
 	virtual void enableFinishingLadderDrawing();
-	void setGeneratorParameters(int* generatorDrawables, int* generatorTextures);
+	void setGeneratorParameters(float* generatorDrawables, int* generatorTextures);
 
 	virtual void render();	
 	virtual void renderGenerator();
@@ -236,10 +233,15 @@ public:
 
 	void loadTexture(unsigned int textureID, unsigned int& textureContainer, std::string path);
 
-	int* getPointerToDebrisTexture() { return &this->levelTextureIDs[0]; }
-	int* getPointerToDebrisLocation() { return &this->levelDrawables[0]; }
+	void setDebrisLocation(int x, int y) {
+		this->levelDrawables[0] = x;
+		this->levelDrawables[1] = y;
+	}
 
-	int* getBrickTexture(int x, int y) { return this->brickTextureMap[x][y]; }
+	void setDebrisState(int state) {
+		this->levelTextureIDs[0] = state;
+	}
+	void setBrickTextureState(int x, int y, int state) { *(this->brickTextureMap[x][y]) =  state; }
 
 	float* setFruitTextureID(int texture);
 };

@@ -54,16 +54,27 @@ void GlfwIOContext::processInput() {
 	buttonInputs.pause.detect(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
 
 	GLFWgamepadstate state;
-	glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
 
-	buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5);
-	buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5);
-	buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5);
-	buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5);
-	buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
-	buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
-	buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
-	buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
+	if (glfwGetGamepadState(GLFW_JOYSTICK_1, &state)) {
+		buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5);
+		buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5);
+		buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5);
+		buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5);
+		buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0);
+		buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS || state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0);
+		buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS);
+		buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS);
+	}
+	else {
+		buttonInputs.left.detect(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+		buttonInputs.right.detect(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+		buttonInputs.up.detect(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
+		buttonInputs.down.detect(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
+		buttonInputs.rightDig.detect(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+		buttonInputs.leftDig.detect(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
+		buttonInputs.enter.detect(glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+		buttonInputs.select.detect(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	}
 
 	buttonInputs.screenshot.detect(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 

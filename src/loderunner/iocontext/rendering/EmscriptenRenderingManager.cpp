@@ -3,22 +3,12 @@
 #include "../EmscriptenIOContext.h"
 
 void EmscriptenRenderingManager::createShaders() {
-	maxVertexUniformNumber = EmscriptenHandler::getVertexMaxUniformNumber();
-	maxFragmentUniformNumber = EmscriptenHandler::getFragmentMaxUniformNumber();
-	int maxEnemyFragmentUniformNumber = maxFragmentUniformNumber / 3;
+	RenderingManager::createShaders();
 
-	levelShader = new Shader(assetFolder + "/shaders/level.vs", assetFolder + "/shaders/level.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
-	enemyShader = new Shader(assetFolder + "/shaders/player.vs", assetFolder + "/shaders/player.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxEnemyFragmentUniformNumber));
-	characterShader = new Shader(assetFolder + "/shaders/character.vs", assetFolder + "/shaders/character.fs", std::make_format_args(maxVertexUniformNumber), std::make_format_args(maxFragmentUniformNumber));
-	mainShader = new Shader(assetFolder + "/shaders/main.vs", assetFolder + "/shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
-	
 	if (EmscriptenHandler::is_mobile()) {
-		touchInputShader = new Shader(assetFolder + "/shaders/touch.vs", assetFolder + "/shaders/touch.fs", std::make_format_args(""), std::make_format_args(""));;
+		touchInputShader = new Shader(assetFolder + "/shaders/touch.vs", assetFolder + "/shaders/touch.fs");
 		setupTouchButtonRenderer();
 	}
-	
-	setupMainMenuRenderer();
-	setUpRenderableCount(generatorRenderableCount, 540, 1);
 
 	int width;
 	int height;
@@ -27,64 +17,17 @@ void EmscriptenRenderingManager::createShaders() {
 }
 
 void EmscriptenRenderingManager::render() {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	int offset = 0;
-	levelShader->use();
-	glBindVertexArray(levelVAO);	
-	for (auto renderableSize : levelRenderableCount) {
-		levelShader->setIntArray("textureID", &levelTextureIDs[offset], renderableSize);
-		levelShader->setInt2Array("gPos", &levelDrawables[2 * offset], renderableSize);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderableSize);
-		offset += renderableSize;
-	}
-
-	offset = 0;
-	enemyShader->use();
-	glBindVertexArray(enemyVAO);
-	for (auto renderableSize : enemyRenderableCount) {
-		enemyShader->setIntArray("textureID", &enemyTextureIDs[offset], renderableSize);
-		enemyShader->setIntArray("carryGold", &enemyGoldIndicator[offset], renderableSize);
-		enemyShader->setVec2Array("gPos", &enemyDrawables[2 * offset], renderableSize);
-		enemyShader->setIntArray("direction", &enemyDirections[offset], renderableSize);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderableSize);
-		offset += renderableSize;
-	}
-
-	offset = 0;
-	characterShader->use();
-	glBindVertexArray(characterVAO);	
-	for (auto renderableSize : characterRenderableCount) {
-		characterShader->setIntArray("textureID", &characterTextureIDs[offset], renderableSize);
-		characterShader->setVec2Array("gPos", &characterDrawables[2 * offset], renderableSize);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderableSize);
-		offset += renderableSize;
-	}
-
+	RenderingManager::render();
 	renderTouchButtons();
 }
 
 void EmscriptenRenderingManager::renderGenerator() {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	int offset = 0;
-	levelShader->use();
-	glBindVertexArray(levelVAO);
-	for (auto renderableSize : generatorRenderableCount) {
-		levelShader->setIntArray("textureID", &generatorTextures[offset], renderableSize);
-		levelShader->setInt2Array("gPos", &generatorDrawables[2 * offset], renderableSize);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, renderableSize);
-		offset += renderableSize;
-	}
-	
+	RenderingManager::renderGenerator();	
 	renderTouchButtons();
 }
 
 void EmscriptenRenderingManager::renderMainMenu(int menuCursor, int gameVersion) {
 	RenderingManager::renderMainMenu(menuCursor, gameVersion);
-
 	renderTouchButtons();
 }
 
@@ -96,51 +39,6 @@ void EmscriptenRenderingManager::renderTouchButtons() {
 		glDrawElements(GL_TRIANGLES, 6 * TOUCH_BUTTON_NR, GL_UNSIGNED_INT, 0);
 		emscriptenIOContext->activateCanvasViewPort();
 	}
-}
-
-void EmscriptenRenderingManager::setUpRenderableCount(std::vector<int>& renderableCount, int drawableSize, int divider) {
-	int maxUniform = (maxVertexUniformNumber < maxFragmentUniformNumber ? maxVertexUniformNumber : maxFragmentUniformNumber) / divider;
-	int fullRenderCount = drawableSize / maxUniform;
-	int remainingRenderable = drawableSize % maxUniform;
-
-	renderableCount = {};
-
-	for (int i = 0; i < fullRenderCount; i++)
-	{
-		renderableCount.push_back(maxUniform);
-	}
-
-	if (remainingRenderable > 0) {
-		renderableCount.push_back(remainingRenderable);
-	}
-}
-
-void EmscriptenRenderingManager::initializeLevelLayout() {
-	RenderingManager::initializeLevelLayout();
-	setUpRenderableCount(levelRenderableCount, currentLevelDrawableSize, 1);
-}
-
-void EmscriptenRenderingManager::initializeEnemies() {
-	RenderingManager::initializeEnemies();
-	setUpRenderableCount(enemyRenderableCount, enemyDrawableSize, 3);
-}
-
-void EmscriptenRenderingManager::initializeCharacters() {
-	RenderingManager::initializeCharacters();
-	setUpRenderableCount(characterRenderableCount, characterDrawableSize, 1);
-}
-
-void EmscriptenRenderingManager::enableFinishingLadderDrawing() {
-	RenderingManager::enableFinishingLadderDrawing();
-	setUpRenderableCount(levelRenderableCount, currentLevelDrawableSize, 1);
-}
-
-void EmscriptenRenderingManager::clearRenderableObjects() {
-	RenderingManager::clearRenderableObjects();
-
-	setUpRenderableCount(levelRenderableCount, 0, 1);
-	setUpRenderableCount(enemyRenderableCount, 0, 1);
-	setUpRenderableCount(characterRenderableCount, 0, 1);
 }
 
 void EmscriptenRenderingManager::setupTouchButtonRenderer() {

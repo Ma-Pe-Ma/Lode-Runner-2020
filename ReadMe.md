@@ -28,7 +28,7 @@ In this ReadMe you can find info about general aspects of the project and about 
 - Collision detection is not the same as in the original one I implemented a new one 
 - Guards' moving are calculated at every frame while in the original one they only moved at every nth (varying) frame
 - If the runner falls through a trapdoor it will be marked
-- Enemies "wear" different suits when they carry gold
+- Enemies "wear" different suits when they carry lode
 - Level-timer at top of the screen
 
 The levels are ripped from the original Apple II version. The NES port has only 50 levels and this remake includes the missing 100 levels too. Note: The levels ported to the NES are not 100% identical to the original ones, as some rows or columns are missing in the ported levels. If you have the proper NES levelset I will happily include it.
@@ -41,7 +41,6 @@ A conspicious difference about the collision detection: in the original when the
 - Recording gameplay video
 
 ### Missing Features:
-- In the NES version after collecting every lode a bonus fruit pickup appears randomly but I could not find the ripped textures so I could not include them
 - Demo in main menu is not implented :(
 
 ### Summarizing what I did not create in this project:
@@ -101,7 +100,7 @@ You can also find the [latest builds here](https://github.com/Ma-Pe-Ma/Lode-Runn
 For the Android notes please check the [aforementioned ReadMe](./Android/ReadMe.md).
 
 ### Configuring the game
-In the root folder there is a simple txt configuration file in which you can change features of the game. Every entry has a description for it.
+In the root folder there is a simple txt configuration file in which you can change features of the game.
 
 #### ImGUI Configurer
 On the desktop and browser ports a simple imgui configurer dialog is available (which can be shown by pressing the 'C' button).
@@ -141,13 +140,12 @@ But altogether I'm satisfied with the result.
 
 ## Future tasks for this project:
 - Finetune collision detection between enemies
-- Restructure gameplay logic
 - Finetune browser/wasm mobile touch input
 - Improve and polish video recording
 - Fix broken Android version (remake this port by using the default cmake project instead of defining a custom one for it)
 
 Backlog:
 - Adding some useful extras, eg. score counter, leaderboard, completion time etc.
-- Add demo scene + bonus fruits
+- Add demo scene
 
 **Have fun playing with it!**

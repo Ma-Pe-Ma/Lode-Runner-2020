@@ -32,12 +32,6 @@ void StateContext::initialize()
 {
     currentState = mainMenu;
     transitionTo(mainMenu);
-
-#ifdef __EMSCRIPTEN__
-    if (EmscriptenHandler::is_mobile()) {
-        showImGuiWindow = false;
-    }
-#endif
 }
 
 void StateContext::setRenderingManager(std::shared_ptr<RenderingManager> renderingManager)

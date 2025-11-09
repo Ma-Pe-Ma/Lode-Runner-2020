@@ -72,21 +72,27 @@ protected:
 
 	float* positionPointer;
 	int* texturePointer;
-	int* directionPointer;
-	int* carryGoldPointer;
+	int* propertyPointer;
 
 	Vector2D pos;
 	Vector2D dPos;
 public:
 	Enemy(float, float, bool player = false);
 
-	EnemyTextureMap getTextureMap() { return this->enemyTextureMap; }
-
-	void setPositionPointer(float* positionPointer)	{ this->positionPointer = positionPointer; }
-	void setTexturePointer(int* texturePointer) { this->texturePointer = texturePointer; }
-	void setDirectionPointer(int* directionPointer) { this->directionPointer = directionPointer; }
-	void setCarryGoldPointer(int* carryGoldPointer)	{ this->carryGoldPointer = carryGoldPointer; }
-	void setTexture(int texture) { *texturePointer = texture; }
+	void setPositionPointer(float* positionPointer)	{ 
+		this->positionPointer = positionPointer;
+		this->positionPointer[0] = pos.x;
+		this->positionPointer[1] = pos.y;
+	}
+	void setTexturePointer(int* texturePointer) { 
+		this->texturePointer = texturePointer;
+		this->texturePointer[0] = this->enemyTextureMap.going;
+	}
+	void setPropertyPointer(int* propertyPointer) {
+		this->propertyPointer = propertyPointer;
+		this->propertyPointer[0] = false;
+		this->propertyPointer[1] = false;	
+	}
 
 	void setPosition(Vector2D pos) {
 		this->pos = pos;
@@ -99,7 +105,6 @@ public:
 	friend class GameContext;
 	friend class GameElements;
 	friend class Outro;
-	friend class RenderingManager;
 };
 
 #endif // !ENEMY_H

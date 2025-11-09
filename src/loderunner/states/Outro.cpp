@@ -166,12 +166,12 @@ void Outro::update() {
 		int timeFactor = ellapsedTime * 4;
 		int textureRef = 36 + timeFactor % 4;
 
-		this->player->setTexture(textureRef);
+		this->player->texturePointer[0] = textureRef;
 	}
 	//nail bitting after reaching top of ladder
 	else {
 		int timeFactor = int(ellapsedTime * 3) % 4;
-		this->player->setTexture(44 + timeFactor);
+		this->player->texturePointer[0] = 44 + timeFactor;
 	}
 
 	if (ellapsedTime > stateContext->getAudio()->getAudioFileByID(13)->lengthInSec() || stateContext->getIOContext()->getButtonInputs().enter.simple()) {

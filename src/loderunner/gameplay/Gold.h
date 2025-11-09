@@ -10,21 +10,21 @@
 class Enemy;
 
 class Gold {
-	Vector2DInt pos;
-	int* positionPointer;
+	Vector2D pos;
+	float* positionPointer;
 
 public:
-	Gold(Vector2DInt pos) { this->pos = { pos.x, pos.y}; }
+	Gold(Vector2D pos) { this->pos = { pos.x, pos.y}; }
 
-	Vector2DInt getPos() { return this->pos; }
+	Vector2D getPos() { return this->pos; }
 
-	void setPos(Vector2DInt pos) { 
+	void setPos(Vector2D pos) { 
 		this->pos = pos;
 		positionPointer[0] = pos.x;
 		positionPointer[1] = pos.y;
 	}
 
-	void setPositionPointer(int* positionPointer)
+	void setPositionPointer(float* positionPointer)
 	{
 		this->positionPointer = positionPointer;
 	}

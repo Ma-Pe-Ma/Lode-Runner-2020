@@ -22,10 +22,26 @@ RenderingManager::RenderingManager(std::string assetFolder, std::shared_ptr<IOCo
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);	
 	
-	initializeBufferObjects(levelVAO, levelVBO, levelEBO, levelVertices);
-	initializeBufferObjects(enemyVAO, enemyVBO, enemyEBO, enemyVertices);
-	initializeBufferObjects(characterVAO, characterVBO, characterEBO, characterVertices);
-	initializeBufferObjects(mainVAO, mainVBO, mainEBO, mainVertices);
+	initializeBufferObjects(levelVAO, levelVBO, levelEBO, levelPositionIBO, levelTextureIBO, levelVertices);
+	initializeBufferObjects(enemyVAO, enemyVBO, enemyEBO, enemyPositionIBO, enemyTextureIBO, enemyVertices);
+	initializeBufferObjects(characterVAO, characterVBO, characterEBO, characterPositionIBO, characterTextureIBO, characterVertices);
+	initializeBufferObjects(mainVAO, mainVBO, mainEBO, mainPositionIBO, mainTextureIBO, mainVertices);
+
+	// initialize extra buffer for enemies
+	glBindVertexArray(enemyVAO);
+	glGenBuffers(1, &enemyPropertiesIBO);
+	glBindBuffer(GL_ARRAY_BUFFER, enemyPropertiesIBO);
+	glBufferData(GL_ARRAY_BUFFER, 30 * 18 * 2 * sizeof(int), nullptr, GL_DYNAMIC_DRAW);
+	glVertexAttribIPointer(4, 1, GL_INT, 2 * sizeof(int), (void*)(0 * sizeof(int)));
+	glVertexAttribDivisor(4, 1);
+
+	glVertexAttribIPointer(5, 1, GL_INT, 2 * sizeof(int), (void*)(1 * sizeof(int)));
+	glVertexAttribDivisor(5, 1);
+
+	glEnableVertexAttribArray(4);
+	glEnableVertexAttribArray(5);
+
+	glBindVertexArray(0);
 
 	loadTexture(0, enemyTexture, assetFolder + "textures/NES - Lode Runner - Characters.png");
 	loadTexture(1, levelTexture, assetFolder + "textures/NES - Lode Runner - Tileset.png");
@@ -35,14 +51,10 @@ RenderingManager::RenderingManager(std::string assetFolder, std::shared_ptr<IOCo
 }
 
 void RenderingManager::createShaders() {
-	int levelArrayNr = 540;
-	int enemyArrayNumber = 340;
-	int characterArrayNumber = 864;
-
-	levelShader = new Shader(assetFolder + "/shaders/level.vs", assetFolder + "/shaders/level.fs", std::make_format_args(levelArrayNr), std::make_format_args(levelArrayNr));
-	enemyShader = new Shader(assetFolder + "/shaders/player.vs", assetFolder + "/shaders/player.fs", std::make_format_args(enemyArrayNumber), std::make_format_args(enemyArrayNumber));
-	characterShader = new Shader(assetFolder + "/shaders/character.vs", assetFolder + "/shaders/character.fs", std::make_format_args(characterArrayNumber), std::make_format_args(characterArrayNumber));
-	mainShader = new Shader(assetFolder + "/shaders/main.vs", assetFolder + "/shaders/main.fs", std::make_format_args(""), std::make_format_args(""));
+	levelShader = new Shader(assetFolder + "/shaders/level.vs", assetFolder + "/shaders/level.fs");
+	enemyShader = new Shader(assetFolder + "/shaders/player.vs", assetFolder + "/shaders/player.fs");
+	characterShader = new Shader(assetFolder + "/shaders/character.vs", assetFolder + "/shaders/character.fs");
+	mainShader = new Shader(assetFolder + "/shaders/main.vs", assetFolder + "/shaders/main.fs");
 
 	setupMainMenuRenderer();	
 }
@@ -67,11 +79,13 @@ void RenderingManager::setupMainMenuRenderer()
 	mainShader->setVec2Array("cursorOffsets", cursorOffsets, 2);
 }
 
-void RenderingManager::initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, const float* vertices)
+void RenderingManager::initializeBufferObjects(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, unsigned int& positionIBO, unsigned int& textureIBO,const float* vertices)
 {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &positionIBO);
+	glGenBuffers(1, &textureIBO);
 
 	glBindVertexArray(VAO);
 
@@ -80,8 +94,21 @@ void RenderingManager::initializeBufferObjects(unsigned int& VAO, unsigned int& 
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0 * sizeof(float)));
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, positionIBO);
+	glBufferData(GL_ARRAY_BUFFER, 30 * 18 * 2 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0 * sizeof(float)));	
+	glVertexAttribDivisor(2, 1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, textureIBO);
+	glBufferData(GL_ARRAY_BUFFER, 30 * 18 * sizeof(int), nullptr, GL_DYNAMIC_DRAW);
+	glVertexAttribIPointer(3, 1, GL_INT, 1 * sizeof(int), (void*)(0 * sizeof(int)));
+	glVertexAttribDivisor(3, 1);
+
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -112,7 +139,7 @@ void RenderingManager::initializeLevelLayout()
 	currentLevelDrawableSize = levelDrawableSize - finishingLadderList.size();
 
 #ifdef USE_DYNAMIC_ARRAY
-	levelDrawables = new int[levelDrawableSize * 2];
+	levelDrawables = new float[levelDrawableSize * 4];
 	levelTextureIDs = new int[levelDrawableSize];
 #endif // USE_DYNAMIC_ARRAY		
 
@@ -128,7 +155,6 @@ void RenderingManager::initializeLevelLayout()
 
 				levelDrawables[2 * brickNumber + 0] = i;
 				levelDrawables[2 * brickNumber + 1] = j;
-
 				brickTextureMap[i][j] = &levelTextureIDs[brickNumber];
 			}
 		}
@@ -215,8 +241,7 @@ void RenderingManager::initializeEnemies() {
 #ifdef USE_DYNAMIC_ARRAY
 	enemyDrawables = new float[2 * enemyDrawableSize];
 	enemyTextureIDs = new int[enemyDrawableSize];
-	enemyDirections = new int[enemyDrawableSize];
-	enemyGoldIndicator = new int[enemyDrawableSize];
+	enemyProperties = new int[2 * enemyDrawableSize];
 #endif
 
 	for (auto iterator = enemyList.begin(); iterator != enemyList.end(); iterator++)
@@ -224,19 +249,9 @@ void RenderingManager::initializeEnemies() {
 		int index = iterator - enemyList.begin();
 
 		auto enemy = *iterator;
-
 		enemy->setTexturePointer(&enemyTextureIDs[index]);
-		enemy->setPositionPointer(&enemyDrawables[2 * index + 0]);
-		enemy->setDirectionPointer(&enemyDirections[index]);
-		enemy->setCarryGoldPointer(&enemyGoldIndicator[index]);
-
-		enemyDrawables[2 * index + 0] = enemy->pos.x;
-		enemyDrawables[2 * index + 1] = enemy->pos.y;
-
-		enemyGoldIndicator[index] = false;
-		enemyDirections[index] = false;
-
-		enemyTextureIDs[index] = enemy->getTextureMap().going;
+		enemy->setPositionPointer(&enemyDrawables[2 * index]);
+		enemy->setPropertyPointer(&enemyProperties[2 * index]);
 	}
 
 	enemyShader->use();
@@ -246,7 +261,7 @@ void RenderingManager::initializeEnemies() {
 float* RenderingManager::setFruitTextureID(int textureID) {
 	enemyTextureIDs[enemyDrawableSize - 1] = textureID;
 	float* fruitPosition = &enemyDrawables[2 * (enemyDrawableSize - 1)];
-	int* fruitDirection = &enemyDirections[enemyDrawableSize - 1];
+	int* fruitDirection = &enemyProperties[2 * (enemyDrawableSize - 1)];
 
 	return fruitPosition;
 }
@@ -295,7 +310,7 @@ void RenderingManager::enableFinishingLadderDrawing()
 	ladderSize += finishingLadderSize;
 }
 
-void RenderingManager::setGeneratorParameters(int* generatorDrawables, int* generatorTextures)
+void RenderingManager::setGeneratorParameters(float* generatorDrawables, int* generatorTextures)
 {
 	this->generatorDrawables = generatorDrawables;
 	this->generatorTextures = generatorTextures;
@@ -310,23 +325,42 @@ void RenderingManager::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	levelShader->use();
+
+	glBindBuffer(GL_ARRAY_BUFFER, levelPositionIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, currentLevelDrawableSize * sizeof(float) * 2, levelDrawables);
+
+	glBindBuffer(GL_ARRAY_BUFFER, levelTextureIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, currentLevelDrawableSize * sizeof(int), levelTextureIDs);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindVertexArray(levelVAO);
-	levelShader->setIntArray("textureID", levelTextureIDs, currentLevelDrawableSize);
-	levelShader->setInt2Array("gPos", levelDrawables, currentLevelDrawableSize);
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, currentLevelDrawableSize);
 
 	enemyShader->use();
+	
+	glBindBuffer(GL_ARRAY_BUFFER, enemyPositionIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, enemyDrawableSize * sizeof(float) * 2, enemyDrawables);
+
+	glBindBuffer(GL_ARRAY_BUFFER, enemyTextureIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, enemyDrawableSize * sizeof(int), enemyTextureIDs);
+
+	glBindBuffer(GL_ARRAY_BUFFER, enemyPropertiesIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, enemyDrawableSize * sizeof(int) * 2, enemyProperties);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindVertexArray(enemyVAO);
-	enemyShader->setIntArray("textureID", enemyTextureIDs, enemyDrawableSize);
-	enemyShader->setIntArray("carryGold", enemyGoldIndicator, enemyDrawableSize);
-	enemyShader->setVec2Array("gPos", enemyDrawables, enemyDrawableSize);
-	enemyShader->setIntArray("direction", enemyDirections, enemyDrawableSize);
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, enemyDrawableSize);
 
 	characterShader->use();
+
+	glBindBuffer(GL_ARRAY_BUFFER, characterPositionIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, characterDrawableSize * sizeof(float) * 2, characterDrawables);
+
+	glBindBuffer(GL_ARRAY_BUFFER, characterTextureIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, characterDrawableSize * sizeof(int), characterTextureIDs);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindVertexArray(characterVAO);
-	characterShader->setIntArray("textureID", characterTextureIDs, characterDrawableSize);
-	characterShader->setVec2Array("gPos", characterDrawables, characterDrawableSize);
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, characterDrawableSize);
 }
 
@@ -351,8 +385,7 @@ void RenderingManager::clearRenderableObjects()
 
 	checkAndDeleteArray(enemyDrawables);
 	checkAndDeleteArray(enemyTextureIDs);
-	checkAndDeleteArray(enemyDirections);
-	checkAndDeleteArray(enemyGoldIndicator);
+	checkAndDeleteArray(enemyProperties);
 
 	checkAndDeleteArray(characterTextureIDs);
 	checkAndDeleteArray(characterDrawables);
@@ -403,8 +436,14 @@ void RenderingManager::renderMainMenu(int menuCursor, int textureID)
 
 	characterShader->use();
 	glBindVertexArray(characterVAO);
-	characterShader->setIntArray("textureID", characterTextureIDs, characterDrawableSize);
-	characterShader->setVec2Array("gPos", characterDrawables, characterDrawableSize);
+
+	glBindBuffer(GL_ARRAY_BUFFER, characterPositionIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, characterDrawableSize * sizeof(float) * 2, characterDrawables);
+
+	glBindBuffer(GL_ARRAY_BUFFER, characterTextureIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, characterDrawableSize * sizeof(int), characterTextureIDs);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, characterDrawableSize);
 }
 
@@ -415,8 +454,14 @@ void RenderingManager::renderGenerator()
 	
 	levelShader->use();
 	glBindVertexArray(levelVAO);
-	levelShader->setIntArray("textureID", generatorTextures, 540);
-	levelShader->setInt2Array("gPos", generatorDrawables, 540);
+
+	glBindBuffer(GL_ARRAY_BUFFER, levelPositionIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 540 * sizeof(float) * 2, generatorDrawables);
+
+	glBindBuffer(GL_ARRAY_BUFFER, levelTextureIBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 540 * sizeof(int), generatorTextures);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 540);
 }
 
