@@ -3,7 +3,7 @@
 
 ![status](https://img.shields.io/badge/status-finished-green) ![license](https://img.shields.io/github/license/Ma-Pe-Ma/Lode-Runner-2020)
 
-![WASM](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-wasm.yml/badge.svg) ![Windows](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-windows.yml/badge.svg) ![Linux](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-linux.yml/badge.svg) ![Android](https://badgen.net/badge/Android/working/green)
+![WASM](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-wasm.yml/badge.svg) ![Windows](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-windows.yml/badge.svg) ![Linux](https://github.com/Ma-Pe-Ma/Lode-Runner-2020/actions/workflows/cmake-linux.yml/badge.svg) ![Android](https://badgen.net/badge/Android/working/green) ![PocketCHIP](https://badgen.net/badge/PocketCHIP/compatible/green)
 
 This is a remake of the classic ['80s puzzle video game](https://en.wikipedia.org/wiki/Lode_Runner) (and its hardcore [sequel's](https://en.wikipedia.org/wiki/Championship_Lode_Runner) too)!
 The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/Douglas_E._Smith) in 1983 for the [Apple 2](https://en.wikipedia.org/wiki/Apple_II) computer. This version is based on the [NES](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) port.
@@ -11,6 +11,8 @@ The original was developed by [Douglas E. Smith](https://en.wikipedia.org/wiki/D
 Before playing check out the manual of the [original](https://www.gamesdatabase.org/Media/SYSTEM/Nintendo_NES//Manual/formated/Lode_Runner_-_1987_-_Br%C3%B8derbund_Software.pdf) version. I could not find the manual  for the NES port of Championship Lode Runner but [here](https://mocagh.org/broderbund/masksun-loderunner-loderunner-manual.pdf) you can check out the Apple II's manual.
 
 In this ReadMe you can find info about general aspects of the project and about the desktop (Windows/Linux/browser) version. For the details of the Android port please [click here](./Android/ReadMe.md)!
+
+**NEW:** For Pocket CHIP handheld device instructions, see [POCKETCHIP.md](./POCKETCHIP.md)!
 
 ## Browser port
 
