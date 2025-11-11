@@ -17,7 +17,7 @@ private:
 	BrickState brickState = BrickState::digging;
 
 	const float diggingTime = 7.15f;
-	const float destroyTime = 0.5f;
+	const float destroyTime = 0.35f;
 	const float buildTime = 0.5f;
 
 	inline void digging(float);

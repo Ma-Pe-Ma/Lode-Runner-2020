@@ -254,7 +254,7 @@ void GameContext::handleDigging() {
 					}					
 				}
 				else if (brickState == BrickState::building || brickState == BrickState::watiting) {
-					if (enemy->state == EnemyState::falling && enemy->pos.y - enemyPath < y) {
+					if (enemy->state == EnemyState::falling && enemy->pos.y - enemyPath < y && enemy->pos.y > y && enemy->dPos.y < 0) {
 						enemy->timer = gameTime;
 						goldDrop(enemy, x, y);
 						enemy->pos.y = y;
@@ -621,8 +621,8 @@ Vector2D GameContext::enemyCollision(std::vector<std::shared_ptr<Enemy>>::iterat
 					d.x = 0.0f;
 				}
 			}
-			//other enemy is stopped
-			else if (scalar == 0.0f) {
+			//same direction or other enemy is stopped
+			else  { 
 				if (std::abs(enemy->pos.x - otherEnemy->pos.x) >= 1.0f) {
 					float dxMagn = std::abs(d.x);
 					float differenceX = otherEnemy->pos.x - enemy->pos.x;
@@ -632,16 +632,6 @@ Vector2D GameContext::enemyCollision(std::vector<std::shared_ptr<Enemy>>::iterat
 						d.x = 0.0f;
 					}
 				}
-			}
-			//same direction
-			else {
-				//wait until other's distance is more than 1
-				if (d.x > 0.0f && otherEnemy->pos.x > enemy->pos.x) {
-					d.x = 0.0f;
-				}
-				else if (d.x < 0.0f && otherEnemy->pos.x < enemy->pos.x) {
-					d.x = 0.0f;
-				}				
 			}
 		}
 

@@ -455,19 +455,16 @@ Vector2D Enemy::handleDropping(Vector2D d, std::shared_ptr<GameElements>& gameEl
 
 Vector2D Enemy::falling(float d, std::shared_ptr<GameElements>& gameElements) {
 	int nextY = int(pos.y - d);
+
+	float dx = 0;
 	
 	if (pos.x < current.x) {
 		direction = Direction::right;
-		float dx = pos.x + d > current.x ? current.x - pos.x : d;
-
-		return { dx, -d };
+		dx = pos.x + d > current.x ? current.x - pos.x : d;
 	}
-	//falling from edge right->left
 	else if (pos.x > current.x) {
 		direction = Direction::left;
-		float dx = pos.x - d < current.x ? current.x - pos.x : -d;
-
-		return { dx, -d };
+		dx = pos.x - d < current.x ? current.x - pos.x : -d;
 	}
 
 	Vector2D stoppedPath = { 0.0f, int(pos.y - d) + 1 - pos.y };
@@ -490,7 +487,7 @@ Vector2D Enemy::falling(float d, std::shared_ptr<GameElements>& gameElements) {
 		return stoppedPath;
 	}
 
-	return {0, -d};
+	return {dx, -d};
 }
 
 Vector2D Enemy::pitting(Vector2D d, float speed, float gameTime, std::shared_ptr<GameElements>& gameElements) {
@@ -532,8 +529,13 @@ Vector2D Enemy::pitting(Vector2D d, float speed, float gameTime, std::shared_ptr
 		}
 
 		if (gameElements->isEnemy(brickX, brickY + 1, 1.0f, 0.1f)) {
-			hole.reset();
-			state = EnemyState::falling;
+			if (pos.y != int(pos.y + 0.5f)) {
+				hole.reset();
+				state = EnemyState::falling;
+			}
+			else {
+				timer = gameTime;
+			}
 		}
 	}
 	else {
