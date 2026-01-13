@@ -6,9 +6,11 @@
 #include <format>
 #include <fstream>
 
+#if defined __EMSCRIPTEN__ || defined POCKET_CHIP
+#include <GLES3/gl3.h>
 #if defined __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
-#include <GLES3/gl3.h>
+#endif
 #else
 #include <glad/glad.h>
 #endif
@@ -322,7 +324,7 @@ void GlfwIOContext::initialize()
 		std::cout << std::hex << "Hex: 0x" << error << std::dec << std::endl;
 	});
 
-#if defined __EMSCRIPTEN__
+#if defined __EMSCRIPTEN__ || defined POCKET_CHIP
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
@@ -387,7 +389,7 @@ void GlfwIOContext::initialize()
 		//std::cout << "WINDOW Resized: " << width << ", height: " << height << std::endl;
 	});
 
-#if !defined __EMSCRIPTEN__
+#if !defined __EMSCRIPTEN__ && !defined POCKET_CHIP
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		int a;
@@ -417,7 +419,7 @@ void GlfwIOContext::initialize()
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 
-#ifdef __EMSCRIPTEN__
+#if defined __EMSCRIPTEN__ || defined POCKET_CHIP
 	ImGui_ImplOpenGL3_Init("#version 300 es");
 #else
 	ImGui_ImplOpenGL3_Init("#version 460 core");

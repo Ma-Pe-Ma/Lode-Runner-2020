@@ -195,6 +195,32 @@ else()
 			-DSOUND_API=RtAudio::LINUX_ALSA
 		)
 	endif()
+
+	# Pocket CHIP specific configuration
+	if(POCKET_CHIP)
+		message(STATUS "Configuring for Pocket CHIP")
+
+		# Use OpenGL ES 2.0 compatible mode (Mali-400 GPU)
+		target_compile_definitions(LodeRunner PRIVATE
+			-DPOCKET_CHIP
+			-DIMGUI_IMPL_OPENGL_ES3
+		)
+
+		# Link against OpenGL ES libraries
+		find_package(OpenGLES2 QUIET)
+		if(OpenGLES2_FOUND)
+			target_link_libraries(LodeRunner PRIVATE ${OPENGLES2_LIBRARIES})
+			target_include_directories(LodeRunner PRIVATE ${OPENGLES2_INCLUDE_DIRS})
+		else()
+			# Fallback to manual linking if package not found
+			target_link_libraries(LodeRunner PRIVATE GLESv2 EGL)
+		endif()
+
+		# Disable video recording on Pocket CHIP (limited resources)
+		set(VIDEO_RECORDING OFF CACHE BOOL "Video recording disabled for Pocket CHIP" FORCE)
+
+		message(STATUS "Pocket CHIP optimizations enabled")
+	endif()
 endif()
 
 # Release mode
